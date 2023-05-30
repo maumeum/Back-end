@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from 'mongoose';
+import { Schema, Types } from 'mongoose';
 
 interface DBReview {
   title: string;
@@ -20,6 +20,4 @@ const ReviewSchema = new Schema<DBReview>({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const Review = mongoose.model<DBReview>('Review', ReviewSchema);
-
-export default Review;
+export { DBReview, ReviewSchema };

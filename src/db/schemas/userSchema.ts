@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
 
 interface DBUser {
@@ -25,6 +25,4 @@ const UserSchema = new Schema<DBUser>({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const User = mongoose.model<DBUser>('User', UserSchema);
-
-export default User;
+export { DBUser, UserSchema };

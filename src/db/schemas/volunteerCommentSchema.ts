@@ -16,9 +16,4 @@ const VolunteerCommentSchema = new Schema<DBVolunteerComment>({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const VolunteerComment = mongoose.model<DBVolunteerComment>(
-  'VolunteerComment',
-  VolunteerCommentSchema
-);
-
-export default VolunteerComment;
+export { DBVolunteerComment, VolunteerCommentSchema };
