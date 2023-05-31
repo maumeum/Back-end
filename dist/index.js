@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -12,5 +13,16 @@ App_js_1.app.get('/', (req, res) => {
     res.send('aaaaaaTypescript + Node.js + Express Server');
 });
 App_js_1.app.listen(port, () => {
+=======
+import { app } from './src/App.js';
+import dotenv from 'dotenv';
+dotenv.config();
+const port = process.env.PORT;
+const url = process.env.URL;
+app.get('/', (req, res) => {
+    res.send('aaaaaaTypescript + Node.js + Express Server');
+});
+app.listen(port, () => {
+>>>>>>> feature-schema-hanna
     console.log(`[server]:서버가 ${url}:${port} 에서 실행되고 있습니다. `);
 });
