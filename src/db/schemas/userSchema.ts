@@ -1,28 +1,28 @@
-import { Schema } from 'mongoose';
+import { prop, modelOptions } from '@typegoose/typegoose';
 import { nanoid } from 'nanoid';
 
-interface DBUser {
-  nickname: string;
-  nanoid: string;
-  image: string;
-  email: string;
-  role: string;
-  password: string;
-  phone: number;
-  createdAt: Date;
-  updatedAt: Date;
+@modelOptions({ schemaOptions: { timestamps: true } })
+class User {
+  @prop({ required: true, default: () => nanoid(4), unique: true })
+  public name!: string;
+
+  @prop({ required: true })
+  public nanoid!: string;
+
+  @prop({ required: true, default: 'image url' })
+  public image!: string;
+
+  @prop({ required: true })
+  public email!: string;
+
+  @prop({ required: true, default: 'user' })
+  public role!: string;
+
+  @prop({ required: true })
+  public password!: string;
+
+  @prop({ required: true })
+  public phone!: string;
 }
 
-const UserSchema = new Schema<DBUser>({
-  nickname: { type: String, required: true },
-  nanoid: { type: String, default: () => nanoid(4), unique: true },
-  image: { type: String, default: 'image url' },
-  email: { type: String, required: true },
-  role: { type: String, default: 'user', required: true },
-  password: { type: String, required: true },
-  phone: { type: Number, required: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
-
-export { DBUser, UserSchema };
+export { User };
