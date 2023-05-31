@@ -3,8 +3,8 @@ import { User } from './schemas/userSchema.js';
 import { VolunteerComment } from './schemas/volunteerCommentSchema.js';
 import { Post } from './schemas/PostSchema.js';
 import { Review } from './schemas/ReviewSchema.js';
-import { Volunteer } from './schemas/Volunteer.js';
-import { PostComment } from './schemas/PostComment.js';
+import { Volunteer } from './schemas/VolunteerSchema.js';
+import { PostComment } from './schemas/PostCommentSchema.js';
 
 //tsconfig.json의 moduleResolution이 nodenext면 확장자 필요
 
