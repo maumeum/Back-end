@@ -6,8 +6,6 @@ import { Review } from './schemas/reviewSchema.js';
 import { Volunteer } from './schemas/volunteerSchema.js';
 import { PostComment } from './schemas/postCommentSchema.js';
 
-//tsconfig.json의 moduleResolution이 nodenext면 확장자 필요
-
 const UserModel = getModelForClass(User);
 const VolunteerCommentModel = getModelForClass(VolunteerComment);
 const PostModel = getModelForClass(Post);
