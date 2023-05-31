@@ -33,7 +33,7 @@ class Volunteer {
   @prop({ required: true, default: [] })
   public images!: string[];
 
-  // @prop({ ref: () => User, type: () => String }) // User 모델을 참조하도록 수정합니다.
+  // @prop({ ref: () => User, type: () => String })
   // public user_id?: Ref<User>;
 }
 

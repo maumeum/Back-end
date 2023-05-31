@@ -3,9 +3,9 @@ import {
   prop,
   getModelForClass,
   Ref,
-} from "@typegoose/typegoose";
-import { Volunteer } from "./VolunteerSchema.js";
-import { User } from "./userSchema.js";
+} from '@typegoose/typegoose';
+import { Volunteer } from './volunteerSchema.js';
+import { User } from './userSchema.js';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Review {
@@ -21,4 +21,5 @@ class Review {
   @prop({ ref: User })
   public user_id!: Ref<User>;
 }
+
 export { Review };
