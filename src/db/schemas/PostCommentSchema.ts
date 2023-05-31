@@ -3,8 +3,8 @@ import {
   getModelForClass,
   Ref,
   modelOptions,
-} from '@typegoose/typegoose';
-import mongoose from 'mongoose';
+} from "@typegoose/typegoose";
+import mongoose from "mongoose";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class PostComment {

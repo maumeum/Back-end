@@ -3,7 +3,9 @@ import {
   prop,
   getModelForClass,
   Ref,
-} from '@typegoose/typegoose';
+} from "@typegoose/typegoose";
+import { Volunteer } from "./VolunteerSchema.js";
+import { User } from "./userSchema.js";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Review {
@@ -14,9 +16,9 @@ class Review {
   public content!: string;
   @prop()
   public images!: string[];
-  //   @prop({ ref: Volunteer })
-  //   public volunteer_id!: Ref<Volunteer>;
-  //   @prop({ ref: User })
-  //   public user_id!: Ref<User>;
+  @prop({ ref: Volunteer })
+  public volunteer_id!: Ref<Volunteer>;
+  @prop({ ref: User })
+  public user_id!: Ref<User>;
 }
 export { Review };

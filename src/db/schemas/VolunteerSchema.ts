@@ -1,5 +1,5 @@
-import { prop, Ref, modelOptions } from '@typegoose/typegoose';
-import mongoose from 'mongoose';
+import { prop, Ref, modelOptions } from "@typegoose/typegoose";
+import mongoose from "mongoose";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Volunteer {
@@ -12,7 +12,7 @@ class Volunteer {
   @prop()
   public centName?: string;
 
-  @prop({ required: true, default: '모집중' })
+  @prop({ required: true, default: "모집중" })
   public statusName!: string;
 
   @prop()
