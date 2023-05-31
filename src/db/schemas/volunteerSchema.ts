@@ -1,5 +1,6 @@
 import { prop, Ref, modelOptions } from '@typegoose/typegoose';
 import mongoose from 'mongoose';
+import { User } from './userSchema.js';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Volunteer {
@@ -33,8 +34,8 @@ class Volunteer {
   @prop({ required: true, default: [] })
   public images!: string[];
 
-  // @prop({ ref: () => User, type: () => String })
-  // public user_id?: Ref<User>;
+  @prop({ ref: () => User, type: () => String })
+  public user_id?: Ref<User>;
 }
 
 export { Volunteer };
