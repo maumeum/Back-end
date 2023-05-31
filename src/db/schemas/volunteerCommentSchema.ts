@@ -1,5 +1,5 @@
-import { prop, modelOptions, Ref } from '@typegoose/typegoose';
-import { User } from './userSchema.js';
+import { prop, modelOptions, Ref } from "@typegoose/typegoose";
+import { User } from "./userSchema.js";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class VolunteerComment {
