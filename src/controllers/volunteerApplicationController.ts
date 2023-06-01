@@ -2,7 +2,7 @@ import { VolunteerApplicationService } from '../services/volunteerApplicationSer
 import { Request, Response } from 'express';
 class VolunteerApplicationController {
   static postApplicationVolunteer = async (req: Request, res: Response) => {
-    const { applicationVolunteerData } = req.body;
+    const applicationVolunteerData = req.body;
     const result = await VolunteerApplicationService.createApplicationVolunteer(
       applicationVolunteerData
     );

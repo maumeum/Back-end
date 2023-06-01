@@ -12,9 +12,9 @@ class VolunteerApplicationService {
   static async createApplicationVolunteer(
     applicationVolunteerData: ApplicationVolunteerData
   ) {
-    const applicationVolunteer = await VolunteerApplicationModel.create({
-      applicationVolunteerData,
-    });
+    const applicationVolunteer = await VolunteerApplicationModel.create(
+      applicationVolunteerData
+    );
 
     if (!applicationVolunteer) {
       throw new Error('봉사활동 신청에 실패하였습니다.');

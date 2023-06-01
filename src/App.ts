@@ -3,7 +3,10 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { volunteerRouter } from './routers/volunteerRouter.js';
+import {
+  volunteerRouter,
+  volunteerApplicationRouter,
+} from './routers/index.js';
 dotenv.config();
 
 const app = express();
@@ -30,6 +33,7 @@ db.on('error', (error) =>
 );
 
 app.use('/api', volunteerRouter);
+app.use('/api', volunteerApplicationRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);

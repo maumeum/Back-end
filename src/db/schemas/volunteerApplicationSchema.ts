@@ -21,7 +21,7 @@ class VolunteerApplication {
   public volunteerStatusName!: string;
 
   @prop({ required: true })
-  public volunteerImages!: string;
+  public volunteerImage!: string;
 }
 
 export { VolunteerApplication };
