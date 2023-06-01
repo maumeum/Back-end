@@ -16,12 +16,10 @@ interface VolunteerData {
   actType: string;
   teenager: boolean;
   images: string[];
-  user_id: Types.ObjectId | string | null;
+  register_user_id: Types.ObjectId | string | null;
 }
 
 class VolunteerService {
-  //public volunteerModel = VolunteerModel;
-
   public async createVolunteer(volunteerData: VolunteerData) {
     const createVolunteer = await VolunteerModel.create(volunteerData);
 
@@ -53,9 +51,20 @@ class VolunteerService {
   }
 
   public async readSearchVolunteer(keyword: string) {
+    const options = [
+      { title: { $regex: `${keyword}` } },
+      { content: { $regex: `${keyword}` } },
+    ];
     const volunteerList = await VolunteerModel.find({
-      text: { $regex: `.${keyword}.*` },
+      $or: options,
     });
+
+    if (!volunteerList) {
+      return false;
+    }
+
+    console.log(volunteerList);
+    return volunteerList;
   }
 
   //사용자가 신청한 봉사활동 조회
@@ -74,7 +83,7 @@ class VolunteerService {
 
   public async readRegistrationVolunteer(userId: string) {
     const volunteerList = await VolunteerModel.find({
-      userId: userId,
+      user_id: userId,
     }).populate('user_id');
 
     if (!volunteerList) {
@@ -88,21 +97,14 @@ class VolunteerService {
     volunteerData: VolunteerData,
     volunteerId: string
   ) {
-    // const {
-    //   title,
-    //   content,
-    //   centName,
-    //   centDescription,
-    //   statusName,
-    //   deadline,
-    //   applyCount,
-    //   registerCount,
-    //   actType,
-    //   teenager,
-    //   images,
-    // } = volunteerData;
+    const newVolunteer = await VolunteerModel.findByIdAndUpdate(
+      volunteerId,
+      volunteerData
+    );
 
-    await VolunteerModel.findByIdAndUpdate(volunteerId, volunteerData);
+    if (!newVolunteer) {
+      throw new Error('봉사활동 정보 업데이트에 실패했습니다.');
+    }
     return true;
   }
 }

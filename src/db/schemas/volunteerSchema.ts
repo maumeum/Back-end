@@ -44,7 +44,7 @@ class Volunteer {
   public images!: string[];
 
   @prop({ ref: () => User, type: () => mongoose.Types.ObjectId })
-  public user_id?: Ref<User>;
+  public register_user_id?: Ref<User>;
 }
 
 export { Volunteer };

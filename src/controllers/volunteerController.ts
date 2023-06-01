@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { VolunteerService } from '../services/volunteerService.js';
 
 class VolunteerController {
-  // public volunteerService = new VolunteerService();
-
   public postVolunteer = async (
     req: Request,
     res: Response,
@@ -16,6 +14,7 @@ class VolunteerController {
         volunteerData
       );
 
+      //if else 문이 필요하지 않음. 어차피
       if (result) {
         res.status(201).json({ message: 'created' });
       } else {
@@ -56,14 +55,25 @@ class VolunteerController {
     } catch (error) {}
   };
 
-  public getSearchVolunteer = async (req: Request, res: Response) => {
+  public getSearchVolunteer = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { keyword } = req.query;
+
       const searchVolunteers =
         await VolunteerService.prototype.readSearchVolunteer(keyword as string);
 
-      res.status(200).json(searchVolunteers);
-    } catch (error) {}
+      if (searchVolunteers) {
+        res.status(200).json(searchVolunteers);
+      } else {
+        res.status(200).json({ message: '검색된 결과가 없습니다.' });
+      }
+    } catch (error) {
+      next(error);
+    }
   };
 
   public getApplicationVolunteer = async (req: Request, res: Response) => {
