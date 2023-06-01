@@ -13,11 +13,20 @@ class Volunteer {
   @prop()
   public centName?: string;
 
+  @prop()
+  public centDescription?: string;
+
   @prop({ required: true, default: '모집중' })
   public statusName!: string;
 
-  @prop()
+  @prop({ type: Date })
   public deadline?: Date;
+
+  @prop({ type: Date })
+  public startDate!: Date;
+
+  @prop({ type: Date })
+  public endDate!: Date;
 
   @prop()
   public applyCount?: number;
@@ -29,12 +38,12 @@ class Volunteer {
   public actType!: string;
 
   @prop({ required: true })
-  public teenager!: string;
+  public teenager!: boolean;
 
-  @prop({ required: true, default: [] })
+  @prop({ required: true })
   public images!: string[];
 
-  @prop({ ref: () => User, type: () => String })
+  @prop({ ref: () => User, type: () => mongoose.Types.ObjectId })
   public user_id?: Ref<User>;
 }
 

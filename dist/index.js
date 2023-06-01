@@ -1,11 +1,11 @@
-import { app } from "./src/App.js";
-import dotenv from "dotenv";
+import { app } from './src/App.js';
+import dotenv from 'dotenv';
 dotenv.config();
 const port = process.env.PORT;
 const url = process.env.URL;
-app.get("/", (req, res) => {
-    res.send("aaaaaaTypescript + Node.js + Express Server");
+app.get('/', (req, res) => {
+    res.send('aaaaaaTypescript + Node.js + Express Server');
 });
 app.listen(port, () => {
-    console.log(`[server]:서버가 ${url}:${3000} 에서 실행되고 있습니다. `);
+    console.log(`[server]:서버가 ${url}:${port} 에서 실행되고 있습니다. `);
 });

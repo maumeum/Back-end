@@ -1,5 +1,6 @@
 import { prop, modelOptions } from '@typegoose/typegoose';
 import { nanoid } from 'nanoid';
+
 @modelOptions({ schemaOptions: { timestamps: true } })
 class User {
   @prop({ required: true, default: () => nanoid(4), unique: true })

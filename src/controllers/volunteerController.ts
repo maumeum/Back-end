@@ -1,11 +1,17 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { VolunteerService } from '../services/volunteerService.js';
-import { Volunteer } from '../db/schemas/volunteerSchema.js';
 
 class VolunteerController {
-  public postVolunteer = async (req: Request, res: Response) => {
+  // public volunteerService = new VolunteerService();
+
+  public postVolunteer = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const volunteerData = req.body;
+
       const result = await VolunteerService.prototype.createVolunteer(
         volunteerData
       );
@@ -13,9 +19,11 @@ class VolunteerController {
       if (result) {
         res.status(201).json({ message: 'created' });
       } else {
-        res.status(404).send({ message: 'error' });
+        res.status(404).json({ message: 'error' });
       }
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
   };
 
   public getVolunteer = async (req: Request, res: Response) => {
@@ -25,9 +33,12 @@ class VolunteerController {
       if (volunteerList) {
         res.status(200).json(volunteerList);
       } else {
-        res.status(404).send({ message: 'error' });
+        console.log('error');
+        res.status(404).json({ message: 'error' });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   public getVolunteerById = async (req: Request, res: Response) => {
@@ -40,7 +51,7 @@ class VolunteerController {
       if (volunteer) {
         res.status(200).json(volunteer);
       } else {
-        res.status(404).send({ message: 'error' });
+        res.status(404).json({ message: 'error' });
       }
     } catch (error) {}
   };
