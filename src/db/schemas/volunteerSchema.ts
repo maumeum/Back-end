@@ -40,7 +40,7 @@ class Volunteer {
   @prop({ required: true })
   public teenager!: boolean;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => [String] })
   public images!: string[];
 
   @prop({ ref: () => User, type: () => mongoose.Types.ObjectId })

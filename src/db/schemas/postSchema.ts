@@ -5,21 +5,27 @@ import {
   Ref,
 } from '@typegoose/typegoose';
 import { User } from './userSchema.js';
-import mongoose from 'mongoose';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Post {
-  public _id!: string;
   @prop({ required: true })
-  @prop({ ref: User, type: () => mongoose.Schema.Types.Mixed })
+  public _id!: string;
+
+  //  @prop({ ref: () => User })
+  @prop({ ref: User })
   public user_id!: Ref<User>;
+
+  @prop()
   public title!: string;
+
   @prop({ required: true })
   public content!: string;
-  @prop()
+
+  @prop({ type: () => [String] })
   public images!: string[];
-  @prop()
-  public postType!: string[];
+
+  @prop({ required: true })
+  public postType!: string;
 }
 
 export { Post };
