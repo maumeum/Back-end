@@ -6,10 +6,13 @@ import passport from 'passport';
 import session from 'express-session';
 import { userRouter } from './routers/userRouter.js';
 import cors from 'cors';
+import { passportConfig } from './passport/index.js';
+import cookieParser from 'cookie-parser';
+
 dotenv.config();
 
 const app = express();
-
+passportConfig();
 const __dirname = path.resolve();
 app.use('/', express.static(path.join(__dirname, 'public')));
 
@@ -29,18 +32,25 @@ db.on('error', (error) =>
 );
 
 app.use(express.json());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
-// // 세션 사용
-// app.use(
-//   session({
-//     secret: process.env.SECRET_CODE || '',
-//     resave: true,
-//     saveUninitialized: false,
-//   }),
-// );
-// //passport 초기화
-// app.use(passport.initialize());
-// app.use(passport.session());
+// 세션 사용
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    //@ts-ignore
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+      httpOnly: false,
+      secure: false,
+    },
+  }),
+);
+
+//passport 초기화
+app.use(passport.initialize());
+app.use(passport.session());
 
 // 라우팅
 
