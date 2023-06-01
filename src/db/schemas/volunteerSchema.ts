@@ -10,8 +10,8 @@ class Volunteer {
   @prop({ required: true })
   public content!: string;
 
-  @prop()
-  public centName?: string;
+  @prop({ required: true })
+  public centName!: string;
 
   @prop()
   public centDescription?: string;
