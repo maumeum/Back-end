@@ -20,11 +20,11 @@ class Post {
   @prop({ required: true })
   public content!: string;
 
-  @prop()
+  @prop({ type: () => [String] })
   public images!: string[];
 
-  @prop()
-  public postType!: string[];
+  @prop({ required: true })
+  public postType!: string;
 }
 
 export { Post };

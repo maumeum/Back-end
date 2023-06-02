@@ -1,8 +1,8 @@
-import { userInfo } from 'os';
 import { UserModel } from '../db/index.js';
 import bcrypt from 'bcrypt';
 import { error } from 'console';
 
+//인터페이스 분리해서 작성
 interface UserInfo {
   user_id?: string;
   nickname?: string;
@@ -32,28 +32,28 @@ class UserService {
   }
 
   //이메일로 유저 찾기
-  public async getUserByEmail(email: UserInfo) {
+  public async getUserByEmail(email: string) {
     const user = await UserModel.findOne({ email });
     return user;
   }
-  //object_id로 유저 찾기
+  //object_id로 유저 찾기 (이메일, 닉네임, 폰)
   public async getUserById(_id: string) {
-    const user = await UserModel.findById({ user_id: userInfo }).select(
+    const user = await UserModel.findById({ _id }).select(
       'email nickname phone',
     );
     return user;
   }
 
-  // public async updateUser(
-  //   user_id: string,
-  //   { nickname, password, phone }: UserInfo,
-  // ) {
-  //   const updatedUser = await UserModel.findOneAndUpdate(
-  //     { user_id },
-  //     { nickname, password, phone, image, introduction },
-  //     { returnOriginal: false },
-  //   );
-  // }
+  //object_id로 유저 찾기 (password)
+  public async getUserPasswordById(_id: string) {
+    const user = await UserModel.findById({ _id }).select('password');
+    return user;
+  }
+
+  public async updateUser(user_id: string, updateInfo: UserInfo) {
+    const updatedUser = await UserModel.findByIdAndUpdate(user_id, updateInfo);
+    return updatedUser;
+  }
 }
 
 export { UserService };

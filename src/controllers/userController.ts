@@ -1,17 +1,36 @@
 import { NextFunction, Request, Response } from 'express';
 import { UserService } from '../services/index.js';
 import bcrypt from 'bcrypt';
-import passport from 'passport';
-interface UserInfo {
+import { makeJwtToken } from '../utils/jwtTokenMaker.js';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user_id: string;
+      role: string;
+    }
+  }
+}
+interface UserLoginInfo {
+  email: string;
+  password: string;
+}
+interface updatedUser {
   user_id?: string;
   nickname?: string;
-  nanoid: string;
+  nanoid?: string;
   introduction?: string;
   images?: string;
-  email?: string;
-  password?: string;
   phone?: string;
   role?: string;
+}
+interface UpdateUserInfoRequest extends Request {
+  body: {
+    nickname?: string;
+    phone?: string;
+    password?: string;
+    introduction?: string;
+  };
 }
 
 class UserController {
@@ -61,32 +80,160 @@ class UserController {
   };
 
   //유저 로그인
-  public login = async (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate('local', (authError: any, user: any, info: any) => {
-      if (authError) {
-        //서버 실패
-        console.error(authError);
-        return next(authError);
-      }
+  public userLogin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { email, password } = <UserLoginInfo>req.body;
+      const user = await this.userService.getUserByEmail(email);
       if (!user) {
-        //로직 실패
-        return res.send(`${info.message}`);
+        throw new Error(
+          '해당 이메일은 가입 내역이 없습니다. 다시 한 번 확인해 주세요.',
+        );
       }
-      return req.login(user, (loginError) => {
-        //로그인 성공
-        if (loginError) {
-          console.error(loginError);
-          return next(loginError);
-        }
-        return res.status(200).send('로그인성공');
-      });
-    })(req, res, next);
+      if (user.role === 'disabled') {
+        throw new Error(
+          '해당 계정은 탈퇴처리된 계정입니다. 관리자에게 문의하세요.',
+        );
+      }
+      const correctPasswordHash = user.password;
+      const isPasswordCorrect = await bcrypt.compare(
+        password,
+        correctPasswordHash,
+      );
+      if (!isPasswordCorrect) {
+        throw new Error(
+          '비밀번호가 일치하지 않습니다. 다시 한 번 확인해 주세요.',
+        );
+      }
+      const madeToken = makeJwtToken(user);
+      res.json(madeToken).status(201);
+      console.log('로그인 성공');
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
   };
-  //유저 로그아웃
-  public logout = (req: Request, res: Response, next: NextFunction) => {
-    req.logout(() => {
-      res.send('로그아웃 성공').status(200);
-    });
+
+  public userAuthorization = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { user_id } = req.params;
+      const { password } = req.body;
+      const user = await this.userService.getUserPasswordById(user_id);
+      if (!user) {
+        throw new Error('비정상적 접근 에러');
+      }
+      const correctPasswordHash = user.password;
+      const isPasswordCorrect = await bcrypt.compare(
+        password,
+        correctPasswordHash,
+      );
+      if (!isPasswordCorrect) {
+        throw new Error(
+          '비밀번호가 일치하지 않습니다. 다시 한 번 확인해 주세요.',
+        );
+      }
+      res.status(200).json();
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  //유저 정보 수정(닉네임, 휴대전화번호 , 비밀번호)
+  public updateUserInfo = async (
+    req: UpdateUserInfoRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      console.log('정보 수정 시작');
+      const { user_id } = req.params;
+      const { nickname, phone, password } = req.body;
+      const updateInfo: {
+        nickname?: string;
+        phone?: string;
+        password?: string;
+      } = {};
+
+      if (nickname) {
+        updateInfo.nickname = nickname;
+      }
+
+      if (phone) {
+        updateInfo.phone = phone;
+      }
+
+      if (password) {
+        const newPasswordHash = await bcrypt.hash(password, 10);
+        updateInfo.password = newPasswordHash;
+      }
+      const updatedUser = await this.userService.updateUser(
+        user_id,
+        updateInfo,
+      );
+      res.status(201).json();
+      console.log('정보수정완료');
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  public updateIntroduction = async (
+    req: UpdateUserInfoRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { user_id } = req.params;
+      const { introduction } = req.body;
+      const updateInfo: {
+        introduction?: string;
+      } = {};
+
+      if (introduction) {
+        updateInfo.introduction = introduction;
+      }
+
+      const updatedUser = await this.userService.updateUser(
+        user_id,
+        updateInfo,
+      );
+      res.status(200).json();
+      console.log('정보수정완료');
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  public deleteUser = async (
+    req: UpdateUserInfoRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { user_id } = req.params;
+      const updateInfo: updatedUser = {};
+      updateInfo.role = 'disabled';
+
+      const updatedUser = await this.userService.updateUser(
+        user_id,
+        updateInfo,
+      );
+      res.status(200).json();
+      console.log('role 변경 완료');
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
   };
 }
 
