@@ -3,22 +3,23 @@ import {
   prop,
   getModelForClass,
   Ref,
-} from '@typegoose/typegoose';
-import { User } from './userSchema.js';
+} from "@typegoose/typegoose";
+import { User } from "./userSchema.js";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Post {
-  public _id!: string;
   @prop({ required: true })
+  public title!: string;
   @prop({ ref: User })
   public user_id!: Ref<User>;
-  public title!: string;
   @prop({ required: true })
   public content!: string;
-  @prop()
+
+  @prop({ type: () => [String] })
   public images!: string[];
-  @prop()
-  public postType!: string[];
+
+  @prop({ required: true })
+  public postType!: string;
 }
 
 export { Post };
