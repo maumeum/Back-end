@@ -19,3 +19,6 @@ communityRouter.patch("/:id", communityController.patchPost);
 
 //특정 게시물 삭제
 communityRouter.delete("/:id", communityController.deletePost);
+
+//유저 게시물 조회
+communityRouter.get("/user/:id", communityController.getUserPosts);
