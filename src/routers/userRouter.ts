@@ -35,6 +35,12 @@ userRouter.patch(
   userController.updateIntroduction,
 );
 
+//사용자 정보 수정(이미지)
+userRouter.patch(
+  '/users/:user_id/image',
+  loginRequired,
+  userController.updateImage,
+);
 //사용자 회원 탈퇴
 userRouter.delete('/users/:user_id', loginRequired, userController.deleteUser);
 

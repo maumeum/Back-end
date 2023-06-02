@@ -20,12 +20,13 @@ interface updatedUser {
   nickname?: string;
   nanoid?: string;
   introduction?: string;
-  images?: string;
+  image?: string;
   phone?: string;
   role?: string;
 }
 interface UpdateUserInfoRequest extends Request {
   body: {
+    image?: string;
     nickname?: string;
     phone?: string;
     password?: string;
@@ -200,6 +201,34 @@ class UserController {
 
       if (introduction) {
         updateInfo.introduction = introduction;
+      }
+
+      const updatedUser = await this.userService.updateUser(
+        user_id,
+        updateInfo,
+      );
+      res.status(200).json();
+      console.log('정보수정완료');
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  public updateImage = async (
+    req: UpdateUserInfoRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { user_id } = req.params;
+      const { image } = req.body;
+      const updateInfo: {
+        image?: string;
+      } = {};
+
+      if (image) {
+        updateInfo.image = image;
       }
 
       const updatedUser = await this.userService.updateUser(
