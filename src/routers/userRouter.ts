@@ -5,11 +5,6 @@ const userRouter = express.Router();
 
 const userController = new UserController();
 
-userRouter.use((req, res, next) => {
-  res.locals.user = req.user;
-  next();
-});
-
 // 회원가입
 userRouter.post('/signup', userController.createUser);
 

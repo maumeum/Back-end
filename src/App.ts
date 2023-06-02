@@ -2,18 +2,21 @@ import express, { NextFunction, Request, Response } from 'express';
 import path from 'path';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import passport from 'passport';
-import session from 'express-session';
-import { userRouter } from './routers/userRouter.js';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
+import {
+  userRouter,
+  volunteerRouter,
+  volunteerApplicationRouter,
+} from './routers/index.js';
 
 dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
 app.use('/', express.static(path.join(__dirname, 'public')));
-app.use(cors());
+
+app.use(cors()); //cors에러 방지
+app.use(express.json()); // 바디파서
 
 // DB연결
 const DB_URL =
@@ -28,17 +31,13 @@ db.on('error', (error) =>
   console.error('\nMongoDB 연결에 실패하였습니다...\n' + DB_URL + '\n' + error),
 );
 
-app.use(express.json());
-app.use(cookieParser(process.env.COOKIE_SECRET));
-
-// 라우팅
-
 app.use('/api', userRouter);
+app.use('/api', volunteerRouter);
+app.use('/api', volunteerApplicationRouter);
 
-//에러핸들러
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
-});
+}); // 마지막에 붙이는 에러핸들러
 
 export { app };
