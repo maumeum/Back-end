@@ -15,15 +15,15 @@ class VolunteerCommentController {
     }
   };
 
+  //아직 구현중
   static getComment = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const commentList = await VolunteerCommentService.readComment(userId);
-
-    if (commentList) {
-      res.status(200).json(commentList);
-    } else {
-      res.status(404).json({ message: 'error' });
-    }
+    // if (commentList) {
+    //   res.status(200).json(commentList);
+    // } else {
+    //   res.status(404).json({ message: 'error' });
+    // }
   };
 
   static getPostComment = async (req: Request, res: Response) => {
@@ -32,27 +32,40 @@ class VolunteerCommentController {
       volunteerId
     );
 
-    // if(commentList){
-    //   res.status(200).json(commentList);
-    // }else{
-    //   res.status(404).json({message : "error"});
-    // }
+    if (commentList) {
+      res.status(200).json(commentList);
+    } else {
+      res.status(404).json({ message: 'error' });
+    }
   };
 
   static patchComment = async (req: Request, res: Response) => {
     const { volunteerCommentId } = req.params;
+    const { volunteerCommentData } = req.body;
     const newComment = await VolunteerCommentService.updateComment(
+      volunteerCommentId,
+      volunteerCommentData
+    );
+
+    if (newComment) {
+      res.status(200).json({ message: 'updated' });
+    } else {
+      res.status(404).json({ message: 'error' });
+    }
+  };
+
+  static deleteComment = async (req: Request, res: Response) => {
+    const { volunteerCommentId } = req.params;
+    const comment = await VolunteerCommentService.deleteComment(
       volunteerCommentId
     );
 
-    // if(newComment){
-    //   res.status(200).json({message : "updated"});
-    // }else{
-    //   res.status(404).json({message : "error"});
-    // }
+    if (comment) {
+      res.status(201).json({ message: 'deleted' });
+    } else {
+      res.status(404).json({ message: 'error' });
+    }
   };
-
-  static deleteComment = async (req: Request, res: Response) => {};
 }
 
 export { VolunteerCommentController };

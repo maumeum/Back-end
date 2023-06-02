@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class VolunteerComment {
-  @prop({ ref: () => Volunteer, type: mongoose.Types.ObjectId })
+  @prop({ ref: Volunteer, type: mongoose.Types.ObjectId })
   public volunteer_id?: Ref<Volunteer>;
 
   @prop({

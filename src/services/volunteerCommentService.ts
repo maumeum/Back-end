@@ -17,19 +17,62 @@ class VolunteerCommentService {
     return true;
   }
 
+  //다시하기
   static async readComment(userId: string) {
-    const commentList = await VolunteerCommentModel.find({ userId });
+    const userComments = await VolunteerCommentModel.find({ user_id: userId });
+    const volunteer_ids = userComments.map(
+      (userComment) => userComment.volunteer_id
+    );
+
+    console.log(volunteer_ids);
+    //volunteer에서 title, content 가져오기
+    //const volunteerData =
+    // const volunteerLists = await VolunteerCommentModel.find({ volunteer_id });
+
+    if (!userComments) {
+      throw new Error('게시글 조회에 실패하였습니다.');
+    }
+
+    return userComments;
+  }
+
+  static async readPostComment(volunteerId: string) {
+    const commentList = await VolunteerCommentModel.find({ volunteerId });
 
     if (!commentList) {
-      throw new Error('게시글 조회에 실패하였습니다.');
+      throw new Error('댓글 조회를 실패하였습니다.');
     }
 
     return commentList;
   }
 
-  static readPostComment(volunteerId: string) {}
+  static async updateComment(
+    volunteerCommentId: string,
+    volunteerCommentData: VolunteerCommentData
+  ) {
+    const newComment = await VolunteerCommentModel.findByIdAndUpdate(
+      volunteerCommentId,
+      volunteerCommentData
+    );
 
-  static updateComment(volunteerCommentId: string) {}
+    if (!newComment) {
+      throw new Error('댓글 수정에 실패햐였습니다.');
+    }
+
+    return true;
+  }
+
+  static async deleteComment(volunteerCommentId: string) {
+    const comment = await VolunteerCommentModel.findByIdAndDelete({
+      volunteerCommentId,
+    });
+
+    if (!comment) {
+      throw new Error('댓글 삭제에 실패하였습니다.');
+    }
+
+    return true;
+  }
 }
 
 export { VolunteerCommentService };
