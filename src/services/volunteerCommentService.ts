@@ -19,6 +19,12 @@ class VolunteerCommentService {
 
   static async readComment(userId: string) {
     const commentList = await VolunteerCommentModel.find({ userId });
+
+    if (!commentList) {
+      throw new Error('게시글 조회에 실패하였습니다.');
+    }
+
+    return commentList;
   }
 
   static readPostComment(volunteerId: string) {}
