@@ -19,6 +19,7 @@ export class CommunityController {
       res.status(400).send(err);
     }
   };
+
   public getPost = async (req: Request, res: Response) => {
     const { id } = req.params;
     const comment = await PostCommentModel.find({ post_id: id });
@@ -54,9 +55,33 @@ export class CommunityController {
         message: "삭제가 완료되었습니다.",
       });
     } catch {
+      res.status(400).send({ message: "오류 발생" });
+    }
+  };
+  public getUserPosts = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const userPosts = await PostModel.find({ user_id: id });
+      res.status(200).send(userPosts);
+    } catch {
+      res.status(404).send({ message: "오류 발생" });
+    }
+  };
+  public serachPost = async (req: Request, res: Response) => {
+    const { keyword } = req.query;
+    if (!keyword) {
       res.status(400).send({
-        message: "오류발생",
+        message: "키워드를 입력해 주세여",
       });
+    } else {
+      const options = [
+        { title: { $regex: `${keyword}` } },
+        { content: { $regex: `${keyword}` } },
+      ];
+      const posts = await PostModel.find({
+        $or: options,
+      });
+      res.send(posts);
     }
   };
 }
