@@ -1,3 +1,4 @@
+import { EnumObj, EnumValues } from '@typegoose/typegoose/lib/types.js';
 import { UserModel } from '../db/index.js';
 import bcrypt from 'bcrypt';
 import { error } from 'console';
@@ -13,7 +14,7 @@ interface UserInfo {
   email?: string;
   password?: string;
   phone?: string;
-  role?: string;
+  role?: 'user' | 'admin' | 'disabled';
 }
 
 class UserService {

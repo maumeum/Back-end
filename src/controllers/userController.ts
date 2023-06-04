@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { makeJwtToken } from '../utils/jwtTokenMaker.js';
 import { mongoose } from '@typegoose/typegoose';
 import { ObjectId } from 'mongodb';
+import { CONSTANTS } from '../utils/Constants.js';
 
 // declare global {
 //   namespace Express {
@@ -24,7 +25,7 @@ interface updatedUser {
   introduction?: string;
   image?: string;
   phone?: string;
-  role?: string;
+  role?: 'user' | 'admin' | 'disabled';
 }
 interface UpdateUserInfoRequest extends Request {
   body: {
@@ -48,13 +49,13 @@ class UserController {
     try {
       console.log('회원가입시작');
       const { nickname, email, password, phone } = req.body;
-      const alreadyUser = await this.userService.getUserByEmail(email);
-      if (alreadyUser) {
+      const user = await this.userService.getUserByEmail(email);
+      if (user) {
         console.log('이메일 중복으로 status 400');
         return res.status(400).json({ message: '이미 가입된 계정입니다.' });
       }
 
-      const user = await this.userService.createUser({
+      const createdUser = await this.userService.createUser({
         nickname,
         email,
         password,
@@ -102,12 +103,8 @@ class UserController {
           '해당 계정은 탈퇴처리된 계정입니다. 관리자에게 문의하세요.',
         );
       }
-      const correctPasswordHash = user.password;
-      const isPasswordCorrect = await bcrypt.compare(
-        password,
-        correctPasswordHash,
-      );
-      if (!isPasswordCorrect) {
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
         throw new Error(
           '비밀번호가 일치하지 않습니다. 다시 한 번 확인해 주세요.',
         );
@@ -175,8 +172,11 @@ class UserController {
       }
 
       if (password) {
-        const newPasswordHash = await bcrypt.hash(password, 10);
-        updateInfo.password = newPasswordHash;
+        const hashedPassword = await bcrypt.hash(
+          password,
+          CONSTANTS.HASHING_TIMES,
+        );
+        updateInfo.password = hashedPassword;
       }
       const updatedUser = await this.userService.updateUser(
         user_id,
