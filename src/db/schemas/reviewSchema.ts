@@ -1,25 +1,28 @@
-import {
-  modelOptions,
-  prop,
-  getModelForClass,
-  Ref,
-} from '@typegoose/typegoose';
+import { modelOptions, prop, Ref } from '@typegoose/typegoose';
 import { Volunteer } from './volunteerSchema.js';
 import { User } from './userSchema.js';
+import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Review {
-  public _id!: string;
+  @prop({ required: true })
+  public _id!: ObjectId;
+
   @prop({ required: true })
   public title!: string;
-  @prop({ required: true })
+
+  @prop()
   public content!: string;
-  @prop({ type: () => [String] })
+
+  @prop()
   public images?: string[];
-  @prop({ ref: Volunteer })
-  public volunteer_id!: Ref<Volunteer>;
-  @prop({ ref: User })
-  public user_id!: Ref<User>;
+
+  @prop({ ref: Volunteer, type: mongoose.Types.ObjectId })
+  public volunteer_id?: Ref<Volunteer>;
+
+  @prop({ ref: () => User, type: () => mongoose.Types.ObjectId })
+  public register_user_id?: Ref<User>;
 }
 
 export { Review };
