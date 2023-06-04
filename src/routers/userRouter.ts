@@ -26,7 +26,6 @@ userRouter.patch(
   loginRequired,
   userController.updateIntroduction,
 );
-
 //사용자 정보 수정(이미지)
 userRouter.patch('/users/image', loginRequired, userController.updateImage);
 //사용자 회원 탈퇴
