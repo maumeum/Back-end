@@ -10,6 +10,7 @@ import {
   communityRouter,
 } from './routers/index.js';
 import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
+import { postCommentRouter } from './routers/postCommentRouter.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api', volunteerRouter);
 app.use('/api', volunteerApplicationRouter);
 app.use('/api', volunteerCommentRouter);
 app.use('/commuities', communityRouter);
+app.use('/api', postCommentRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
