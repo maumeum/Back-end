@@ -9,6 +9,7 @@ import {
   volunteerApplicationRouter,
   communityRouter,
 } from './routers/index.js';
+import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
 
 dotenv.config();
 
@@ -26,17 +27,17 @@ const DB_URL =
 mongoose.connect(DB_URL, { dbName: 'maum' });
 const db = mongoose.connection;
 db.on('connected', () =>
-  console.log('정상적으로 MongoDB 서버에 연결되었습니다.  ' + DB_URL),
+  console.log('정상적으로 MongoDB 서버에 연결되었습니다.  ' + DB_URL)
 );
 db.on('error', (error) =>
-  console.error('\nMongoDB 연결에 실패하였습니다...\n' + DB_URL + '\n' + error),
+  console.error('\nMongoDB 연결에 실패하였습니다...\n' + DB_URL + '\n' + error)
 );
 
 app.use('/api', userRouter);
 app.use('/api', volunteerRouter);
 app.use('/api', volunteerApplicationRouter);
+app.use('/api', volunteerCommentRouter);
 app.use('/commuities', communityRouter);
-// app.use('/api');
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
