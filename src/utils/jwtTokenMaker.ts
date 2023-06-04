@@ -12,9 +12,6 @@ function makeJwtToken(user: any) {
   const token = jwt.sign({ user_id: user._id, role: user.role }, secretKey);
   const userInfoWithUserToken = <Token>{};
   userInfoWithUserToken.token = token;
-  userInfoWithUserToken.user_id = user._id;
-  userInfoWithUserToken.role = user.role;
-
   return userInfoWithUserToken;
 }
 

@@ -12,36 +12,24 @@ userRouter.post('/signup', userController.createUser);
 userRouter.post('/login', userController.userLogin);
 
 //비밀번호 확인
-userRouter.post(
-  '/users/auth/:user_id',
-  loginRequired,
-  userController.userAuthorization,
-);
+userRouter.post('/users/auth', loginRequired, userController.userAuthorization);
 
 //사용자 정보 조회
-userRouter.get('/users/:user_id', loginRequired, userController.getUser);
+userRouter.get('/users/info', loginRequired, userController.getUser);
 
 //사용자 정보 수정 (닉네임, 휴대전화번호, 비밀번호)
-userRouter.patch(
-  '/users/:user_id',
-  loginRequired,
-  userController.updateUserInfo,
-);
+userRouter.patch('/users/info', loginRequired, userController.updateUserInfo);
 
 //사용자 정보 수정 (자기소개)
 userRouter.patch(
-  '/users/:user_id/introduction',
+  '/users/introduction',
   loginRequired,
   userController.updateIntroduction,
 );
 
 //사용자 정보 수정(이미지)
-userRouter.patch(
-  '/users/:user_id/image',
-  loginRequired,
-  userController.updateImage,
-);
+userRouter.patch('/users/image', loginRequired, userController.updateImage);
 //사용자 회원 탈퇴
-userRouter.delete('/users/:user_id', loginRequired, userController.deleteUser);
+userRouter.delete('/users', loginRequired, userController.deleteUser);
 
 export { userRouter };
