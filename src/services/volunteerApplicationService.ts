@@ -19,6 +19,7 @@ class VolunteerApplicationService {
     isParticipate,
   }: ApplicationVolunteerData) {
     //신청 가능여부 체크
+
     const result = await this.doubleCheckApplicationVolunteer({
       user_id,
       volunteer_id,
@@ -31,9 +32,9 @@ class VolunteerApplicationService {
         isParticipate,
       });
 
-      if (!applicationVolunteer) {
-        throw new Error('봉사활동 신청에 실패하였습니다.');
-      }
+      // if (!applicationVolunteer) {
+      //   throw new Error('봉사활동 신청에 실패하였습니다.');
+      // }
 
       return applicationVolunteer;
     }
@@ -50,10 +51,6 @@ class VolunteerApplicationService {
       'images',
     ]);
 
-    if (!applicationVolunteerList) {
-      throw new Error('신청한 봉사활동 정보가 없습니다.');
-    }
-
     return applicationVolunteerList;
   }
 
@@ -67,7 +64,7 @@ class VolunteerApplicationService {
         volunteer_id: volunteer_id,
       });
 
-      if (volunteerApplication) {
+      if (volunteerApplication.length !== 0) {
         throw new Error('이미 신청이 완료된 봉사활동입니다.');
       }
 
