@@ -41,7 +41,7 @@ class VolunteerCommentController {
 
   static patchComment = async (req: Request, res: Response) => {
     const { volunteerCommentId } = req.params;
-    const { volunteerCommentData } = req.body;
+    const volunteerCommentData = req.body;
     const newComment = await VolunteerCommentService.updateComment(
       volunteerCommentId,
       volunteerCommentData
