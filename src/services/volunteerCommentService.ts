@@ -1,9 +1,10 @@
-import { Types } from 'mongoose';
-import { VolunteerCommentModel } from '../db/index.js';
+import { VolunteerCommentModel, VolunteerModel } from '../db/index.js';
+import { ObjectId } from 'mongodb';
+import { Volunteer } from '../db/schemas/volunteerSchema.js';
 
 interface VolunteerCommentData {
-  volunteer_id: Types.ObjectId | string | null;
-  user_id: Types.ObjectId | string | null;
+  volunteer_id: ObjectId | string | null;
+  user_id: ObjectId | string | null;
   content: string;
 }
 class VolunteerCommentService {
@@ -18,28 +19,27 @@ class VolunteerCommentService {
   }
 
   //다시하기
-  static async readComment(userId: string) {
-    const userComments = await VolunteerCommentModel.find({ user_id: userId });
-    const volunteer_ids = userComments.map((userComment) =>
-      userComment.volunteer_id!.toString()
+  static async readVolunteerByComment(user_id: ObjectId) {
+    // console.log(userComments);
+    const userComments = await VolunteerCommentModel.find({ user_id }).populate(
+      'volunteer_id',
+      ['title', 'content']
     );
 
-    const volunteerList = await volunteer_ids.map(
-      async (volunteer_id) =>
-        await VolunteerCommentModel.find({ volunteer_id: volunteer_id })
-    );
-
-    console.log(volunteerList);
-    //volunteer에서 title, content 가져오기
-    //const volunteerData =
-    // const volunteerLists = await VolunteerCommentModel.find({ volunteer_id });
-
-    //console.log(volunteerList);
-    if (!userComments) {
-      throw new Error('게시글 조회에 실패하였습니다.');
+    if (userComments.length === 0) {
+      throw new Error('사용자 댓글 목록이 비어있습니다.');
     }
 
-    return userComments;
+    const volunteerList = userComments.map((userComment) => {
+      const volunteerId = userComment.volunteer_id as Volunteer;
+
+      return {
+        title: volunteerId.title,
+        content: volunteerId.content,
+      };
+    });
+
+    return volunteerList;
   }
 
   static async readPostComment(volunteerId: string) {
