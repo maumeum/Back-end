@@ -18,7 +18,6 @@ class VolunteerCommentService {
     return true;
   }
 
-  //다시하기
   static async readVolunteerByComment(user_id: ObjectId) {
     // console.log(userComments);
     const userComments = await VolunteerCommentModel.find({ user_id }).populate(
@@ -26,9 +25,9 @@ class VolunteerCommentService {
       ['title', 'content']
     );
 
-    if (userComments.length === 0) {
-      throw new Error('사용자 댓글 목록이 비어있습니다.');
-    }
+    // if (userComments.length === 0) {
+    //   throw new Error('사용자 댓글 목록이 비어있습니다.');
+    // }
 
     const volunteerList = userComments.map((userComment) => {
       const volunteerId = userComment.volunteer_id as Volunteer;

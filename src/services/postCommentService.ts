@@ -1,9 +1,10 @@
-import { Types } from 'mongoose';
 import { PostCommentModel } from '../db/index.js';
+import { ObjectId } from 'mongodb';
+import { Post } from '../db/schemas/postSchema.js';
 
 interface PostCommentData {
-  post_id: Types.ObjectId | string | null;
-  user_id: Types.ObjectId | string | null;
+  post_id: ObjectId | string | null;
+  user_id: ObjectId | string | null;
   content: string;
 }
 class PostCommentService {
@@ -17,9 +18,26 @@ class PostCommentService {
     return true;
   }
 
-  //추후 다시 작성
-  static async readPostByComment(userId: string) {
-    throw new Error('Method not implemented.');
+  static async readPostByComment(user_id: ObjectId) {
+    const userComments = await PostCommentModel.find({ user_id }).populate(
+      'post_id',
+      ['title', 'content']
+    );
+
+    //  if(userComments.length === 0 ){
+    //   throw new Error('사용')
+    //  }
+
+    const postList = userComments.map((userComment) => {
+      const postId = userComment.post_id as Post;
+
+      return {
+        title: postId.title,
+        content: postId.content,
+      };
+    });
+
+    return postList;
   }
 
   static async readComment(postId: string) {

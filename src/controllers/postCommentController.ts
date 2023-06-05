@@ -24,17 +24,15 @@ class PostCommentController {
     }
   };
 
-  // 다시 짜야됨
   static getPostByComment = async (req: Request, res: Response) => {
-    const { userId } = req.params;
-    const postList = await PostCommentService.readPostByComment(userId);
-    /*
-    if (postList) {
-      res.status(200).json(postList);
+    const user_id = req.id;
+    const postComment = await PostCommentService.readPostByComment(user_id);
+
+    if (postComment) {
+      res.status(200).json(postComment);
     } else {
       res.status(404).json({ message: 'error' });
     }
-    */
   };
 
   static patchComment = async (req: Request, res: Response) => {
