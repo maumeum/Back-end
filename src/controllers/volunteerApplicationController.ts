@@ -2,9 +2,12 @@ import { VolunteerApplicationService } from '../services/volunteerApplicationSer
 import { Request, Response } from 'express';
 class VolunteerApplicationController {
   static postApplicationVolunteer = async (req: Request, res: Response) => {
-    const applicationVolunteerData = req.body;
+    const { volunteer_id, isParticipate } = req.body;
+
+    const user_id = req.id;
+
     const result = await VolunteerApplicationService.createApplicationVolunteer(
-      applicationVolunteerData
+      { user_id, volunteer_id, isParticipate }
     );
 
     if (result) {
@@ -15,15 +18,15 @@ class VolunteerApplicationController {
   };
 
   static getApplicationVolunter = async (req: Request, res: Response) => {
-    const { userId } = req.params;
-    //const applicationVolunteerList =
-    //await userService.readApplicationVolunteer(userId);
+    const user_id = req.id;
+    const applicationVolunteerList =
+      await VolunteerApplicationService.readApplicationVolunteer(user_id);
 
-    // if (applicationVolunteerList) {
-    //   res.status(200).json(applicationVolunteerList);
-    // } else {
-    //   res.status(404).json({ message: 'error' });
-    // }
+    if (applicationVolunteerList) {
+      res.status(200).json(applicationVolunteerList);
+    } else {
+      res.status(404).json({ message: 'error' });
+    }
   };
 }
 
