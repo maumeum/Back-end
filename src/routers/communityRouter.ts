@@ -1,15 +1,15 @@
 import express from "express";
-import { PostModel } from "../db/index.js";
+
 import { CommunityController } from "../controllers/communityController.js";
 
 export const communityRouter = express.Router();
 const communityController = new CommunityController();
 
-//전체 게시물 조회
-communityRouter.get("/", communityController.getAllPosts);
+//유저 게시물 조회
+communityRouter.get("/search", communityController.searchPost);
 
-//게시물 작성
-communityRouter.post("/", communityController.createPost);
+//유저 게시물 조회
+communityRouter.get("/user/:id", communityController.getUserPosts);
 
 //특정 게시물 조회
 communityRouter.get("/:id", communityController.getPost);
@@ -20,5 +20,8 @@ communityRouter.patch("/:id", communityController.patchPost);
 //특정 게시물 삭제
 communityRouter.delete("/:id", communityController.deletePost);
 
-//유저 게시물 조회
-communityRouter.get("/user/:id", communityController.getUserPosts);
+//게시물 작성
+communityRouter.post("/create", communityController.createPost);
+
+//게시글 조회
+communityRouter.get("/", communityController.getAllPosts);
