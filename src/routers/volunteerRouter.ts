@@ -4,7 +4,6 @@ import { VolunteerController } from '../controllers/volunteerController.js';
 const volunteerRouter = Router();
 const volunteerController = new VolunteerController();
 
-//VolunteerControll.prototype.postVolunteer
 volunteerRouter.post('/volunteers', volunteerController.postVolunteer);
 
 // 쿼리스트링 : req.query.keyword 형태로 가져옴
