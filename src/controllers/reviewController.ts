@@ -17,24 +17,34 @@ class ReviewController {
     res: Response,
     next: NextFunction,
   ) => {
-    const reviews = await this.reviewService.getReviews();
-    console.log(reviews);
-    res.status(201).json(reviews);
-    console.log('리뷰 전체 조회 성공');
+    try {
+      const reviews = await this.reviewService.getReviews();
+      console.log(reviews);
+      res.status(201).json(reviews);
+      console.log('리뷰 전체 조회 성공');
+    } catch (error) {
+      console.error(error);
+      next();
+    }
   };
 
   public postReview = (req: Request, res: Response, next: NextFunction) => {
-    const user_id = req.id;
-    const { title, content, images, volunteer_id }: ReviewData = req.body;
-    const createdReview = this.reviewService.createReview({
-      user_id,
-      title,
-      content,
-      images,
-      volunteer_id,
-    });
-    res.status(201).json();
-    console.log('리뷰 생성 성공');
+    try {
+      const user_id = req.id;
+      const { title, content, images, volunteer_id }: ReviewData = req.body;
+      const createdReview = this.reviewService.createReview({
+        user_id,
+        title,
+        content,
+        images,
+        volunteer_id,
+      });
+      res.status(201).json();
+      console.log('리뷰 생성 성공');
+    } catch (error) {
+      console.error(error);
+      next();
+    }
   };
 
   public updateReview = async (
@@ -67,16 +77,30 @@ class ReviewController {
         review_id,
         updateInfo,
       );
-      console.log(
-        '🚀 ~ file: reviewController.ts:65 ~ ReviewController ~ updatedUser:',
-        updatedReview,
-      );
 
       res.status(201).json(updatedReview);
       console.log('리뷰수정완료');
     } catch (error) {
       console.error(error);
       next(error);
+    }
+  };
+
+  public deleteReview = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { review_id }: ReviewData = req.params;
+      if (!review_id) {
+        throw new Error('리뷰 id가 제공되지 않았습니다.');
+      }
+      await this.reviewService.deleteReview(review_id);
+      res.status(204).json();
+    } catch (error) {
+      console.error(error);
+      next();
     }
   };
 }

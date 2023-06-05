@@ -39,6 +39,25 @@ interface UpdateUserInfoRequest extends Request {
 class UserController {
   public userService = new UserService();
 
+  //회원가입시 이메일 중복체크
+  public checkEmailDuplication = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { email } = req.body;
+      const user = await this.userService.getUserByEmail(email);
+      if (user) {
+        return res.json(false);
+      } else if (!user) {
+        return res.json(true);
+      }
+    } catch (error) {
+      console.error(error);
+      next();
+    }
+  };
   //유저 생성
   public createUser = async (
     req: Request,

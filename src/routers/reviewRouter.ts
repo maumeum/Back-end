@@ -18,4 +18,11 @@ reviewRouter.patch(
   reviewController.updateReview,
 );
 
+//리뷰 삭제
+reviewRouter.delete(
+  '/review/users/:review_id',
+  loginRequired,
+  reviewController.deleteReview,
+);
+
 export { reviewRouter };
