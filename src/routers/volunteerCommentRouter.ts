@@ -10,8 +10,8 @@ volunteerCommentRouter.post(
 
 // 사용자가 작성한 댓글 게시물 제목 조회
 volunteerCommentRouter.get(
-  '/volunteerComments/users/:userId',
-  VolunteerCommentController.getComment
+  '/volunteerComments/users',
+  VolunteerCommentController.getVolunteerByComment
 );
 
 //봉사 모집하기 게시글의 특정 게시글의 댓글 조회

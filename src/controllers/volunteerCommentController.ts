@@ -16,14 +16,12 @@ class VolunteerCommentController {
   };
 
   //아직 구현중
-  static getComment = async (req: Request, res: Response) => {
-    const { userId } = req.params;
-    const commentList = await VolunteerCommentService.readComment(userId);
-    // if (commentList) {
-    //   res.status(200).json(commentList);
-    // } else {
-    //   res.status(404).json({ message: 'error' });
-    // }
+  static getVolunteerByComment = async (req: Request, res: Response) => {
+    const user_id = req.id;
+    const volunteerComment =
+      await VolunteerCommentService.readVolunteerByComment(user_id);
+
+    console.log(volunteerComment);
   };
 
   static getPostComment = async (req: Request, res: Response) => {

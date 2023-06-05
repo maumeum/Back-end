@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { VolunteerCommentModel } from '../db/index.js';
+import { ObjectId } from 'mongodb';
 
 interface VolunteerCommentData {
   volunteer_id: Types.ObjectId | string | null;
@@ -18,7 +19,7 @@ class VolunteerCommentService {
   }
 
   //다시하기
-  static async readComment(userId: string) {
+  static async readVolunteerByComment(userId: ObjectId) {
     const userComments = await VolunteerCommentModel.find({ user_id: userId });
     const volunteer_ids = userComments.map((userComment) =>
       userComment.volunteer_id!.toString()
