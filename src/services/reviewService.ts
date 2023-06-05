@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { ReviewModel, VolunteerApplicationModel } from '../db/index.js';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
-
+import { DateTime } from 'luxon';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -42,43 +42,45 @@ class ReviewService {
     return reviews;
   }
 
-  // public async changeParticipateStatus(
-  //   volunteer_id: ObjectId,
-  //   user_id: ObjectId,
-  // ) {
-  //   const matchedApplyVolunteer = await VolunteerApplicationModel.findOne({
-  //     volunteer_id,
-  //     user_id,
-  //   }).populate('volunteer_id').exec();
+  public async changeParticipateStatus(
+    volunteer_id: ObjectId,
+    user_id: ObjectId,
+  ) {
+    const matchedApplyVolunteer = await VolunteerApplicationModel.findOne({
+      volunteer_id,
+      user_id,
+    }).populate('volunteer_id');
+    console.log(
+      '🚀 ~ file: reviewService.ts:53 ~ ReviewService ~ matchedApplyVolunteer:',
+      matchedApplyVolunteer,
+    );
 
-  //   if (!matchedApplyVolunteer) {
-  //     throw new Error('Matching volunteer application not found.');
-  //   }
-  //   Volunteer>
-  //   const { endDate } = matchedApplyVolunteer.volunteer_id;
+    if (!matchedApplyVolunteer) {
+      throw new Error('Matching volunteer application not found.');
+    }
 
-  //   const currentDate = new Date();
-  //   const endDatePlus7Days = new Date(
-  //     endDate.getTime() + 7 * 24 * 60 * 60 * 1000,
-  //   );
+    const volunteer = matchedApplyVolunteer.volunteer_id as Volunteer;
+    const { endDate } = volunteer;
 
-  //   if (currentDate <= endDatePlus7Days) {
-  //     throw new Error(
-  //       'Cannot change participate status before 7 days of the end date.',
-  //     );
-  //   }
+    const now = DateTime.now();
+    console.log('🚀 ~ file: reviewService.ts:64 ~ ReviewService ~ now:', now);
+    const endDateTime = DateTime.fromJSDate(endDate);
+    console.log(
+      '🚀 ~ file: reviewService.ts:65 ~ ReviewService ~ endDateTime:',
+      endDateTime,
+    );
+    const sevenDaysAfterEnd = endDateTime.plus({ days: 7 });
+    console.log(
+      '🚀 ~ file: reviewService.ts:68 ~ ReviewService ~ sevenDaysAfterEnd:',
+      sevenDaysAfterEnd,
+    );
 
-  //   matchedApplyVolunteer.isParticipate = true;
-  //   await matchedApplyVolunteer.save();
-
-  //   return matchedApplyVolunteer;
-
-  //   //volunteerID와 userId를 받아서 volunteerApplication 모델에서 두개 다 일치하는 것을 한개 찾아옴.
-  //   // 그렇게 찾은 document에 들어있는 volunteer_id를 통해서 populate하기.
-  //   // 그리고 populate한 volunteer의 정보중 endDate를 받아온다.
-  //   //현재 시간이 endDate보다 7일이 안지난 상태라면, throw error
-  //   // 현재 시간이 endDate보다 7일이 안지난 상태라면 volunteerApplication의 isParticipate 상태가 true로 바뀜.
-  // }
+    if (now > endDateTime && now < sevenDaysAfterEnd) {
+      if (!matchedApplyVolunteer.isParticipate) {
+        matchedApplyVolunteer.isParticipate = true;
+        await matchedApplyVolunteer.save();
+      }
+    }
+  }
 }
-
 export { ReviewService };

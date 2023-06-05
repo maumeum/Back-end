@@ -22,7 +22,7 @@ class Review {
   @prop({ ref: User })
   public user_id?: Ref<User>;
 
-  @prop({ ref: Volunteer })
+  @prop({ ref: () => Volunteer, type: () => mongoose.Types.ObjectId })
   public volunteer_id?: Ref<Volunteer>;
 }
 
