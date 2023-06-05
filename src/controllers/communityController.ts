@@ -1,10 +1,21 @@
-import { PostCommentModel, PostModel } from "../db/index.js";
 import { Request, Response } from "express";
+import { CommunityService } from "../services/communityService.js";
 
 export class CommunityController {
+  public communityService = new CommunityService();
+
   public createPost = async (req: Request, res: Response) => {
     try {
-      const newPost = await PostModel.create(req.body);
+      const { title, content, postType, images, user_id } = req.body;
+      console.log(req.body);
+      // const newPost = await PostModel.create(req.body);
+      const newPost = await this.communityService.createPost({
+        title,
+        content,
+        postType,
+        images,
+        user_id,
+      });
       res.send(newPost);
     } catch (err) {
       res.status(400).send(err);
@@ -13,7 +24,18 @@ export class CommunityController {
 
   public getAllPosts = async (req: Request, res: Response) => {
     try {
-      const posts = await PostModel.find();
+      const posts = await this.communityService.findAllPost();
+      // const posts = await PostModel.find();
+      res.send(posts);
+    } catch (err) {
+      res.status(400).send(err);
+    }
+  };
+
+  public searchPost = async (req: Request, res: Response) => {
+    const { keyword } = req.query;
+    try {
+      const posts = await this.communityService.searchPost(keyword as string);
       res.send(posts);
     } catch (err) {
       res.status(400).send(err);
@@ -22,8 +44,10 @@ export class CommunityController {
 
   public getPost = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const comment = await PostCommentModel.find({ post_id: id });
-    const post = await PostModel.findOne({ _id: id });
+    // const comment = await PostCommentModel.find({ post_id: id });
+    const comment = await this.communityService.findByPostIdComment(id);
+    // const post = await PostModel.findOne({ _id: id });
+    const post = await this.communityService.indByPostIdPost(id);
     res.send({ post, comment });
   };
 
@@ -31,16 +55,12 @@ export class CommunityController {
     const { id } = req.params;
     const { title, content, images, postType } = req.body;
     try {
-      const Posts = await PostModel.findOneAndUpdate(
-        { _id: id },
-        {
-          title,
-          content,
-          images,
-          postType,
-        },
-        { new: true }
-      );
+      const Posts = await this.communityService.findOneAndUpdate(id, {
+        title,
+        content,
+        images,
+        postType,
+      });
       res.send(Posts);
     } catch {
       res.status(400).send({ message: "오류 발생" });
@@ -50,7 +70,8 @@ export class CommunityController {
   public deletePost = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-      await PostModel.deleteOne({ _id: id });
+      // await PostModel.deleteOne({ _id: id });
+      await this.communityService.delete(id);
       res.send({
         message: "삭제가 완료되었습니다.",
       });
@@ -58,30 +79,14 @@ export class CommunityController {
       res.status(400).send({ message: "오류 발생" });
     }
   };
+
   public getUserPosts = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-      const userPosts = await PostModel.find({ user_id: id });
+      const userPosts = await this.communityService.getUserPosts(id);
       res.status(200).send(userPosts);
     } catch {
       res.status(404).send({ message: "오류 발생" });
-    }
-  };
-  public serachPost = async (req: Request, res: Response) => {
-    const { keyword } = req.query;
-    if (!keyword) {
-      res.status(400).send({
-        message: "키워드를 입력해 주세여",
-      });
-    } else {
-      const options = [
-        { title: { $regex: `${keyword}` } },
-        { content: { $regex: `${keyword}` } },
-      ];
-      const posts = await PostModel.find({
-        $or: options,
-      });
-      res.send(posts);
     }
   };
 }

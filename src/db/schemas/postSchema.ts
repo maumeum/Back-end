@@ -10,8 +10,10 @@ import { User } from "./userSchema.js";
 class Post {
   @prop({ required: true })
   public title!: string;
+
   @prop({ ref: User })
   public user_id!: Ref<User>;
+
   @prop({ required: true })
   public content!: string;
 

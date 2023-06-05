@@ -18,7 +18,7 @@ declare global {
 function loginRequired(req: Request, res: Response, next: NextFunction) {
   const userToken = req.headers['authorization']?.split(' ')[1];
 
-  if (!userToken || userToken === 'null') {
+  if (!userToken || userToken === null) {
     console.log('서비스 사용 요청이 있습니다.하지만, Authorization 토큰: 없음');
     res.status(403).json({
       result: 'forbidden-approach',

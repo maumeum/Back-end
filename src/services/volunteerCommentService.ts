@@ -20,15 +20,21 @@ class VolunteerCommentService {
   //다시하기
   static async readComment(userId: string) {
     const userComments = await VolunteerCommentModel.find({ user_id: userId });
-    const volunteer_ids = userComments.map(
-      (userComment) => userComment.volunteer_id
+    const volunteer_ids = userComments.map((userComment) =>
+      userComment.volunteer_id!.toString()
     );
 
-    console.log(volunteer_ids);
+    const volunteerList = await volunteer_ids.map(
+      async (volunteer_id) =>
+        await VolunteerCommentModel.find({ volunteer_id: volunteer_id })
+    );
+
+    console.log(volunteerList);
     //volunteer에서 title, content 가져오기
     //const volunteerData =
     // const volunteerLists = await VolunteerCommentModel.find({ volunteer_id });
 
+    //console.log(volunteerList);
     if (!userComments) {
       throw new Error('게시글 조회에 실패하였습니다.');
     }
@@ -37,7 +43,9 @@ class VolunteerCommentService {
   }
 
   static async readPostComment(volunteerId: string) {
-    const commentList = await VolunteerCommentModel.find({ volunteerId });
+    const commentList = await VolunteerCommentModel.find({
+      volunteer_id: volunteerId,
+    });
 
     if (!commentList) {
       throw new Error('댓글 조회를 실패하였습니다.');
@@ -63,9 +71,9 @@ class VolunteerCommentService {
   }
 
   static async deleteComment(volunteerCommentId: string) {
-    const comment = await VolunteerCommentModel.findByIdAndDelete({
-      volunteerCommentId,
-    });
+    const comment = await VolunteerCommentModel.findByIdAndDelete(
+      volunteerCommentId
+    );
 
     if (!comment) {
       throw new Error('댓글 삭제에 실패하였습니다.');

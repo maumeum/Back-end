@@ -10,6 +10,7 @@ import {
   communityRouter,
 } from './routers/index.js';
 import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
+import { postCommentRouter } from './routers/postCommentRouter.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 
 app.use(cors()); //cors에러 방지
 app.use(express.json()); // 바디파서
+app.use(express.urlencoded({ extended: true }));
 
 // DB연결
 const DB_URL =
@@ -38,6 +40,7 @@ app.use('/api', volunteerRouter);
 app.use('/api', volunteerApplicationRouter);
 app.use('/api', volunteerCommentRouter);
 app.use('/commuities', communityRouter);
+app.use('/api', postCommentRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
