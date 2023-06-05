@@ -2,18 +2,17 @@ import { NextFunction, Request, Response } from 'express';
 import { UserService } from '../services/index.js';
 import bcrypt from 'bcrypt';
 import { makeJwtToken } from '../utils/jwtTokenMaker.js';
-import { mongoose } from '@typegoose/typegoose';
 import { ObjectId } from 'mongodb';
 import { CONSTANTS } from '../utils/Constants.js';
 
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       user_id: ObjectId;
-//       role: string;
-//     }
-//   }
-// }
+declare global {
+  namespace Express {
+    interface Request {
+      user_id: ObjectId;
+      role: string;
+    }
+  }
+}
 interface UserLoginInfo {
   email: string;
   password: string;

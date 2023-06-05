@@ -1,8 +1,7 @@
-import { EnumObj, EnumValues } from '@typegoose/typegoose/lib/types.js';
 import { UserModel } from '../db/index.js';
 import bcrypt from 'bcrypt';
-import { error } from 'console';
 import { ObjectId } from 'mongodb';
+import { CONSTANTS } from '../utils/Constants.js';
 
 //인터페이스 분리해서 작성
 interface UserInfo {
@@ -23,7 +22,7 @@ class UserService {
     if (!password) {
       throw new Error('password is required');
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, CONSTANTS.HASHING_TIMES);
     const createdUser = await UserModel.create({
       nickname,
       email,

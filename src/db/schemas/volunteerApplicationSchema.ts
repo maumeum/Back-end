@@ -19,7 +19,7 @@ class VolunteerApplication {
   })
   public volunteer_id!: Ref<Volunteer>;
 
-  @prop({ required: true })
+  @prop({ required: true, default: false })
   public isParticipate!: boolean;
 }
 
