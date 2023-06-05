@@ -9,7 +9,7 @@ class User {
   @prop({ required: true, default: () => nanoid(4) })
   public nanoid!: string;
 
-  @prop({ required: true, default: 'imageurl' })
+  @prop({ required: true, default: '/default-profile-image.png' })
   public image!: string;
 
   @prop({ required: true })

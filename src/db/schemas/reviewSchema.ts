@@ -15,7 +15,7 @@ class Review {
   @prop({ required: true })
   public content!: string;
   @prop({ type: () => [String] })
-  public images!: string[];
+  public images?: string[];
   @prop({ ref: Volunteer })
   public volunteer_id!: Ref<Volunteer>;
   @prop({ ref: User })

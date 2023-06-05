@@ -1,14 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
 interface JwtPayload {
-  user_id: string;
+  user_id: ObjectId;
   role: string;
 }
 
 declare global {
   namespace Express {
     interface Request {
-      id: string;
+      id: ObjectId;
       role: string;
     }
   }
@@ -35,8 +36,8 @@ function loginRequired(req: Request, res: Response, next: NextFunction) {
     console.log(user_id);
     req.id = user_id;
     req.role = role;
+    console.log('디코딩성공');
     next();
-    console.log('여기는되는가? ');
   } catch (error) {
     // jwt.verify 함수가 에러를 발생시키는 경우는 토큰이 정상적으로 decode 안되었을 경우임.
     // 403 코드로 JSON 형태로 프론트에 전달함.
