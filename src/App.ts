@@ -18,6 +18,7 @@ app.use("/", express.static(path.join(__dirname, "public")));
 
 app.use(cors()); //cors에러 방지
 app.use(express.json()); // 바디파서
+app.use(express.urlencoded({ extended: true }));
 
 // DB연결
 const DB_URL =
