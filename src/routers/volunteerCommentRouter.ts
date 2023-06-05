@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { VolunteerCommentController } from '../controllers/volunteerCommentController.js';
+import { loginRequired } from '../middlewares/loginRequied.js';
 
 const volunteerCommentRouter = Router();
 
@@ -11,6 +12,7 @@ volunteerCommentRouter.post(
 // 사용자가 작성한 댓글 게시물 제목 조회
 volunteerCommentRouter.get(
   '/volunteerComments/users',
+  loginRequired,
   VolunteerCommentController.getVolunteerByComment
 );
 
