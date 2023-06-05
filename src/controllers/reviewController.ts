@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ReviewService } from '../services/reviewService.js';
 import { ObjectId } from 'mongodb';
+import { error } from 'console';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -102,6 +103,25 @@ class ReviewController {
       console.error(error);
       next();
     }
+  };
+
+  public changeParticipationStatus = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const user_id = req.id;
+    const { volunteer_id } = req.body;
+
+    if (!volunteer_id) {
+      throw new Error('volunteer_id 없음');
+    }
+    const changed = await this.reviewService.changeParticipateStatus(
+      volunteer_id,
+      user_id,
+    );
+
+    res.status(200).json(changed);
   };
 }
 export { ReviewController };

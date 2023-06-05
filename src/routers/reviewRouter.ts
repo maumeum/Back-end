@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction } from 'express';
 import { ReviewController } from '../controllers/reviewController.js';
 import { loginRequired } from '../middlewares/loginRequied.js';
 
@@ -23,6 +23,12 @@ reviewRouter.delete(
   '/review/users/:review_id',
   loginRequired,
   reviewController.deleteReview,
+);
+
+reviewRouter.post(
+  '/review/users/participation',
+  loginRequired,
+  reviewController.changeParticipationStatus,
 );
 
 export { reviewRouter };
