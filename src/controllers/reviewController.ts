@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ReviewService } from '../services/reviewService.js';
 import { ObjectId } from 'mongodb';
 import { error } from 'console';
+import mongoose from 'mongoose';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -12,6 +13,28 @@ interface ReviewData {
 }
 class ReviewController {
   public reviewService = new ReviewService();
+
+  public readMyReview = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const user_id = req.id;
+      console.log(
+        '🚀 ~ file: reviewController.ts:24 ~ ReviewController ~ req.id:',
+        req.id,
+      );
+
+      console.log(user_id);
+      const reviews = await this.reviewService.getReviewsById(user_id);
+      console.log(reviews);
+      res.status(200).json(reviews);
+    } catch (error) {
+      console.error(error);
+      next();
+    }
+  };
 
   public readReview = async (
     req: Request,
@@ -113,8 +136,22 @@ class ReviewController {
     const user_id = req.id;
     const { volunteer_id } = req.body;
 
+<<<<<<< Updated upstream
     if (!volunteer_id) {
       throw new Error('volunteer_id 없음');
+=======
+      if (!volunteer_id) {
+        throw new Error('volunteer_id 없음');
+      }
+      const changed = await this.reviewService.changeParticipateStatus(
+        volunteer_id,
+        user_id,
+      );
+      res.status(201).json(changed);
+    } catch (error) {
+      console.error(error);
+      next();
+>>>>>>> Stashed changes
     }
     const changed = await this.reviewService.changeParticipateStatus(
       volunteer_id,

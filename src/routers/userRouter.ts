@@ -1,6 +1,6 @@
 import express from 'express';
 import { UserController } from '../controllers/userController.js';
-import { loginRequired } from '../middlewares/loginRequied.js';
+import { loginRequired } from '../middlewares/loginRequired.js';
 const userRouter = express.Router();
 
 const userController = new UserController();
