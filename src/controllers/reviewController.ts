@@ -133,13 +133,9 @@ class ReviewController {
     res: Response,
     next: NextFunction,
   ) => {
-    const user_id = req.id;
-    const { volunteer_id } = req.body;
-
-<<<<<<< Updated upstream
-    if (!volunteer_id) {
-      throw new Error('volunteer_id 없음');
-=======
+    try {
+      const user_id = req.id;
+      const { volunteer_id } = req.body;
       if (!volunteer_id) {
         throw new Error('volunteer_id 없음');
       }
@@ -151,14 +147,7 @@ class ReviewController {
     } catch (error) {
       console.error(error);
       next();
->>>>>>> Stashed changes
     }
-    const changed = await this.reviewService.changeParticipateStatus(
-      volunteer_id,
-      user_id,
-    );
-
-    res.status(200).json(changed);
   };
 }
 export { ReviewController };
