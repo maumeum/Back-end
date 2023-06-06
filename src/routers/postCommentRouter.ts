@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { PostCommentController } from '../controllers/postCommentController.js';
+import { loginRequired } from '../middlewares/loginRequied.js';
 const postCommentRouter = Router();
 
 postCommentRouter.post('/postComments', PostCommentController.postComment);
 
 //이 부분 다시 수정
 postCommentRouter.get(
-  '/postComments/users/:userId',
+  '/postComments/users',
+  loginRequired,
   PostCommentController.getPostByComment
 );
 

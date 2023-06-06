@@ -2,18 +2,17 @@ import { NextFunction, Request, Response } from 'express';
 import { UserService } from '../services/index.js';
 import bcrypt from 'bcrypt';
 import { makeJwtToken } from '../utils/jwtTokenMaker.js';
-import { mongoose } from '@typegoose/typegoose';
 import { ObjectId } from 'mongodb';
 import { CONSTANTS } from '../utils/Constants.js';
 
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       user_id: ObjectId;
-//       role: string;
-//     }
-//   }
-// }
+declare global {
+  namespace Express {
+    interface Request {
+      user_id: ObjectId;
+      role: string;
+    }
+  }
+}
 interface UserLoginInfo {
   email: string;
   password: string;
@@ -40,6 +39,25 @@ interface UpdateUserInfoRequest extends Request {
 class UserController {
   public userService = new UserService();
 
+  //회원가입시 이메일 중복체크
+  public checkEmailDuplication = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { email } = req.body;
+      const user = await this.userService.getUserByEmail(email);
+      if (user) {
+        return res.json(false);
+      } else if (!user) {
+        return res.json(true);
+      }
+    } catch (error) {
+      console.error(error);
+      next();
+    }
+  };
   //유저 생성
   public createUser = async (
     req: Request,

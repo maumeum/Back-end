@@ -5,6 +5,9 @@ const userRouter = express.Router();
 
 const userController = new UserController();
 
+//이메일 중복체크
+userRouter.post('/email', userController.checkEmailDuplication);
+
 // 회원가입
 userRouter.post('/signup', userController.createUser);
 

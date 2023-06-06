@@ -66,7 +66,7 @@ export class CommunityService {
     }: {
       title: string;
       content: string;
-      images: [];
+      images: string;
       postType: string;
     }
   ) {

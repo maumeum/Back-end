@@ -1,19 +1,31 @@
 import { Request, Response } from "express";
 import { CommunityService } from "../services/communityService.js";
+import fs from "fs";
+
+interface MulterRequest extends Request {
+  file: any;
+}
 
 export class CommunityController {
   public communityService = new CommunityService();
 
   public createPost = async (req: Request, res: Response) => {
     try {
-      const { title, content, postType, images, user_id } = req.body;
-      console.log(req.body);
+      const { title, content, postType } = req.body;
+
       // const newPost = await PostModel.create(req.body);
+      const { originalname, path } = (req as MulterRequest).file;
+      const parts = originalname.split(".");
+      const ext = parts[parts.length - 1];
+      const newPath = path + "." + ext;
+      fs.renameSync(path, newPath);
+      const user_id: any = req.id;
+
       const newPost = await this.communityService.createPost({
         title,
         content,
         postType,
-        images,
+        images: newPath,
         user_id,
       });
       res.send(newPost);
@@ -55,10 +67,19 @@ export class CommunityController {
     const { id } = req.params;
     const { title, content, images, postType } = req.body;
     try {
+      const { title, content, postType } = req.body;
+
+      // const newPost = await PostModel.create(req.body);
+      const { originalname, path } = (req as MulterRequest).file;
+      const parts = originalname.split(".");
+      const ext = parts[parts.length - 1];
+      const newPath = path + "." + ext;
+      fs.renameSync(path, newPath);
+
       const Posts = await this.communityService.findOneAndUpdate(id, {
         title,
         content,
-        images,
+        images: newPath,
         postType,
       });
       res.send(Posts);
