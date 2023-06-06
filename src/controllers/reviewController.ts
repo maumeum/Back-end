@@ -147,7 +147,6 @@ class ReviewController {
     try {
       const user_id = req.id;
       const { volunteer_id } = req.body;
-
       if (!volunteer_id) {
         throw new Error('volunteer_id 없음');
       }
