@@ -25,9 +25,9 @@ class VolunteerCommentService {
       ['title', 'content']
     );
 
-    // if (userComments.length === 0) {
-    //   throw new Error('사용자 댓글 목록이 비어있습니다.');
-    // }
+    if (userComments.length === 0) {
+      return false;
+    }
 
     const volunteerList = userComments.map((userComment) => {
       const volunteerId = userComment.volunteer_id as Volunteer;

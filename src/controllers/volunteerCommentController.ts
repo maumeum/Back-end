@@ -33,12 +33,10 @@ class VolunteerCommentController {
       const volunteerComment =
         await VolunteerCommentService.readVolunteerByComment(user_id);
 
-      if (volunteerComment.length > 0) {
+      if (volunteerComment) {
         res.status(200).json(volunteerComment);
       } else {
-        res
-          .status(404)
-          .json({ message: '댓글 목록을 불러오는데 실패하였습니다.' });
+        res.status(404).json({ status: 'false' });
       }
     } catch (error) {
       next(error);
