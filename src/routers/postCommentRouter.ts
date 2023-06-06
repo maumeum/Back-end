@@ -3,9 +3,12 @@ import { PostCommentController } from '../controllers/postCommentController.js';
 import { loginRequired } from '../middlewares/loginRequied.js';
 const postCommentRouter = Router();
 
-postCommentRouter.post('/postComments', PostCommentController.postComment);
+postCommentRouter.post(
+  '/postComments',
+  loginRequired,
+  PostCommentController.postComment
+);
 
-//이 부분 다시 수정
 postCommentRouter.get(
   '/postComments/users',
   loginRequired,
@@ -19,11 +22,13 @@ postCommentRouter.get(
 
 postCommentRouter.patch(
   '/postComments/:postCommentId',
+  loginRequired,
   PostCommentController.patchComment
 );
 
 postCommentRouter.delete(
   '/postComments/:postCommentId',
+  loginRequired,
   PostCommentController.deleteComment
 );
 
