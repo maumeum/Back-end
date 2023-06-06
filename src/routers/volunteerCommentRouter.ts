@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { VolunteerCommentController } from '../controllers/volunteerCommentController.js';
-import { loginRequired } from '../middlewares/loginRequied.js';
+import { loginRequired } from '../middlewares/loginRequired.js';
 
 const volunteerCommentRouter = Router();
 

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { VolunteerController } from '../controllers/volunteerController.js';
-import { loginRequired } from '../middlewares/loginRequied.js';
+
+import { loginRequired } from '../middlewares/loginRequired.js';
 
 const volunteerRouter = Router();
 const volunteerController = new VolunteerController();

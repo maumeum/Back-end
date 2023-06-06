@@ -1,13 +1,9 @@
 import { Router } from 'express';
 import { PostCommentController } from '../controllers/postCommentController.js';
-import { loginRequired } from '../middlewares/loginRequied.js';
+import { loginRequired } from '../middlewares/loginRequired.js';
 const postCommentRouter = Router();
 
-postCommentRouter.post(
-  '/postComments',
-  loginRequired,
-  PostCommentController.postComment
-);
+postCommentRouter.post('/postComments', PostCommentController.postComment);
 
 postCommentRouter.get(
   '/postComments/users',
