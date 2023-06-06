@@ -1,11 +1,13 @@
 import { PostCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
 import { Post } from '../db/schemas/postSchema.js';
+import { DateTime } from 'luxon';
 
 interface PostCommentData {
   post_id: ObjectId | string | null;
   user_id: ObjectId | string | null;
   content: string;
+  createdAt: Date;
 }
 class PostCommentService {
   static async createComment(postCommentData: PostCommentData) {
@@ -21,19 +23,25 @@ class PostCommentService {
   static async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
-      ['title', 'content']
+      ['title', 'content', 'postType']
     );
 
-    //  if(userComments.length === 0 ){
-    //   throw new Error('사용')
-    //  }
+    if (userComments.length === 0) {
+      return false;
+    }
 
     const postList = userComments.map((userComment) => {
       const postId = userComment.post_id as Post;
+      const uuserCommentObj = userComment.toObject() as PostCommentData;
+      const createdAt = uuserCommentObj.createdAt;
+
+      const postCommentSavedTime = DateTime.fromJSDate(createdAt);
 
       return {
         title: postId.title,
         content: postId.content,
+        postType: postId.postType,
+        createdAt: postCommentSavedTime,
       };
     });
 

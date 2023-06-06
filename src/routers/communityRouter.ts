@@ -18,7 +18,7 @@ const upload = multer({ storage: storage });
 export const communityRouter = express.Router();
 const communityController = new CommunityController();
 
-//유저 게시물 조회
+//유저 게시물 검색
 communityRouter.get("/community/search", communityController.searchPost);
 
 //유저 게시물 조회
@@ -34,7 +34,11 @@ communityRouter.patch(
   loginRequired,
   communityController.patchPost
 );
-
+//카테고리별 조회
+communityRouter.post(
+  "commnity/:category",
+  communityController.getPostByCategory
+);
 //특정 게시물 삭제
 communityRouter.delete(
   "/community/:id",

@@ -1,13 +1,6 @@
 import { Ref } from "@typegoose/typegoose";
 import { PostCommentModel, PostModel } from "../db/index.js";
 
-type Post = {
-  title: string;
-  content: string;
-  user_id: string;
-  postType: string;
-  images: string;
-};
 export class CommunityService {
   public async createPost({
     title,
@@ -32,8 +25,11 @@ export class CommunityService {
     return newPost;
   }
 
-  async findAllPost() {
+  public async findAllPost() {
     return await PostModel.find();
+  }
+  public async getPostByCat(category: string) {
+    return await PostModel.find({ postType: category });
   }
 
   public async searchPost(keyword: string) {

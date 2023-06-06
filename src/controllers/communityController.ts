@@ -24,7 +24,7 @@ export class CommunityController {
       const newPost = await this.communityService.createPost({
         title,
         content,
-        postType,
+        postType, //동행/함께
         images: newPath,
         user_id,
       });
@@ -86,6 +86,13 @@ export class CommunityController {
     } catch {
       res.status(400).send({ message: "오류 발생" });
     }
+  };
+  public getPostByCategory = async (req: Request, res: Response) => {
+    const { category } = req.params;
+    try {
+      const categoryPost = await this.communityService.getPostByCat(category);
+      res.send(categoryPost);
+    } catch {}
   };
 
   public deletePost = async (req: Request, res: Response) => {

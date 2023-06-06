@@ -76,20 +76,6 @@ class VolunteerController {
     }
   };
 
-  public getApplicationVolunteer = async (req: Request, res: Response) => {
-    try {
-      const { userId } = req.params;
-      const applicationVolunteers =
-        await VolunteerService.prototype.readApplicationVolunteer(userId);
-
-      if (applicationVolunteers) {
-        res.status(200).json(applicationVolunteers);
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {}
-  };
-
   public getRegisterationVolunteer = async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
