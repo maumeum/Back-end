@@ -1,11 +1,13 @@
-import { VolunteerCommentModel, VolunteerModel } from '../db/index.js';
+import { VolunteerCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
+import { DateTime } from 'luxon';
 
 interface VolunteerCommentData {
   volunteer_id: ObjectId | string | null;
   user_id: ObjectId | string | null;
   content: string;
+  createdAt: Date;
 }
 class VolunteerCommentService {
   static async createComment(volunteerComment: VolunteerCommentData) {
@@ -19,7 +21,6 @@ class VolunteerCommentService {
   }
 
   static async readVolunteerByComment(user_id: ObjectId) {
-    // console.log(userComments);
     const userComments = await VolunteerCommentModel.find({ user_id }).populate(
       'volunteer_id',
       ['title', 'content']
@@ -31,10 +32,16 @@ class VolunteerCommentService {
 
     const volunteerList = userComments.map((userComment) => {
       const volunteerId = userComment.volunteer_id as Volunteer;
+      const userCommentObj = userComment.toObject() as VolunteerCommentData;
+      const createdAt = userCommentObj.createdAt;
+
+      const volunteerCommentSavedTime = DateTime.fromJSDate(createdAt);
 
       return {
         title: volunteerId.title,
         content: volunteerId.content,
+        createdAt: volunteerCommentSavedTime,
+        postType: '봉사모집하기',
       };
     });
 
