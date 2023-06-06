@@ -1,5 +1,9 @@
 import { ObjectId } from 'mongodb';
-import { ReviewModel, VolunteerApplicationModel } from '../db/index.js';
+import {
+  ReviewModel,
+  VolunteerApplicationModel,
+  VolunteerModel,
+} from '../db/index.js';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
 import { DateTime } from 'luxon';
 interface ReviewData {
@@ -42,6 +46,7 @@ class ReviewService {
     return reviews;
   }
 
+  // endDate 이후 && 7일 지나기 전, 사용자 본인이 상태를 직접 false => true로 변경하는 코드
   public async changeParticipateStatus(
     volunteer_id: ObjectId,
     user_id: ObjectId,
@@ -81,6 +86,28 @@ class ReviewService {
         await matchedApplyVolunteer.save();
       }
     }
+  }
+
+  public async changeParticipateStatusAtMidnight() {
+    const applyVolunteer = await VolunteerApplicationModel.find({
+      isParticipate: false,
+    }).select('volunteer_id isParticipate');
+    const now = DateTime.now();
+
+    for (const apply of applyVolunteer) {
+      const volunteer = await VolunteerModel.findById(
+        apply.volunteer_id,
+      ).select('endDate');
+
+      if (
+        volunteer &&
+        DateTime.fromJSDate(volunteer.endDate) < now.minus({ days: 7 })
+      ) {
+        apply.isParticipate = true;
+        await apply.save();
+      }
+    }
+    console.log('실행완료');
   }
 }
 export { ReviewService };
