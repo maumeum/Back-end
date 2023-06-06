@@ -35,13 +35,11 @@ class PostCommentService {
       const uuserCommentObj = userComment.toObject() as PostCommentData;
       const createdAt = uuserCommentObj.createdAt;
 
-      const postCommentSavedTime = DateTime.fromJSDate(createdAt);
-
       return {
         title: postId.title,
         content: postId.content,
         postType: postId.postType,
-        createdAt: postCommentSavedTime,
+        createdAt: createdAt,
       };
     });
 
