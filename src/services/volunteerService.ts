@@ -81,11 +81,11 @@ class VolunteerService {
 
   public async updateVolunteer(
     volunteerData: VolunteerData,
-    volunteerId: string
+    volunteerId: string,
   ) {
     const newVolunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
-      volunteerData
+      volunteerData,
     );
 
     if (!newVolunteer) {
