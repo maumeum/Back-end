@@ -6,6 +6,7 @@ const volunteerCommentRouter = Router();
 
 volunteerCommentRouter.post(
   '/volunteerComments',
+  loginRequired,
   VolunteerCommentController.postComment
 );
 
@@ -16,7 +17,7 @@ volunteerCommentRouter.get(
   VolunteerCommentController.getVolunteerByComment
 );
 
-//봉사 모집하기 게시글의 특정 게시글의 댓글 조회
+//봉사 모집하기 특정 게시글의 댓글 조회
 volunteerCommentRouter.get(
   '/volunteerComments/:volunteerId',
   VolunteerCommentController.getPostComment
@@ -24,11 +25,13 @@ volunteerCommentRouter.get(
 
 volunteerCommentRouter.patch(
   '/volunteerComments/:volunteerCommentId',
+  loginRequired,
   VolunteerCommentController.patchComment
 );
 
 volunteerCommentRouter.delete(
   '/volunteerComments/:volunteerCommentId',
+  loginRequired,
   VolunteerCommentController.deleteComment
 );
 
