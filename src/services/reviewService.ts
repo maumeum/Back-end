@@ -6,6 +6,7 @@ import {
 } from '../db/index.js';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
 import { DateTime } from 'luxon';
+import { CONSTANTS } from '../utils/Constants.js';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -73,7 +74,13 @@ class ReviewService {
 
     const now = DateTime.now();
     const endDateTime = DateTime.fromJSDate(endDate);
+<<<<<<< Updated upstream
     const sevenDaysAfterEnd = endDateTime.plus({ days: 7 });
+=======
+    const sevenDaysAfterEnd = endDateTime.plus({
+      days: CONSTANTS.CHANGING_DATE,
+    });
+>>>>>>> Stashed changes
 
     if (now > endDateTime && now < sevenDaysAfterEnd) {
       if (!matchedApplyVolunteer.isParticipate) {
@@ -96,7 +103,8 @@ class ReviewService {
 
       if (
         volunteer &&
-        DateTime.fromJSDate(volunteer.endDate) < now.minus({ days: 7 })
+        DateTime.fromJSDate(volunteer.endDate) <
+          now.minus({ days: CONSTANTS.CHANGING_DATE })
       ) {
         apply.isParticipate = true;
         await apply.save();

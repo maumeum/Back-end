@@ -46,7 +46,9 @@ app.use('/api', reviewRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res
+    .status(500)
+    .send('마지막 에러핸들러로 오류가 전달되었습니다. 콘솔을 확인해주세요.');
 }); // 마지막에 붙이는 에러핸들러
 
 export { app };

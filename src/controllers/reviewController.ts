@@ -1,15 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import { ReviewService } from '../services/reviewService.js';
+import {
+  ReviewService,
+  VolunteerApplicationService,
+} from '../services/index.js';
 import { ObjectId } from 'mongodb';
-import { error } from 'console';
-import mongoose from 'mongoose';
+
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
   title?: string;
   content?: string;
   images?: string[];
-  volunteer_id?: ObjectId;
+  volunteer_id?: any; // 나중에 고쳐야함.
 }
 class ReviewController {
   public reviewService = new ReviewService();
@@ -21,15 +23,10 @@ class ReviewController {
   ) => {
     try {
       const user_id = req.id;
-      console.log(
-        '🚀 ~ file: reviewController.ts:24 ~ ReviewController ~ req.id:',
-        req.id,
-      );
-
       console.log(user_id);
       const reviews = await this.reviewService.getReviewsById(user_id);
       console.log(reviews);
-      res.status(200).json(reviews);
+      res.sendStatus(200).json(reviews);
     } catch (error) {
       console.error(error);
       next();
@@ -44,7 +41,7 @@ class ReviewController {
     try {
       const reviews = await this.reviewService.getReviews();
       console.log(reviews);
-      res.status(201).json(reviews);
+      res.sendStatus(201).json(reviews);
       console.log('리뷰 + 닉네임 전체 조회 성공');
     } catch (error) {
       console.error(error);
@@ -52,18 +49,32 @@ class ReviewController {
     }
   };
 
-  public postReview = (req: Request, res: Response, next: NextFunction) => {
+  public postReview = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user_id = req.id;
       const { title, content, images, volunteer_id }: ReviewData = req.body;
-      const createdReview = this.reviewService.createReview({
+      const volunteer =
+        await VolunteerApplicationService.readApplicationVolunteerByVId(
+          volunteer_id,
+        );
+      if (!volunteer[0].isParticipate) {
+        throw new Error(
+          '참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.',
+        );
+      }
+
+      const createdReview = await this.reviewService.createReview({
         user_id,
         title,
         content,
         images,
         volunteer_id,
       });
-      res.status(201).json();
+      res.sendStatus(201).json();
       console.log('리뷰 생성 성공');
     } catch (error) {
       console.error(error);
@@ -102,7 +113,7 @@ class ReviewController {
         updateInfo,
       );
 
-      res.status(201).json(updatedReview);
+      res.sendStatus(201).json(updatedReview);
       console.log('리뷰수정완료');
     } catch (error) {
       console.error(error);
@@ -121,7 +132,7 @@ class ReviewController {
         throw new Error('리뷰 id가 제공되지 않았습니다.');
       }
       await this.reviewService.deleteReview(review_id);
-      res.status(204).json();
+      res.sendStatus(204).json();
     } catch (error) {
       console.error(error);
       next();
@@ -137,13 +148,6 @@ class ReviewController {
       const user_id = req.id;
       const { volunteer_id } = req.body;
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-    if (!volunteer_id) {
-      throw new Error('volunteer_id 없음');
-=======
->>>>>>> 8bc3748d4f95224af1ab0210316db9d3ab0beca2
       if (!volunteer_id) {
         throw new Error('volunteer_id 없음');
       }
@@ -151,18 +155,10 @@ class ReviewController {
         volunteer_id,
         user_id,
       );
-<<<<<<< HEAD
-
-=======
->>>>>>> 8bc3748d4f95224af1ab0210316db9d3ab0beca2
-      res.status(201).json(changed);
+      res.sendStatus(201).json(changed);
     } catch (error) {
       console.error(error);
       next();
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 8bc3748d4f95224af1ab0210316db9d3ab0beca2
     }
   };
 }
