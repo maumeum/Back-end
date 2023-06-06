@@ -49,9 +49,9 @@ class UserController {
       const { email } = req.body;
       const user = await this.userService.getUserByEmail(email);
       if (user) {
-        return res.json(false);
+        return res.sendStatus(400).json(false);
       } else if (!user) {
-        return res.json(true);
+        return res.sendStatus(200).json(true);
       }
     } catch (error) {
       console.error(error);
@@ -70,7 +70,7 @@ class UserController {
       const user = await this.userService.getUserByEmail(email);
       if (user) {
         console.log('이메일 중복으로 status 400');
-        return res.status(400).json({ message: '이미 가입된 계정입니다.' });
+        return res.sendStatus(400).json({ message: '이미 가입된 계정입니다.' });
       }
 
       const createdUser = await this.userService.createUser({
@@ -94,7 +94,7 @@ class UserController {
       const user_id = req.id;
 
       const user = await this.userService.getUserById(user_id);
-      res.json(user).status(200);
+      res.json(user).sendStatus(200);
       console.log('회원 조회 성공');
     } catch (error) {
       console.error(error);
@@ -128,7 +128,7 @@ class UserController {
         );
       }
       const madeToken = makeJwtToken(user);
-      res.json(madeToken).status(201);
+      res.json(madeToken).sendStatus(201);
       console.log('로그인 성공');
     } catch (error) {
       console.error(error);
@@ -159,7 +159,7 @@ class UserController {
           '비밀번호가 일치하지 않습니다. 다시 한 번 확인해 주세요.',
         );
       }
-      res.status(200).json();
+      res.sendStatus(200).json();
     } catch (error) {
       console.error(error);
       next(error);
@@ -200,7 +200,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(201).json();
+      res.sendStatus(201).json();
       console.log('정보수정완료');
     } catch (error) {
       console.error(error);
@@ -228,7 +228,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(200).json();
+      res.sendStatus(200).json();
       console.log('정보수정완료');
     } catch (error) {
       console.error(error);
@@ -256,7 +256,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(200).json();
+      res.sendStatus(200).json();
       console.log('정보수정완료');
     } catch (error) {
       console.error(error);
@@ -278,7 +278,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(200).json();
+      res.sendStatus(200).json();
       console.log('role 변경 완료');
     } catch (error) {
       console.error(error);
