@@ -6,13 +6,13 @@ class Post {
   @prop({ required: true })
   public title!: string;
 
-  @prop({ required: true })
-  public user_id!: string;
+  @prop({ ref: User })
+  public user_id!: Ref<User>;
 
   @prop({ required: true })
   public content!: string;
 
-  @prop({ type: () => [String] })
+  @prop({ required: true })
   public images!: string[];
 
   @prop({ required: true })

@@ -13,12 +13,12 @@ export class CommunityController {
     try {
       const { title, content, postType } = req.body;
 
-      // const newPost = await PostModel.create(req.body);
       const { originalname, path } = (req as MulterRequest).file;
       const parts = originalname.split(".");
       const ext = parts[parts.length - 1];
       const newPath = path + "." + ext;
       fs.renameSync(path, newPath);
+
       const user_id: any = req.id;
 
       const newPost = await this.communityService.createPost({
@@ -28,6 +28,7 @@ export class CommunityController {
         images: newPath,
         user_id,
       });
+      console.log(req.body);
       res.send(newPost);
     } catch (err) {
       res.status(400).send(err);
@@ -37,7 +38,7 @@ export class CommunityController {
   public getAllPosts = async (req: Request, res: Response) => {
     try {
       const posts = await this.communityService.findAllPost();
-      // const posts = await PostModel.find();
+
       res.send(posts);
     } catch (err) {
       res.status(400).send(err);
@@ -56,20 +57,19 @@ export class CommunityController {
 
   public getPost = async (req: Request, res: Response) => {
     const { id } = req.params;
-    // const comment = await PostCommentModel.find({ post_id: id });
+
     const comment = await this.communityService.findByPostIdComment(id);
-    // const post = await PostModel.findOne({ _id: id });
+
     const post = await this.communityService.indByPostIdPost(id);
     res.send({ post, comment });
   };
 
   public patchPost = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { title, content, images, postType } = req.body;
+
     try {
       const { title, content, postType } = req.body;
 
-      // const newPost = await PostModel.create(req.body);
       const { originalname, path } = (req as MulterRequest).file;
       const parts = originalname.split(".");
       const ext = parts[parts.length - 1];

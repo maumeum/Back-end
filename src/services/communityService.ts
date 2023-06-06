@@ -19,8 +19,8 @@ export class CommunityService {
     title: string;
     content: string;
     postType: string;
-    images: string;
-    user_id: string;
+    images: any;
+    user_id: any;
   }) {
     const newPost = await PostModel.create({
       title,
