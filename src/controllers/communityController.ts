@@ -1,21 +1,34 @@
 import { Request, Response } from "express";
 import { CommunityService } from "../services/communityService.js";
+import fs from "fs";
+
+interface MulterRequest extends Request {
+  file: any;
+}
 
 export class CommunityController {
   public communityService = new CommunityService();
 
   public createPost = async (req: Request, res: Response) => {
     try {
-      const { title, content, postType, images, user_id } = req.body;
-      console.log(req.body);
-      // const newPost = await PostModel.create(req.body);
+      const { title, content, postType } = req.body;
+
+      const { originalname, path } = (req as MulterRequest).file;
+      const parts = originalname.split(".");
+      const ext = parts[parts.length - 1];
+      const newPath = path + "." + ext;
+      fs.renameSync(path, newPath);
+
+      const user_id: any = req.id;
+
       const newPost = await this.communityService.createPost({
         title,
         content,
-        postType,
-        images,
+        postType, //동행/함께
+        images: newPath,
         user_id,
       });
+      console.log(req.body);
       res.send(newPost);
     } catch (err) {
       res.status(400).send(err);
@@ -25,7 +38,7 @@ export class CommunityController {
   public getAllPosts = async (req: Request, res: Response) => {
     try {
       const posts = await this.communityService.findAllPost();
-      // const posts = await PostModel.find();
+
       res.send(posts);
     } catch (err) {
       res.status(400).send(err);
@@ -44,27 +57,42 @@ export class CommunityController {
 
   public getPost = async (req: Request, res: Response) => {
     const { id } = req.params;
-    // const comment = await PostCommentModel.find({ post_id: id });
+
     const comment = await this.communityService.findByPostIdComment(id);
-    // const post = await PostModel.findOne({ _id: id });
+
     const post = await this.communityService.indByPostIdPost(id);
     res.send({ post, comment });
   };
 
   public patchPost = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { title, content, images, postType } = req.body;
+
     try {
+      const { title, content, postType } = req.body;
+
+      const { originalname, path } = (req as MulterRequest).file;
+      const parts = originalname.split(".");
+      const ext = parts[parts.length - 1];
+      const newPath = path + "." + ext;
+      fs.renameSync(path, newPath);
+
       const Posts = await this.communityService.findOneAndUpdate(id, {
         title,
         content,
-        images,
+        images: newPath,
         postType,
       });
       res.send(Posts);
     } catch {
       res.status(400).send({ message: "오류 발생" });
     }
+  };
+  public getPostByCategory = async (req: Request, res: Response) => {
+    const { category } = req.params;
+    try {
+      const categoryPost = await this.communityService.getPostByCat(category);
+      res.send(categoryPost);
+    } catch {}
   };
 
   public deletePost = async (req: Request, res: Response) => {

@@ -40,7 +40,7 @@ app.use('/api', userRouter);
 app.use('/api', volunteerRouter);
 app.use('/api', volunteerApplicationRouter);
 app.use('/api', volunteerCommentRouter);
-app.use('/commuities', communityRouter);
+app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
 
