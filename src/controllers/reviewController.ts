@@ -22,7 +22,7 @@ class ReviewController {
       const reviews = await this.reviewService.getReviews();
       console.log(reviews);
       res.status(201).json(reviews);
-      console.log('리뷰 전체 조회 성공');
+      console.log('리뷰 + 닉네임 전체 조회 성공');
     } catch (error) {
       console.error(error);
       next();

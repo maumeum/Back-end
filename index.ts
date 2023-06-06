@@ -9,6 +9,7 @@ dotenv.config();
 const port = process.env.PORT;
 const url = process.env.URL;
 
+//매일 자정 applyVolunteer의 document들 중, isParticipate와 endDate를 체크하여 상태값을 true로 바꿔주는 모듈
 changeParticipateStatus();
 
 app.get('/', (req: Request, res: Response) => {

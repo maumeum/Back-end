@@ -42,7 +42,7 @@ class ReviewService {
   }
 
   public async getReviews() {
-    const reviews = await ReviewModel.find();
+    const reviews = await ReviewModel.find().populate('user_id', 'nickname');
     return reviews;
   }
 
