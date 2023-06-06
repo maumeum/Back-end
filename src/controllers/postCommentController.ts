@@ -52,7 +52,7 @@ class PostCommentController {
       if (postComment) {
         res.status(200).json(postComment);
       } else {
-        res.status(404).json({ message: 'error' });
+        res.status(404).json({ status: 'false' });
       }
     } catch (error) {
       next(error);

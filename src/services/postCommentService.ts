@@ -24,9 +24,9 @@ class PostCommentService {
       ['title', 'content']
     );
 
-    //  if(userComments.length === 0 ){
-    //   throw new Error('사용')
-    //  }
+    if (userComments.length === 0) {
+      return false;
+    }
 
     const postList = userComments.map((userComment) => {
       const postId = userComment.post_id as Post;
