@@ -31,7 +31,7 @@ class ReviewService {
     const updatedReview = await ReviewModel.findOneAndUpdate(
       { _id: review_id },
       updateInfo,
-      { new: true },
+      { new: true }
     );
     if (!updatedReview) {
       throw new Error('해당하는 리뷰가 존재하지 않습니다.');
@@ -55,7 +55,7 @@ class ReviewService {
   // endDate 이후 && 7일 지나기 전, 사용자 본인이 상태를 직접 false => true로 변경하는 코드
   public async changeParticipateStatus(
     volunteer_id: ObjectId,
-    user_id: ObjectId,
+    user_id: ObjectId
   ) {
     const matchedApplyVolunteer = await VolunteerApplicationModel.findOne({
       volunteer_id,
@@ -74,13 +74,9 @@ class ReviewService {
 
     const now = DateTime.now();
     const endDateTime = DateTime.fromJSDate(endDate);
-<<<<<<< Updated upstream
-    const sevenDaysAfterEnd = endDateTime.plus({ days: 7 });
-=======
     const sevenDaysAfterEnd = endDateTime.plus({
       days: CONSTANTS.CHANGING_DATE,
     });
->>>>>>> Stashed changes
 
     if (now > endDateTime && now < sevenDaysAfterEnd) {
       if (!matchedApplyVolunteer.isParticipate) {
@@ -98,7 +94,7 @@ class ReviewService {
 
     for (const apply of applyVolunteer) {
       const volunteer = await VolunteerModel.findById(
-        apply.volunteer_id,
+        apply.volunteer_id
       ).select('endDate');
 
       if (
