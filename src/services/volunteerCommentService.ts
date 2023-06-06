@@ -35,12 +35,10 @@ class VolunteerCommentService {
       const userCommentObj = userComment.toObject() as VolunteerCommentData;
       const createdAt = userCommentObj.createdAt;
 
-      const volunteerCommentSavedTime = DateTime.fromJSDate(createdAt);
-
       return {
         title: volunteerId.title,
         content: volunteerId.content,
-        createdAt: volunteerCommentSavedTime,
+        createdAt: createdAt,
         postType: '봉사모집하기',
       };
     });
