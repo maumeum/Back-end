@@ -63,31 +63,23 @@ class VolunteerController {
     try {
       const { keyword } = req.query;
 
-      const searchVolunteers =
-        await VolunteerService.prototype.readSearchVolunteer(keyword as string);
+      if (keyword) {
+        const searchVolunteers =
+          await VolunteerService.prototype.readSearchVolunteer(
+            keyword as string
+          );
 
-      if (searchVolunteers) {
-        res.status(200).json(searchVolunteers);
+        if (searchVolunteers) {
+          res.status(200).json(searchVolunteers);
+        } else {
+          res.status(404).json({ message: '검색된 결과가 없습니다.' });
+        }
       } else {
-        res.status(200).json({ message: '검색된 결과가 없습니다.' });
+        res.status(404).json([]);
       }
     } catch (error) {
       next(error);
     }
-  };
-
-  public getApplicationVolunteer = async (req: Request, res: Response) => {
-    try {
-      const { userId } = req.params;
-      const applicationVolunteers =
-        await VolunteerService.prototype.readApplicationVolunteer(userId);
-
-      if (applicationVolunteers) {
-        res.status(200).json(applicationVolunteers);
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {}
   };
 
   public getRegisterationVolunteer = async (req: Request, res: Response) => {
@@ -106,7 +98,6 @@ class VolunteerController {
 
   public patchVolunteer = async (req: Request, res: Response) => {
     try {
-      //const { title, content, centName, centDescription, statusName, deadline, applyCount, registerCount, actType, teenager, images } = req.body;
       const VolunteerData = req.body;
       const { volunteerId } = req.params;
 

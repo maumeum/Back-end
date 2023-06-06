@@ -67,20 +67,6 @@ class VolunteerService {
     return volunteerList;
   }
 
-  //사용자가 신청한 봉사활동 조회
-  public async readApplicationVolunteer(userId: string) {
-    const volunteerList = await VolunteerModel.find({
-      user_id: userId,
-    }).populate('user_id');
-
-    console.log(await VolunteerModel.find({ user_id: userId }));
-    if (!volunteerList) {
-      throw new Error('신청한 봉사활동 목록 조회를 실패했습니다.');
-    }
-
-    return volunteerList;
-  }
-
   public async readRegistrationVolunteer(userId: string) {
     const volunteerList = await VolunteerModel.find({
       user_id: userId,

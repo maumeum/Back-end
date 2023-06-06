@@ -6,45 +6,33 @@ const volunteerCommentRouter = Router();
 
 volunteerCommentRouter.post(
   '/volunteerComments',
-<<<<<<< Updated upstream
-  VolunteerCommentController.postComment
-=======
   loginRequired,
-  VolunteerCommentController.postComment,
->>>>>>> Stashed changes
+  VolunteerCommentController.postComment
 );
 
 // 사용자가 작성한 댓글 게시물 제목 조회
 volunteerCommentRouter.get(
   '/volunteerComments/users',
   loginRequired,
-  VolunteerCommentController.getVolunteerByComment,
+  VolunteerCommentController.getVolunteerByComment
 );
 
-//봉사 모집하기 게시글의 특정 게시글의 댓글 조회
+//봉사 모집하기 특정 게시글의 댓글 조회
 volunteerCommentRouter.get(
   '/volunteerComments/:volunteerId',
-  VolunteerCommentController.getPostComment,
+  VolunteerCommentController.getPostComment
 );
 
 volunteerCommentRouter.patch(
   '/volunteerComments/:volunteerCommentId',
-<<<<<<< Updated upstream
-  VolunteerCommentController.patchComment
-=======
   loginRequired,
-  VolunteerCommentController.patchComment,
->>>>>>> Stashed changes
+  VolunteerCommentController.patchComment
 );
 
 volunteerCommentRouter.delete(
   '/volunteerComments/:volunteerCommentId',
-<<<<<<< Updated upstream
-  VolunteerCommentController.deleteComment
-=======
   loginRequired,
-  VolunteerCommentController.deleteComment,
->>>>>>> Stashed changes
+  VolunteerCommentController.deleteComment
 );
 
 export { volunteerCommentRouter };
