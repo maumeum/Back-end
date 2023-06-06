@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ReviewService } from '../services/reviewService.js';
 import { ObjectId } from 'mongodb';
 import { error } from 'console';
+import mongoose from 'mongoose';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -12,6 +13,28 @@ interface ReviewData {
 }
 class ReviewController {
   public reviewService = new ReviewService();
+
+  public readMyReview = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const user_id = req.id;
+      console.log(
+        '🚀 ~ file: reviewController.ts:24 ~ ReviewController ~ req.id:',
+        req.id,
+      );
+
+      console.log(user_id);
+      const reviews = await this.reviewService.getReviewsById(user_id);
+      console.log(reviews);
+      res.status(200).json(reviews);
+    } catch (error) {
+      console.error(error);
+      next();
+    }
+  };
 
   public readReview = async (
     req: Request,
@@ -114,6 +137,13 @@ class ReviewController {
       const user_id = req.id;
       const { volunteer_id } = req.body;
 
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+    if (!volunteer_id) {
+      throw new Error('volunteer_id 없음');
+=======
+>>>>>>> 8bc3748d4f95224af1ab0210316db9d3ab0beca2
       if (!volunteer_id) {
         throw new Error('volunteer_id 없음');
       }
@@ -121,11 +151,18 @@ class ReviewController {
         volunteer_id,
         user_id,
       );
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8bc3748d4f95224af1ab0210316db9d3ab0beca2
       res.status(201).json(changed);
     } catch (error) {
       console.error(error);
       next();
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> 8bc3748d4f95224af1ab0210316db9d3ab0beca2
     }
   };
 }
