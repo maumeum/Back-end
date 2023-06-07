@@ -1,5 +1,5 @@
-import { Ref } from '@typegoose/typegoose';
-import { PostCommentModel, PostModel } from '../db/index.js';
+import { Ref } from "@typegoose/typegoose";
+import { PostCommentModel, PostModel, UserModel } from "../db/index.js";
 
 export class CommunityService {
   public async createPost({
@@ -19,7 +19,7 @@ export class CommunityService {
       title,
       content,
       postType,
-      images: null,
+      images,
       user_id,
     });
 
@@ -47,7 +47,13 @@ export class CommunityService {
     return await PostCommentModel.find({ post_id: id });
   }
   public async indByPostIdPost(id: string) {
-    return await PostModel.findOne({ _id: id });
+    const post = await PostModel.findOne({ _id: id });
+    const user = await UserModel.findOne({ _id: post?.user_id });
+    const total = {
+      user: user!.nickname,
+      post,
+    };
+    return total;
   }
   public async delete(id: string) {
     PostModel.deleteOne({ _id: id });
@@ -63,7 +69,7 @@ export class CommunityService {
     }: {
       title: string;
       content: string;
-      images: string;
+      images?: string;
       postType: string;
     }
   ) {
