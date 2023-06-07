@@ -7,6 +7,9 @@ import { CONSTANTS } from '../utils/Constants.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { makeInstance } from '../utils/makeInstance.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
+import { buildResponse } from '../utils/builderResponse.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
 declare global {
   namespace Express {
     interface Request {
@@ -47,10 +50,13 @@ class UserController {
       const { email } = req.body;
       const user = await this.userService.getUserByEmail(email);
       if (user) {
-        throw new Error('중복된 이메일입니다.');
+        throw new AppError(
+          commonErrors.duplicationError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
       }
-
-      res.status(STATUS_CODE.OK).json(true);
+      res.status(STATUS_CODE.OK).json(buildResponse(null, null));
     },
   );
 
@@ -60,7 +66,11 @@ class UserController {
       const { nickname, email, password, phone } = req.body;
       const user = await this.userService.getUserByEmail(email);
       if (user) {
-        throw new Error('이미 가입된 계정입니다.');
+        throw new AppError(
+          commonErrors.duplicationError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
       }
 
       const createdUser = await this.userService.createUser({
@@ -69,7 +79,7 @@ class UserController {
         password,
         phone,
       });
-      res.status(STATUS_CODE.OK).json(createdUser);
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, createdUser));
     },
   );
 
@@ -88,23 +98,30 @@ class UserController {
       const { email, password } = <UserLoginInfo>req.body;
       const user = await this.userService.getUserByEmail(email);
       if (!user) {
-        throw new Error(
-          '해당 이메일은 가입 내역이 없습니다. 다시 한 번 확인해 주세요.',
+        throw new AppError(
+          `${commonErrors.authenticationError} : 가입내역 없음`,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
         );
       }
+
       if (user.role === 'disabled') {
-        throw new Error(
-          '해당 계정은 탈퇴처리된 계정입니다. 관리자에게 문의하세요.',
+        throw new AppError(
+          `${commonErrors.authorizationError} : 탈퇴`,
+          STATUS_CODE.FORBIDDEN,
+          'FORBIDDEN',
         );
       }
       const validPassword = await bcrypt.compare(password, user.password);
       if (!validPassword) {
-        throw new Error(
-          '비밀번호가 일치하지 않습니다. 다시 한 번 확인해 주세요.',
+        throw new AppError(
+          `${commonErrors.authorizationError} : 비밀번호 불일치`,
+          STATUS_CODE.FORBIDDEN,
+          'FORBIDDEN',
         );
       }
       const madeToken = makeJwtToken(user);
-      res.status(STATUS_CODE.CREATED).json(madeToken);
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, madeToken));
     },
   );
 
@@ -114,7 +131,11 @@ class UserController {
       const { password } = req.body;
       const user = await this.userService.getUserPasswordById(user_id);
       if (!user) {
-        throw new Error('비정상적 접근 에러');
+        throw new AppError(
+          commonErrors.authorizationError,
+          STATUS_CODE.FORBIDDEN,
+          'FORBIDDEN',
+        );
       }
 
       const correctPasswordHash = user.password;
@@ -123,11 +144,13 @@ class UserController {
         correctPasswordHash,
       );
       if (!isPasswordCorrect) {
-        throw new Error(
-          '비밀번호가 일치하지 않습니다. 다시 한 번 확인해 주세요.',
+        throw new AppError(
+          `${commonErrors.authorizationError} : 비밀번호 불일치`,
+          STATUS_CODE.FORBIDDEN,
+          'FORBIDDEN',
         );
       }
-      res.status(STATUS_CODE.OK).json();
+      res.status(STATUS_CODE.OK).json(buildResponse(null, null));
     },
   );
 
@@ -161,7 +184,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(STATUS_CODE.CREATED).json();
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedUser));
     },
   );
 
@@ -181,19 +204,16 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(200).json();
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedUser));
     },
   );
 
   public updateImage = asyncHandler(
     async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
       const user_id = req.id;
-
       //@ts-ignore
       const image = `images/${req.file.filename}`;
       //@ts-ignore
-
-      // const { image } = req.body;
       const updateInfo: {
         image?: string;
       } = {};
@@ -206,7 +226,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(200).json();
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedUser));
     },
   );
 
@@ -220,7 +240,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(200).json();
+      res.status(STATUS_CODE.OK).json(buildResponse(null, updatedUser));
     },
   );
 }
