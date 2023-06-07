@@ -12,6 +12,7 @@ import {
 } from './routers/index.js';
 import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
 import { postCommentRouter } from './routers/postCommentRouter.js';
+import { error } from 'console';
 
 dotenv.config();
 
@@ -44,8 +45,8 @@ app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(error);
   res
     .status(500)
     .send('마지막 에러핸들러로 오류가 전달되었습니다. 콘솔을 확인해주세요.');
