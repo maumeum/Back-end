@@ -3,13 +3,16 @@ import { ObjectId } from 'mongodb';
 import { Post } from '../db/schemas/postSchema.js';
 
 interface PostCommentData {
-  post_id: ObjectId;
   user_id: ObjectId;
+  post_id: ObjectId;
   content: string;
+}
+
+interface PostCommentDateData {
   createdAt: Date;
 }
 class PostCommentService {
-  static async createComment(postCommentData: PostCommentData) {
+  public async createComment(postCommentData: PostCommentData) {
     const postComment = await PostCommentModel.create(postCommentData);
 
     if (!postComment) {
@@ -19,19 +22,19 @@ class PostCommentService {
     return true;
   }
 
-  static async readPostByComment(user_id: ObjectId) {
+  public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
       ['title', 'content', 'postType']
     );
 
     if (userComments.length === 0) {
-      return false;
+      return [];
     }
 
     const postList = userComments.map((userComment) => {
       const postId = userComment.post_id as Post;
-      const uuserCommentObj = userComment.toObject() as PostCommentData;
+      const uuserCommentObj = userComment.toObject() as PostCommentDateData;
       const createdAt = uuserCommentObj.createdAt;
 
       return {
@@ -45,17 +48,17 @@ class PostCommentService {
     return postList;
   }
 
-  static async readComment(postId: string) {
-    const postCommentList = await PostCommentModel.find({ post_id: postId });
+  public async readComment(post_id: string) {
+    const postCommentList = await PostCommentModel.find({ post_id: post_id });
 
-    if (!postCommentList) {
-      throw new Error('댓글 조회를 실패하였습니다.');
+    if (postCommentList.length === 0) {
+      return [];
     }
 
     return postCommentList;
   }
 
-  static async updateComment(
+  public async updateComment(
     postCommentId: string,
     postCommentData: PostCommentData
   ) {
@@ -71,7 +74,7 @@ class PostCommentService {
     return true;
   }
 
-  static async deleteComment(postCommentId: string) {
+  public async deleteComment(postCommentId: string) {
     const deletePostComment = await PostCommentModel.findByIdAndDelete(
       postCommentId
     );

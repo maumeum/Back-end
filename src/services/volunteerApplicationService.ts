@@ -13,7 +13,7 @@ interface doubleCheckApplicationVolunteerData {
 }
 
 class VolunteerApplicationService {
-  static async createApplicationVolunteer({
+  public async createApplicationVolunteer({
     user_id,
     volunteer_id,
     isParticipate,
@@ -32,15 +32,11 @@ class VolunteerApplicationService {
         isParticipate,
       });
 
-      // if (!applicationVolunteer) {
-      //   throw new Error('봉사활동 신청에 실패하였습니다.');
-      // }
-
       return applicationVolunteer;
     }
   }
 
-  static async readApplicationVolunteer(userId: ObjectId) {
+  public async readApplicationVolunteer(userId: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
     }).populate('volunteer_id', [
@@ -51,10 +47,14 @@ class VolunteerApplicationService {
       'images',
     ]);
 
+    if (applicationVolunteerList.length === 0) {
+      return [];
+    }
+
     return applicationVolunteerList;
   }
 
-  static async doubleCheckApplicationVolunteer({
+  public async doubleCheckApplicationVolunteer({
     user_id,
     volunteer_id,
   }: doubleCheckApplicationVolunteerData) {
@@ -79,6 +79,9 @@ class VolunteerApplicationService {
       volunteer_id: volunteer_id,
     }).select('isParticipate');
 
+    if (applicationVolunteerList.length === 0) {
+      return [];
+    }
     return applicationVolunteerList;
   }
 }

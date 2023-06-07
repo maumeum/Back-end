@@ -1,125 +1,84 @@
-import { VolunteerCommentService } from '../services/volunteerCommentService.js';
+import { VolunteerCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { makeInstance } from '../utils/makeInstance.js';
 
 class VolunteerCommentController {
-  static postComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const volunteerComment = req.body;
-      const result = await VolunteerCommentService.createComment(
-        volunteerComment
-      );
+  private volunteerCommentService = makeInstance<VolunteerCommentService>(
+    VolunteerCommentService
+  );
 
-      if (result) {
-        res.status(200).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+  public postComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const user_id = req.id;
+      const { volunteer_id, content } = req.body;
+
+      await this.volunteerCommentService.createComment({
+        volunteer_id,
+        content,
+        user_id,
+      });
+
+      res.status(STATUS_CODE.OK).json({ message: 'created' });
     }
-  };
+  );
 
-  static getVolunteerByComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getVolunteerByComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const volunteerComment =
-        await VolunteerCommentService.readVolunteerByComment(user_id);
+        await this.volunteerCommentService.readVolunteerByComment(user_id);
 
-      if (volunteerComment) {
-        res.status(200).json(volunteerComment);
-      } else {
-        res.status(404).json({ status: 'false' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(volunteerComment);
     }
-  };
+  );
 
-  static getPostComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getPostComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
 
       if (!volunteerId) {
         throw new Error('봉사활동에 대한 정보가 없습니다.');
       }
 
-      const commentList = await VolunteerCommentService.readPostComment(
+      const commentList = await this.volunteerCommentService.readPostComment(
         volunteerId
       );
 
-      if (commentList) {
-        res.status(200).json(commentList);
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(commentList);
     }
-  };
+  );
 
-  static patchComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public patchComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
-        throw new Error('봉사활동 댓글ID에 대한 정보가 없습니다.');
+        throw new Error('봉사활동 댓글에 대한 정보가 없습니다.');
       }
       const volunteerCommentData = req.body;
-      const newComment = await VolunteerCommentService.updateComment(
+      await this.volunteerCommentService.updateComment(
         volunteerCommentId,
         volunteerCommentData
       );
 
-      if (newComment) {
-        res.status(200).json({ message: 'updated' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json({ message: 'updated' });
     }
-  };
+  );
 
-  static deleteComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public deleteComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
-        throw new Error('봉사활동 댓글ID에 대한 정보가 없습니다.');
+        throw new Error('봉사활동 댓글에 대한 정보가 없습니다.');
       }
-      const comment = await VolunteerCommentService.deleteComment(
-        volunteerCommentId
-      );
+      await this.volunteerCommentService.deleteComment(volunteerCommentId);
 
-      if (comment) {
-        res.status(201).json({ message: 'deleted' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json({ message: 'deleted' });
     }
-  };
+  );
 }
 
 export { VolunteerCommentController };

@@ -1,105 +1,87 @@
-import { PostCommentService } from '../services/postCommentService.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { PostCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { makeInstance } from '../utils/makeInstance.js';
 
 class PostCommentController {
-  static postComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const postCommentData = req.body;
-      const result = await PostCommentService.createComment(postCommentData);
+  private postCommentService =
+    makeInstance<PostCommentService>(PostCommentService);
 
-      if (result) {
-        res.status(201).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  static getComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { postId } = req.params;
-      const postCommentList = await PostCommentService.readComment(postId);
-
-      if (postCommentList) {
-        res.status(200).json(postCommentList);
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  static getPostByComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public postComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { post_id, content } = req.body;
       const user_id = req.id;
-      const postComment = await PostCommentService.readPostByComment(user_id);
 
-      if (postComment) {
-        res.status(200).json(postComment);
-      } else {
-        res.status(404).json({ status: 'false' });
-      }
-    } catch (error) {
-      next(error);
+      await this.postCommentService.createComment({
+        post_id,
+        content,
+        user_id,
+      });
+
+      res.status(STATUS_CODE.OK).json({ message: 'created' });
     }
-  };
+  );
 
-  static patchComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { post_id } = req.params;
+
+      if (!post_id) {
+        throw new Error('post_id 값이 올바르지 않습니다.');
+      }
+
+      const postCommentList = await this.postCommentService.readComment(
+        post_id
+      );
+
+      res.status(STATUS_CODE.OK).json(postCommentList);
+    }
+  );
+
+  public getPostByComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const user_id = req.id;
+
+      const postComment = await this.postCommentService.readPostByComment(
+        user_id
+      );
+
+      res.status(STATUS_CODE.OK).json(postComment);
+    }
+  );
+
+  public patchComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { postCommentId } = req.params;
+
+      if (!postCommentId) {
+        throw new Error('post_id 값이 올바르지 않습니다.');
+      }
       const postCommentData = req.body;
-      const result = await PostCommentService.updateComment(
+
+      await this.postCommentService.updateComment(
         postCommentId,
         postCommentData
       );
 
-      if (result) {
-        res.status(201).json({ message: 'updated' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json({ message: 'updated' });
     }
-  };
+  );
 
-  static deleteComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public deleteComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { postCommentId } = req.params;
-      const result = await PostCommentService.deleteComment(postCommentId);
 
-      if (result) {
-        res.status(201).json({ message: 'deleted' });
-      } else {
-        res.status(404).json({ message: 'error' });
+      if (!postCommentId) {
+        throw new Error('post_id 값이 올바르지 않습니다.');
       }
-    } catch (error) {
-      next(error);
+
+      await this.postCommentService.deleteComment(postCommentId);
+
+      res.status(STATUS_CODE.CREATED).json({ message: 'deleted' });
     }
-  };
+  );
 }
 
 export { PostCommentController };
