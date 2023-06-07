@@ -1,9 +1,12 @@
 import { Router } from 'express';
-import { VolunteerController } from '../controllers/volunteerController.js';
+import { VolunteerController } from '../controllers/index.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
+import { makeInstance } from '../utils/makeInstance.js';
 
 const volunteerRouter = Router();
-const volunteerController = new VolunteerController();
+
+const volunteerController =
+  makeInstance<VolunteerController>(VolunteerController);
 
 volunteerRouter.post(
   '/volunteers',

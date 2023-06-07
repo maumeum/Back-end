@@ -6,10 +6,13 @@ interface VolunteerCommentData {
   volunteer_id: ObjectId;
   user_id: ObjectId;
   content: string;
+}
+
+interface VolunteerCommentDateData {
   createdAt: Date;
 }
 class VolunteerCommentService {
-  static async createComment(volunteerComment: VolunteerCommentData) {
+  public async createComment(volunteerComment: VolunteerCommentData) {
     const comment = await VolunteerCommentModel.create(volunteerComment);
 
     if (!comment) {
@@ -19,19 +22,19 @@ class VolunteerCommentService {
     return true;
   }
 
-  static async readVolunteerByComment(user_id: ObjectId) {
+  public async readVolunteerByComment(user_id: ObjectId) {
     const userComments = await VolunteerCommentModel.find({ user_id }).populate(
       'volunteer_id',
       ['title', 'content']
     );
 
     if (userComments.length === 0) {
-      return false;
+      return [];
     }
 
     const volunteerList = userComments.map((userComment) => {
       const volunteerId = userComment.volunteer_id as Volunteer;
-      const userCommentObj = userComment.toObject() as VolunteerCommentData;
+      const userCommentObj = userComment.toObject() as VolunteerCommentDateData;
       const createdAt = userCommentObj.createdAt;
 
       return {
@@ -45,19 +48,19 @@ class VolunteerCommentService {
     return volunteerList;
   }
 
-  static async readPostComment(volunteerId: string) {
-    const commentList = await VolunteerCommentModel.find({
+  public async readPostComment(volunteerId: string) {
+    const postCommentList = await VolunteerCommentModel.find({
       volunteer_id: volunteerId,
     });
 
-    if (!commentList) {
-      throw new Error('댓글 조회를 실패하였습니다.');
+    if (postCommentList.length === 0) {
+      return [];
     }
 
-    return commentList;
+    return postCommentList;
   }
 
-  static async updateComment(
+  public async updateComment(
     volunteerCommentId: string,
     volunteerCommentData: VolunteerCommentData
   ) {
@@ -73,7 +76,7 @@ class VolunteerCommentService {
     return true;
   }
 
-  static async deleteComment(volunteerCommentId: string) {
+  public async deleteComment(volunteerCommentId: string) {
     const comment = await VolunteerCommentModel.findByIdAndDelete(
       volunteerCommentId
     );

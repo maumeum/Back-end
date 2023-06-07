@@ -1,54 +1,39 @@
-import { VolunteerApplicationService } from '../services/volunteerApplicationService.js';
+import { VolunteerApplicationService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { makeInstance } from '../utils/makeInstance.js';
 class VolunteerApplicationController {
-  static postApplicationVolunteer = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  private volunteerApplicationService =
+    makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
+
+  public postApplicationVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteer_id, isParticipate } = req.body;
 
       const user_id = req.id;
 
-      const result =
-        await VolunteerApplicationService.createApplicationVolunteer({
-          user_id,
-          volunteer_id,
-          isParticipate,
-        });
+      await this.volunteerApplicationService.createApplicationVolunteer({
+        user_id,
+        volunteer_id,
+        isParticipate,
+      });
 
-      if (result) {
-        res.status(201).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: '봉사활동 신청에 실패하였습니다.' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json({ message: 'created' });
     }
-  };
+  );
 
-  static getApplicationVolunter = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getApplicationVolunter = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const applicationVolunteerList =
-        await VolunteerApplicationService.readApplicationVolunteer(user_id);
+        await this.volunteerApplicationService.readApplicationVolunteer(
+          user_id
+        );
 
-      if (applicationVolunteerList) {
-        res.status(200).json(applicationVolunteerList);
-      } else {
-        res
-          .status(404)
-          .json({ message: '봉사활동 신청내역 조회에 실패하였습니다.' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(applicationVolunteerList);
     }
-  };
+  );
 }
 
 export { VolunteerApplicationController };

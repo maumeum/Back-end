@@ -1,120 +1,88 @@
 import { NextFunction, Request, Response } from 'express';
-import { VolunteerService } from '../services/volunteerService.js';
-import { ObjectId } from 'mongodb';
+import { VolunteerService } from '../services/index.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { makeInstance } from '../utils/makeInstance.js';
 
 class VolunteerController {
-  public postVolunteer = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const volunteerData = req.body;
+  private volunteerService = makeInstance<VolunteerService>(VolunteerService);
 
-      const result = await VolunteerService.prototype.createVolunteer(
-        volunteerData
-      );
+  public postVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const register_user_id = req.id;
+      const volunteerBodyData = req.body;
 
-      //if else 문이 필요하지 않음. 어차피
-      if (result) {
-        res.status(201).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      const volunteerData = { ...volunteerBodyData, register_user_id };
+
+      await this.volunteerService.createVolunteer(volunteerData);
+
+      res.status(STATUS_CODE.CREATED).json({ message: 'created' });
     }
-  };
+  );
 
-  public getVolunteer = async (req: Request, res: Response) => {
-    try {
-      const volunteerList = await VolunteerService.prototype.readVolunteer();
+  public getVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const volunteerList = await this.volunteerService.readVolunteer();
 
-      if (volunteerList) {
-        res.status(200).json(volunteerList);
-      } else {
-        console.log('error');
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      console.log(error);
+      res.status(STATUS_CODE.OK).json(volunteerList);
     }
-  };
+  );
 
-  public getVolunteerById = async (req: Request, res: Response) => {
-    try {
+  public getVolunteerById = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
-      const volunteer = await VolunteerService.prototype.readVolunteerById(
+
+      if (!volunteerId) {
+        throw new Error('봉사활동 ID 정보를 다시 확인해주세요.');
+      }
+      const volunteer = await this.volunteerService.readVolunteerById(
         volunteerId
       );
 
-      if (volunteer) {
-        res.status(200).json(volunteer);
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {}
-  };
+      res.status(STATUS_CODE.OK).json(volunteer);
+    }
+  );
 
-  public getSearchVolunteer = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getSearchVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { keyword } = req.query;
 
       if (keyword) {
         const searchVolunteers =
-          await VolunteerService.prototype.readSearchVolunteer(
-            keyword as string
-          );
+          await this.volunteerService.readSearchVolunteer(keyword as string);
 
-        if (searchVolunteers) {
-          res.status(200).json(searchVolunteers);
-        } else {
-          res.status(404).json({ message: '검색된 결과가 없습니다.' });
-        }
+        res.status(STATUS_CODE.OK).json(searchVolunteers);
       } else {
-        res.status(404).json([]);
+        res.status(STATUS_CODE.OK).json([]);
       }
-    } catch (error) {
-      next(error);
     }
-  };
+  );
 
-  public getRegisterationVolunteer = async (req: Request, res: Response) => {
-    try {
+  public getRegisterationVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
 
       const registerationVolunteers =
-        await VolunteerService.prototype.readRegistrationVolunteer(user_id);
+        await this.volunteerService.readRegistrationVolunteer(user_id);
 
-      if (registerationVolunteers) {
-        res.status(200).json(registerationVolunteers);
-      } else {
-        res.status(400).json({ message: 'error' });
-      }
-    } catch (error) {}
-  };
+      res.status(STATUS_CODE.OK).json(registerationVolunteers);
+    }
+  );
 
-  public patchVolunteer = async (req: Request, res: Response) => {
-    try {
+  public patchVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const VolunteerData = req.body;
       const { volunteerId } = req.params;
 
-      const volunteer = await VolunteerService.prototype.updateVolunteer(
-        VolunteerData,
-        volunteerId
-      );
-
-      if (volunteer) {
-        res.status(201).json({ message: 'updated' });
-      } else {
-        res.status(404).json({ message: 'error' });
+      if (!volunteerId) {
+        throw new Error('봉사활동 ID 정보를 다시 확인해주세요.');
       }
-    } catch (error) {}
-  };
+
+      await this.volunteerService.updateVolunteer(VolunteerData, volunteerId);
+
+      res.status(STATUS_CODE.CREATED).json({ message: 'updated' });
+    }
+  );
 }
 
 export { VolunteerController };
