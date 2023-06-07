@@ -1,6 +1,9 @@
 import { PostCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
 import { Post } from '../db/schemas/postSchema.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface PostCommentData {
   user_id: ObjectId;
@@ -16,7 +19,12 @@ class PostCommentService {
     const postComment = await PostCommentModel.create(postCommentData);
 
     if (!postComment) {
-      throw new Error('댓글 작성에 실패하였습니다.');
+      //throw new Error('댓글 작성에 실패하였습니다.');
+      // throw new AppError(
+      //   commonErrors.inputError,
+      //   STATUS_CODE.NOT_FOUND,
+      //   'NOT FOUND'
+      // );
     }
 
     return true;
@@ -25,7 +33,7 @@ class PostCommentService {
   public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
-      ['title', 'content', 'postType'],
+      ['title', 'content', 'postType']
     );
 
     if (userComments.length === 0) {
@@ -60,11 +68,11 @@ class PostCommentService {
 
   public async updateComment(
     postCommentId: string,
-    postCommentData: PostCommentData,
+    postCommentData: PostCommentData
   ) {
     const newPostComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
-      postCommentData,
+      postCommentData
     );
 
     if (!newPostComment) {
@@ -76,7 +84,7 @@ class PostCommentService {
 
   public async deleteComment(postCommentId: string) {
     const deletePostComment = await PostCommentModel.findByIdAndDelete(
-      postCommentId,
+      postCommentId
     );
 
     if (!deletePostComment) {
