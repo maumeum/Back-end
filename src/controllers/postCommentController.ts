@@ -1,13 +1,11 @@
+import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { PostCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 class PostCommentController {
-  static postComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static postComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { post_id, content } = req.body;
       const user_id = req.id;
 
@@ -17,18 +15,12 @@ class PostCommentController {
         user_id,
       });
 
-      res.status(201).json({ message: 'created' });
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json({ message: 'created' });
     }
-  };
+  );
 
-  static getComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static getComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { post_id } = req.params;
 
       if (!post_id) {
@@ -37,34 +29,22 @@ class PostCommentController {
 
       const postCommentList = await PostCommentService.readComment(post_id);
 
-      res.status(200).json(postCommentList);
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(postCommentList);
     }
-  };
+  );
 
-  static getPostByComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static getPostByComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
 
       const postComment = await PostCommentService.readPostByComment(user_id);
 
-      res.status(200).json(postComment);
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(postComment);
     }
-  };
+  );
 
-  static patchComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static patchComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { postCommentId } = req.params;
 
       if (!postCommentId) {
@@ -74,18 +54,12 @@ class PostCommentController {
 
       await PostCommentService.updateComment(postCommentId, postCommentData);
 
-      res.status(201).json({ message: 'updated' });
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json({ message: 'updated' });
     }
-  };
+  );
 
-  static deleteComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static deleteComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { postCommentId } = req.params;
 
       if (!postCommentId) {
@@ -94,11 +68,9 @@ class PostCommentController {
 
       await PostCommentService.deleteComment(postCommentId);
 
-      res.status(201).json({ message: 'deleted' });
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json({ message: 'deleted' });
     }
-  };
+  );
 }
 
 export { PostCommentController };

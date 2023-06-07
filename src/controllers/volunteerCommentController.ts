@@ -1,13 +1,11 @@
 import { VolunteerCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
 
 class VolunteerCommentController {
-  static postComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static postComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const { volunteer_id, content } = req.body;
 
@@ -17,34 +15,22 @@ class VolunteerCommentController {
         user_id,
       });
 
-      res.status(200).json({ message: 'created' });
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json({ message: 'created' });
     }
-  };
+  );
 
-  static getVolunteerByComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static getVolunteerByComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const volunteerComment =
         await VolunteerCommentService.readVolunteerByComment(user_id);
 
-      res.status(200).json(volunteerComment);
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(volunteerComment);
     }
-  };
+  );
 
-  static getPostComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static getPostComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
 
       if (!volunteerId) {
@@ -55,22 +41,12 @@ class VolunteerCommentController {
         volunteerId
       );
 
-      if (commentList) {
-        res.status(200).json(commentList);
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(commentList);
     }
-  };
+  );
 
-  static patchComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static patchComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
@@ -82,18 +58,12 @@ class VolunteerCommentController {
         volunteerCommentData
       );
 
-      res.status(200).json({ message: 'updated' });
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json({ message: 'updated' });
     }
-  };
+  );
 
-  static deleteComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  static deleteComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
@@ -101,11 +71,9 @@ class VolunteerCommentController {
       }
       await VolunteerCommentService.deleteComment(volunteerCommentId);
 
-      res.status(201).json({ message: 'deleted' });
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json({ message: 'deleted' });
     }
-  };
+  );
 }
 
 export { VolunteerCommentController };

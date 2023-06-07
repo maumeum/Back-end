@@ -1,13 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { VolunteerService } from '../services/index.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
 
 class VolunteerController {
-  public postVolunteer = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public postVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const register_user_id = req.id;
       const volunteerBodyData = req.body;
 
@@ -15,32 +13,20 @@ class VolunteerController {
 
       await VolunteerService.prototype.createVolunteer(volunteerData);
 
-      res.status(201).json({ message: 'created' });
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json({ message: 'created' });
     }
-  };
+  );
 
-  public getVolunteer = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const volunteerList = await VolunteerService.prototype.readVolunteer();
 
-      res.status(200).json(volunteerList);
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(volunteerList);
     }
-  };
+  );
 
-  public getVolunteerById = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getVolunteerById = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
 
       if (!volunteerId) {
@@ -50,18 +36,12 @@ class VolunteerController {
         volunteerId
       );
 
-      res.status(200).json(volunteer);
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(volunteer);
     }
-  };
+  );
 
-  public getSearchVolunteer = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getSearchVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { keyword } = req.query;
 
       if (keyword) {
@@ -70,38 +50,26 @@ class VolunteerController {
             keyword as string
           );
 
-        res.status(200).json(searchVolunteers);
+        res.status(STATUS_CODE.OK).json(searchVolunteers);
       } else {
-        res.status(200).json([]);
+        res.status(STATUS_CODE.OK).json([]);
       }
-    } catch (error) {
-      next(error);
     }
-  };
+  );
 
-  public getRegisterationVolunteer = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getRegisterationVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
 
       const registerationVolunteers =
         await VolunteerService.prototype.readRegistrationVolunteer(user_id);
 
-      res.status(200).json(registerationVolunteers);
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.OK).json(registerationVolunteers);
     }
-  };
+  );
 
-  public patchVolunteer = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public patchVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const VolunteerData = req.body;
       const { volunteerId } = req.params;
 
@@ -109,16 +77,14 @@ class VolunteerController {
         throw new Error('봉사활동 ID 정보를 다시 확인해주세요.');
       }
 
-      const volunteer = await VolunteerService.prototype.updateVolunteer(
+      await VolunteerService.prototype.updateVolunteer(
         VolunteerData,
         volunteerId
       );
 
-      res.status(201).json({ message: 'updated' });
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json({ message: 'updated' });
     }
-  };
+  );
 }
 
 export { VolunteerController };
