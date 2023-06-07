@@ -5,6 +5,7 @@ import { makeJwtToken } from '../utils/jwtTokenMaker.js';
 import { ObjectId } from 'mongodb';
 import { CONSTANTS } from '../utils/Constants.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { makeInstance } from '../utils/makeInstance.js';
 declare global {
   namespace Express {
     interface Request {
@@ -35,9 +36,11 @@ interface UpdateUserInfoRequest extends Request {
     introduction?: string;
   };
 }
+//@ts-ignore
 
 class UserController {
-  public userService = new UserService();
+  // public userService = new UserService();
+  private userService = makeInstance<UserService>(UserService);
 
   //회원가입시 이메일 중복체크
   public checkEmailDuplication = asyncHandler(
