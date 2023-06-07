@@ -1,4 +1,4 @@
-import { VolunteerCommentService } from '../services/volunteerCommentService.js';
+import { VolunteerCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
 
 class VolunteerCommentController {
@@ -8,16 +8,16 @@ class VolunteerCommentController {
     next: NextFunction
   ) => {
     try {
-      const volunteerComment = req.body;
-      const result = await VolunteerCommentService.createComment(
-        volunteerComment
-      );
+      const user_id = req.id;
+      const { volunteer_id, content } = req.body;
 
-      if (result) {
-        res.status(200).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
+      await VolunteerCommentService.createComment({
+        volunteer_id,
+        content,
+        user_id,
+      });
+
+      res.status(200).json({ message: 'created' });
     } catch (error) {
       next(error);
     }
@@ -33,11 +33,7 @@ class VolunteerCommentController {
       const volunteerComment =
         await VolunteerCommentService.readVolunteerByComment(user_id);
 
-      if (volunteerComment) {
-        res.status(200).json(volunteerComment);
-      } else {
-        res.status(404).json({ status: 'false' });
-      }
+      res.status(200).json(volunteerComment);
     } catch (error) {
       next(error);
     }
@@ -78,19 +74,15 @@ class VolunteerCommentController {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
-        throw new Error('봉사활동 댓글ID에 대한 정보가 없습니다.');
+        throw new Error('봉사활동 댓글에 대한 정보가 없습니다.');
       }
       const volunteerCommentData = req.body;
-      const newComment = await VolunteerCommentService.updateComment(
+      await VolunteerCommentService.updateComment(
         volunteerCommentId,
         volunteerCommentData
       );
 
-      if (newComment) {
-        res.status(200).json({ message: 'updated' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
+      res.status(200).json({ message: 'updated' });
     } catch (error) {
       next(error);
     }
@@ -105,17 +97,11 @@ class VolunteerCommentController {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
-        throw new Error('봉사활동 댓글ID에 대한 정보가 없습니다.');
+        throw new Error('봉사활동 댓글에 대한 정보가 없습니다.');
       }
-      const comment = await VolunteerCommentService.deleteComment(
-        volunteerCommentId
-      );
+      await VolunteerCommentService.deleteComment(volunteerCommentId);
 
-      if (comment) {
-        res.status(201).json({ message: 'deleted' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
+      res.status(201).json({ message: 'deleted' });
     } catch (error) {
       next(error);
     }

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { VolunteerController } from '../controllers/volunteerController.js';
+import { VolunteerController } from '../controllers/index.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
 
 const volunteerRouter = Router();

@@ -3,9 +3,12 @@ import { ObjectId } from 'mongodb';
 import { Post } from '../db/schemas/postSchema.js';
 
 interface PostCommentData {
-  post_id: ObjectId;
   user_id: ObjectId;
+  post_id: ObjectId;
   content: string;
+}
+
+interface PostCommentDateData {
   createdAt: Date;
 }
 class PostCommentService {
@@ -26,12 +29,12 @@ class PostCommentService {
     );
 
     if (userComments.length === 0) {
-      return false;
+      return [];
     }
 
     const postList = userComments.map((userComment) => {
       const postId = userComment.post_id as Post;
-      const uuserCommentObj = userComment.toObject() as PostCommentData;
+      const uuserCommentObj = userComment.toObject() as PostCommentDateData;
       const createdAt = uuserCommentObj.createdAt;
 
       return {
@@ -45,11 +48,11 @@ class PostCommentService {
     return postList;
   }
 
-  static async readComment(postId: string) {
-    const postCommentList = await PostCommentModel.find({ post_id: postId });
+  static async readComment(post_id: string) {
+    const postCommentList = await PostCommentModel.find({ post_id: post_id });
 
-    if (!postCommentList) {
-      throw new Error('댓글 조회를 실패하였습니다.');
+    if (postCommentList.length === 0) {
+      return [];
     }
 
     return postCommentList;

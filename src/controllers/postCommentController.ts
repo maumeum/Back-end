@@ -1,4 +1,4 @@
-import { PostCommentService } from '../services/postCommentService.js';
+import { PostCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
 
 class PostCommentController {
@@ -8,14 +8,16 @@ class PostCommentController {
     next: NextFunction
   ) => {
     try {
-      const postCommentData = req.body;
-      const result = await PostCommentService.createComment(postCommentData);
+      const { post_id, content } = req.body;
+      const user_id = req.id;
 
-      if (result) {
-        res.status(201).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
+      await PostCommentService.createComment({
+        post_id,
+        content,
+        user_id,
+      });
+
+      res.status(201).json({ message: 'created' });
     } catch (error) {
       next(error);
     }
@@ -27,14 +29,15 @@ class PostCommentController {
     next: NextFunction
   ) => {
     try {
-      const { postId } = req.params;
-      const postCommentList = await PostCommentService.readComment(postId);
+      const { post_id } = req.params;
 
-      if (postCommentList) {
-        res.status(200).json(postCommentList);
-      } else {
-        res.status(404).json({ message: 'error' });
+      if (!post_id) {
+        throw new Error('post_id 값이 올바르지 않습니다.');
       }
+
+      const postCommentList = await PostCommentService.readComment(post_id);
+
+      res.status(200).json(postCommentList);
     } catch (error) {
       next(error);
     }
@@ -47,13 +50,10 @@ class PostCommentController {
   ) => {
     try {
       const user_id = req.id;
+
       const postComment = await PostCommentService.readPostByComment(user_id);
 
-      if (postComment) {
-        res.status(200).json(postComment);
-      } else {
-        res.status(404).json({ status: 'false' });
-      }
+      res.status(200).json(postComment);
     } catch (error) {
       next(error);
     }
@@ -66,17 +66,15 @@ class PostCommentController {
   ) => {
     try {
       const { postCommentId } = req.params;
-      const postCommentData = req.body;
-      const result = await PostCommentService.updateComment(
-        postCommentId,
-        postCommentData
-      );
 
-      if (result) {
-        res.status(201).json({ message: 'updated' });
-      } else {
-        res.status(404).json({ message: 'error' });
+      if (!postCommentId) {
+        throw new Error('post_id 값이 올바르지 않습니다.');
       }
+      const postCommentData = req.body;
+
+      await PostCommentService.updateComment(postCommentId, postCommentData);
+
+      res.status(201).json({ message: 'updated' });
     } catch (error) {
       next(error);
     }
@@ -89,13 +87,14 @@ class PostCommentController {
   ) => {
     try {
       const { postCommentId } = req.params;
-      const result = await PostCommentService.deleteComment(postCommentId);
 
-      if (result) {
-        res.status(201).json({ message: 'deleted' });
-      } else {
-        res.status(404).json({ message: 'error' });
+      if (!postCommentId) {
+        throw new Error('post_id 값이 올바르지 않습니다.');
       }
+
+      await PostCommentService.deleteComment(postCommentId);
+
+      res.status(201).json({ message: 'deleted' });
     } catch (error) {
       next(error);
     }

@@ -32,10 +32,6 @@ class VolunteerApplicationService {
         isParticipate,
       });
 
-      // if (!applicationVolunteer) {
-      //   throw new Error('봉사활동 신청에 실패하였습니다.');
-      // }
-
       return applicationVolunteer;
     }
   }
@@ -50,6 +46,10 @@ class VolunteerApplicationService {
       'statusName',
       'images',
     ]);
+
+    if (applicationVolunteerList.length === 0) {
+      return [];
+    }
 
     return applicationVolunteerList;
   }
@@ -79,6 +79,9 @@ class VolunteerApplicationService {
       volunteer_id: volunteer_id,
     }).select('isParticipate');
 
+    if (applicationVolunteerList.length === 0) {
+      return [];
+    }
     return applicationVolunteerList;
   }
 }

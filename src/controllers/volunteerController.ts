@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { VolunteerService } from '../services/volunteerService.js';
-import { ObjectId } from 'mongodb';
+import { VolunteerService } from '../services/index.js';
 
 class VolunteerController {
   public postVolunteer = async (
@@ -9,51 +8,52 @@ class VolunteerController {
     next: NextFunction
   ) => {
     try {
-      const volunteerData = req.body;
+      const register_user_id = req.id;
+      const volunteerBodyData = req.body;
 
-      const result = await VolunteerService.prototype.createVolunteer(
-        volunteerData
-      );
+      const volunteerData = { ...volunteerBodyData, register_user_id };
 
-      //if else 문이 필요하지 않음. 어차피
-      if (result) {
-        res.status(201).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
+      await VolunteerService.prototype.createVolunteer(volunteerData);
+
+      res.status(201).json({ message: 'created' });
     } catch (error) {
       next(error);
     }
   };
 
-  public getVolunteer = async (req: Request, res: Response) => {
+  public getVolunteer = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const volunteerList = await VolunteerService.prototype.readVolunteer();
 
-      if (volunteerList) {
-        res.status(200).json(volunteerList);
-      } else {
-        console.log('error');
-        res.status(404).json({ message: 'error' });
-      }
+      res.status(200).json(volunteerList);
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   };
 
-  public getVolunteerById = async (req: Request, res: Response) => {
+  public getVolunteerById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new Error('봉사활동 ID 정보를 다시 확인해주세요.');
+      }
       const volunteer = await VolunteerService.prototype.readVolunteerById(
         volunteerId
       );
 
-      if (volunteer) {
-        res.status(200).json(volunteer);
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {}
+      res.status(200).json(volunteer);
+    } catch (error) {
+      next(error);
+    }
   };
 
   public getSearchVolunteer = async (
@@ -70,50 +70,54 @@ class VolunteerController {
             keyword as string
           );
 
-        if (searchVolunteers) {
-          res.status(200).json(searchVolunteers);
-        } else {
-          res.status(404).json({ message: '검색된 결과가 없습니다.' });
-        }
+        res.status(200).json(searchVolunteers);
       } else {
-        res.status(404).json([]);
+        res.status(200).json([]);
       }
     } catch (error) {
       next(error);
     }
   };
 
-  public getRegisterationVolunteer = async (req: Request, res: Response) => {
+  public getRegisterationVolunteer = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const user_id = req.id;
 
       const registerationVolunteers =
         await VolunteerService.prototype.readRegistrationVolunteer(user_id);
 
-      if (registerationVolunteers) {
-        res.status(200).json(registerationVolunteers);
-      } else {
-        res.status(400).json({ message: 'error' });
-      }
-    } catch (error) {}
+      res.status(200).json(registerationVolunteers);
+    } catch (error) {
+      next(error);
+    }
   };
 
-  public patchVolunteer = async (req: Request, res: Response) => {
+  public patchVolunteer = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const VolunteerData = req.body;
       const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new Error('봉사활동 ID 정보를 다시 확인해주세요.');
+      }
 
       const volunteer = await VolunteerService.prototype.updateVolunteer(
         VolunteerData,
         volunteerId
       );
 
-      if (volunteer) {
-        res.status(201).json({ message: 'updated' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {}
+      res.status(201).json({ message: 'updated' });
+    } catch (error) {
+      next(error);
+    }
   };
 }
 

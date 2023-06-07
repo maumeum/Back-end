@@ -1,35 +1,35 @@
 import { Router } from 'express';
-import { PostCommentController } from '../controllers/postCommentController.js';
+import { PostCommentController } from '../controllers/index.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
 const postCommentRouter = Router();
 
 postCommentRouter.post(
   '/postComments',
   loginRequired,
-  PostCommentController.postComment,
+  PostCommentController.postComment
 );
 
 postCommentRouter.get(
   '/postComments/users',
   loginRequired,
-  PostCommentController.getPostByComment,
+  PostCommentController.getPostByComment
 );
 
 postCommentRouter.get(
   '/postComments/:postId',
-  PostCommentController.getComment,
+  PostCommentController.getComment
 );
 
 postCommentRouter.patch(
   '/postComments/:postCommentId',
   loginRequired,
-  PostCommentController.patchComment,
+  PostCommentController.patchComment
 );
 
 postCommentRouter.delete(
   '/postComments/:postCommentId',
   loginRequired,
-  PostCommentController.deleteComment,
+  PostCommentController.deleteComment
 );
 
 export { postCommentRouter };

@@ -1,4 +1,4 @@
-import { VolunteerApplicationService } from '../services/volunteerApplicationService.js';
+import { VolunteerApplicationService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
 class VolunteerApplicationController {
   static postApplicationVolunteer = async (
@@ -11,18 +11,13 @@ class VolunteerApplicationController {
 
       const user_id = req.id;
 
-      const result =
-        await VolunteerApplicationService.createApplicationVolunteer({
-          user_id,
-          volunteer_id,
-          isParticipate,
-        });
+      await VolunteerApplicationService.createApplicationVolunteer({
+        user_id,
+        volunteer_id,
+        isParticipate,
+      });
 
-      if (result) {
-        res.status(201).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: '봉사활동 신청에 실패하였습니다.' });
-      }
+      res.status(201).json({ message: 'created' });
     } catch (error) {
       next(error);
     }
@@ -38,13 +33,7 @@ class VolunteerApplicationController {
       const applicationVolunteerList =
         await VolunteerApplicationService.readApplicationVolunteer(user_id);
 
-      if (applicationVolunteerList) {
-        res.status(200).json(applicationVolunteerList);
-      } else {
-        res
-          .status(404)
-          .json({ message: '봉사활동 신청내역 조회에 실패하였습니다.' });
-      }
+      res.status(200).json(applicationVolunteerList);
     } catch (error) {
       next(error);
     }

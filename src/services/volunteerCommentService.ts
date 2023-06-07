@@ -6,6 +6,9 @@ interface VolunteerCommentData {
   volunteer_id: ObjectId;
   user_id: ObjectId;
   content: string;
+}
+
+interface VolunteerCommentDateData {
   createdAt: Date;
 }
 class VolunteerCommentService {
@@ -26,12 +29,12 @@ class VolunteerCommentService {
     );
 
     if (userComments.length === 0) {
-      return false;
+      return [];
     }
 
     const volunteerList = userComments.map((userComment) => {
       const volunteerId = userComment.volunteer_id as Volunteer;
-      const userCommentObj = userComment.toObject() as VolunteerCommentData;
+      const userCommentObj = userComment.toObject() as VolunteerCommentDateData;
       const createdAt = userCommentObj.createdAt;
 
       return {
@@ -46,15 +49,15 @@ class VolunteerCommentService {
   }
 
   static async readPostComment(volunteerId: string) {
-    const commentList = await VolunteerCommentModel.find({
+    const postCommentList = await VolunteerCommentModel.find({
       volunteer_id: volunteerId,
     });
 
-    if (!commentList) {
-      throw new Error('댓글 조회를 실패하였습니다.');
+    if (postCommentList.length === 0) {
+      return [];
     }
 
-    return commentList;
+    return postCommentList;
   }
 
   static async updateComment(

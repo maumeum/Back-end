@@ -35,10 +35,6 @@ class VolunteerService {
 
   public async readVolunteer() {
     const volunteerList = await VolunteerModel.find({});
-    if (!volunteerList) {
-      throw new Error('봉사활동 전체 조회를 실패했습니다.');
-    }
-
     return volunteerList;
   }
 
@@ -63,11 +59,10 @@ class VolunteerService {
       $or: options,
     });
 
-    if (!volunteerList) {
-      return false;
+    if (volunteerList.length === 0) {
+      return [];
     }
 
-    console.log(volunteerList);
     return volunteerList;
   }
 
@@ -76,8 +71,8 @@ class VolunteerService {
       register_user_id: user_id,
     }).populate('register_user_id');
 
-    if (!volunteerList) {
-      throw new Error('등록한 봉사활동 목록 조회를 실패했습니다.');
+    if (volunteerList.length === 0) {
+      return [];
     }
 
     return volunteerList;
