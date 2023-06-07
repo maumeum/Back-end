@@ -1,11 +1,10 @@
 import { PostCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
 import { Post } from '../db/schemas/postSchema.js';
-import { DateTime } from 'luxon';
 
 interface PostCommentData {
-  post_id: ObjectId | string | null;
-  user_id: ObjectId | string | null;
+  post_id: ObjectId;
+  user_id: ObjectId;
   content: string;
   createdAt: Date;
 }
@@ -56,7 +55,10 @@ class PostCommentService {
     return postCommentList;
   }
 
-  static async updateComment(postCommentId: string, postCommentData: any) {
+  static async updateComment(
+    postCommentId: string,
+    postCommentData: PostCommentData
+  ) {
     const newPostComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
       postCommentData
