@@ -16,6 +16,8 @@ interface ReviewData {
 }
 class ReviewController {
   private reviewService = makeInstance<ReviewService>(ReviewService);
+  private volunteerApplicationService =
+    makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
 
   public readMyReview = async (
     req: Request,
@@ -57,7 +59,7 @@ class ReviewController {
       const user_id = req.id;
       const { title, content, images, volunteer_id }: ReviewData = req.body;
       const volunteer =
-        await VolunteerApplicationService.readApplicationVolunteerByVId(
+        await this.volunteerApplicationService.readApplicationVolunteerByVId(
           volunteer_id,
         );
       if (!volunteer[0].isParticipate) {

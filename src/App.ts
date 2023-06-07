@@ -19,8 +19,6 @@ dotenv.config();
 const app = express();
 const __dirname = path.resolve();
 app.use('/', express.static(path.join(__dirname, 'public')));
-console.log('🚀 ~ file: App.ts:22 ~ __dirname:', __dirname);
-
 app.use(cors()); //cors에러 방지
 app.use(express.json()); // 바디파서
 app.use(express.urlencoded({ extended: true }));

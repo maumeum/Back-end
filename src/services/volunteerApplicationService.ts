@@ -74,7 +74,7 @@ class VolunteerApplicationService {
     }
   }
 
-  static async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
+  public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       volunteer_id: volunteer_id,
     }).select('isParticipate');
