@@ -28,7 +28,6 @@
     "nanoid": "^4.0.2",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7"
-
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -40,7 +39,6 @@
     "@types/node": "^20.2.5",
     "@types/node-schedule": "^2.1.0",
     "concurrently": "^8.0.1",
-    "i": "^0.3.7",
     "nodemon": "^2.0.22",
     "npm": "^9.6.7",
     "typescript": "^5.0.4"
