@@ -12,24 +12,36 @@ export class CommunityController {
   public createPost = async (req: Request, res: Response) => {
     try {
       const { title, content, postType } = req.body;
-      const { originalname, path } = (req as MulterRequest).file;
-      const parts = originalname.split('.');
-      const ext = parts[parts.length - 1];
-      const newPath = path + '.' + ext;
 
-      fs.renameSync(path, newPath);
+      if (req.file) {
+        const { originalname, path } = (req as MulterRequest).file;
+        const parts = originalname.split('.');
+        const ext = parts[parts.length - 1];
+        const newPath = path + '.' + ext;
+        fs.renameSync(path, newPath);
+        const user_id: any = req.id;
+        const newPost = await this.communityService.createPost({
+          title,
+          content,
+          postType, //동행/함께
+          images: newPath,
+          user_id,
+        });
+        res.send(newPost);
+      } else {
+        const user_id: any = req.id;
 
-      const user_id: any = req.id;
+        const newPost = await this.communityService.createPost({
+          title,
+          content,
+          postType,
+          images: [],
+          user_id,
+        });
+        res.send(newPost);
+      }
 
-      const newPost = await this.communityService.createPost({
-        title,
-        content,
-        postType, //동행/함께
-        images: newPath,
-        user_id,
-      });
       console.log(req.body);
-      res.send(newPost);
     } catch (err) {
       res.status(400).send(err);
     }

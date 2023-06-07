@@ -19,7 +19,7 @@ export class CommunityService {
       title,
       content,
       postType,
-      images,
+      images: null,
       user_id,
     });
 

@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import { VolunteerModel } from '../db/index.js';
 
 interface VolunteerData {
+  volunteer_id: ObjectId;
   title: string;
   content: string;
   centName: string;

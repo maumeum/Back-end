@@ -12,10 +12,10 @@ class Post {
   @prop({ required: true })
   public content!: string;
 
-  @prop({ required: true })
+  @prop({ required: false })
   public images!: string[];
 
-  @prop({ required: true })
+  @prop({ required: false })
   public postType!: string;
 }
 
