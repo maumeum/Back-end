@@ -27,7 +27,8 @@ export class CommunityController {
           images: newPath,
           user_id,
         });
-        res.send(newPost);
+        console.log('저장성공');
+        res.status(201).send(newPost);
       } else {
         const user_id: any = req.id;
 
@@ -38,6 +39,7 @@ export class CommunityController {
           images: [],
           user_id,
         });
+        console.log('저장성공');
         res.send(newPost);
       }
 
