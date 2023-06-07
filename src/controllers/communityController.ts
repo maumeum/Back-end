@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { CommunityService } from '../services/communityService.js';
-import fs from 'fs';
+import { Request, Response } from "express";
+import { CommunityService } from "../services/communityService.js";
+import fs from "fs";
 
 interface MulterRequest extends Request {
   file: any;
@@ -15,9 +15,9 @@ export class CommunityController {
 
       if (req.file) {
         const { originalname, path } = (req as MulterRequest).file;
-        const parts = originalname.split('.');
+        const parts = originalname.split(".");
         const ext = parts[parts.length - 1];
-        const newPath = path + '.' + ext;
+        const newPath = path + "." + ext;
         fs.renameSync(path, newPath);
         const user_id: any = req.id;
         const newPost = await this.communityService.createPost({
@@ -27,11 +27,10 @@ export class CommunityController {
           images: newPath,
           user_id,
         });
-        console.log('저장성공');
+        console.log("저장성공");
         res.status(201).send(newPost);
       } else {
         const user_id: any = req.id;
-
         const newPost = await this.communityService.createPost({
           title,
           content,
@@ -39,7 +38,7 @@ export class CommunityController {
           images: [],
           user_id,
         });
-        console.log('저장성공');
+        console.log("저장성공");
         res.send(newPost);
       }
 
@@ -84,21 +83,30 @@ export class CommunityController {
     try {
       const { title, content, postType } = req.body;
 
-      const { originalname, path } = (req as MulterRequest).file;
-      const parts = originalname.split('.');
-      const ext = parts[parts.length - 1];
-      const newPath = path + '.' + ext;
-      fs.renameSync(path, newPath);
+      if (req.file) {
+        const { originalname, path } = (req as MulterRequest).file;
+        const parts = originalname.split(".");
+        const ext = parts[parts.length - 1];
+        const newPath = path + "." + ext;
+        fs.renameSync(path, newPath);
 
-      const Posts = await this.communityService.findOneAndUpdate(id, {
-        title,
-        content,
-        images: newPath,
-        postType,
-      });
-      res.send(Posts);
+        const Posts = await this.communityService.findOneAndUpdate(id, {
+          title,
+          content,
+          images: newPath,
+          postType,
+        });
+        res.send(Posts);
+      } else {
+        const Posts = await this.communityService.findOneAndUpdate(id, {
+          title,
+          content,
+          postType,
+        });
+        res.send(Posts);
+      }
     } catch {
-      res.status(400).send({ message: '오류 발생' });
+      res.status(400).send({ message: "오류 발생" });
     }
   };
   public getPostByCategory = async (req: Request, res: Response) => {
@@ -115,10 +123,10 @@ export class CommunityController {
       // await PostModel.deleteOne({ _id: id });
       await this.communityService.delete(id);
       res.send({
-        message: '삭제가 완료되었습니다.',
+        message: "삭제가 완료되었습니다.",
       });
     } catch {
-      res.status(400).send({ message: '오류 발생' });
+      res.status(400).send({ message: "오류 발생" });
     }
   };
 
@@ -128,7 +136,7 @@ export class CommunityController {
       const userPosts = await this.communityService.getUserPosts(id);
       res.status(200).send(userPosts);
     } catch {
-      res.status(404).send({ message: '오류 발생' });
+      res.status(404).send({ message: "오류 발생" });
     }
   };
 }

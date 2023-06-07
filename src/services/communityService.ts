@@ -19,7 +19,7 @@ export class CommunityService {
       title,
       content,
       postType,
-      images: null,
+      images,
       user_id,
     });
 
@@ -63,7 +63,7 @@ export class CommunityService {
     }: {
       title: string;
       content: string;
-      images: string;
+      images?: string;
       postType: string;
     }
   ) {
