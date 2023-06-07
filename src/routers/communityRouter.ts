@@ -32,18 +32,18 @@ communityRouter.patch(
   '/community/:id',
   upload.single('file'),
   loginRequired,
-  communityController.patchPost,
+  communityController.patchPost
 );
 //카테고리별 조회
 communityRouter.post(
   'commnity/:category',
-  communityController.getPostByCategory,
+  communityController.getPostByCategory
 );
 //특정 게시물 삭제
 communityRouter.delete(
   '/community/:id',
   loginRequired,
-  communityController.deletePost,
+  communityController.deletePost
 );
 
 //게시물 작성
@@ -51,7 +51,7 @@ communityRouter.post(
   '/community/create',
   upload.single('file'),
   loginRequired,
-  communityController.createPost,
+  communityController.createPost
 );
 
 //게시글 조회
