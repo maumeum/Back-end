@@ -1,6 +1,5 @@
+import { ObjectId } from 'mongodb';
 import { VolunteerModel } from '../db/index.js';
-import { Volunteer } from '../db/schemas/volunteerSchema.js';
-import { Types } from 'mongoose';
 
 interface VolunteerData {
   title: string;
@@ -16,7 +15,7 @@ interface VolunteerData {
   actType: string;
   teenager: boolean;
   images: string[];
-  register_user_id: Types.ObjectId | string | null;
+  register_user_id: ObjectId;
 }
 
 class VolunteerService {
@@ -72,10 +71,10 @@ class VolunteerService {
     return volunteerList;
   }
 
-  public async readRegistrationVolunteer(userId: string) {
+  public async readRegistrationVolunteer(user_id: ObjectId) {
     const volunteerList = await VolunteerModel.find({
-      user_id: userId,
-    }).populate('user_id');
+      register_user_id: user_id,
+    }).populate('register_user_id');
 
     if (!volunteerList) {
       throw new Error('등록한 봉사활동 목록 조회를 실패했습니다.');
@@ -86,11 +85,11 @@ class VolunteerService {
 
   public async updateVolunteer(
     volunteerData: VolunteerData,
-    volunteerId: string,
+    volunteerId: string
   ) {
     const newVolunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
-      volunteerData,
+      volunteerData
     );
 
     if (!newVolunteer) {

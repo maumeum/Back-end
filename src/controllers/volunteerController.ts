@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { VolunteerService } from '../services/volunteerService.js';
+import { ObjectId } from 'mongodb';
 
 class VolunteerController {
   public postVolunteer = async (
@@ -84,9 +85,10 @@ class VolunteerController {
 
   public getRegisterationVolunteer = async (req: Request, res: Response) => {
     try {
-      const { userId } = req.params;
+      const user_id = req.id;
+
       const registerationVolunteers =
-        await VolunteerService.prototype.readRegistrationVolunteer(userId);
+        await VolunteerService.prototype.readRegistrationVolunteer(user_id);
 
       if (registerationVolunteers) {
         res.status(200).json(registerationVolunteers);
