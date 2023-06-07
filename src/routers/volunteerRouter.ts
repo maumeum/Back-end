@@ -8,43 +8,32 @@ const volunteerController = new VolunteerController();
 volunteerRouter.post(
   '/volunteers',
   loginRequired,
-  volunteerController.postVolunteer,
-);
-volunteerRouter.post(
-  '/volunteers',
-  loginRequired,
-  volunteerController.postVolunteer,
-);
-
-volunteerRouter.post(
-  '/volunteers',
-  loginRequired,
-  volunteerController.postVolunteer,
+  volunteerController.postVolunteer
 );
 
 // 쿼리스트링 : req.query.keyword 형태로 가져옴
 volunteerRouter.get(
   '/volunteers/search',
-  volunteerController.getSearchVolunteer,
+  volunteerController.getSearchVolunteer
+);
+
+volunteerRouter.get(
+  '/volunteers/registeration',
+  loginRequired,
+  volunteerController.getRegisterationVolunteer
+);
+
+volunteerRouter.get(
+  '/volunteers/:volunteerId',
+  volunteerController.getVolunteerById
 );
 
 volunteerRouter.get('/volunteers', volunteerController.getVolunteer);
 
-volunteerRouter.get(
-  '/volunteers/:volunteerId',
-  volunteerController.getVolunteerById,
-);
-
-volunteerRouter.get(
-  '/volunteers/:userId/registeration',
-  loginRequired,
-  volunteerController.getRegisterationVolunteer,
-);
-
 volunteerRouter.patch(
   '/volunteers/:volunteerId',
   loginRequired,
-  volunteerController.patchVolunteer,
+  volunteerController.patchVolunteer
 );
 
 export { volunteerRouter };
