@@ -74,7 +74,8 @@ class VolunteerApplicationService {
     }
   }
 
-  public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
+  //review랑 연결되어있어서 static으로 해뒀습니다! public으로 바꾸시면 돼요
+  static async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       volunteer_id: volunteer_id,
     }).select('isParticipate');
