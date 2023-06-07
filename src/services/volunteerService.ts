@@ -21,12 +21,17 @@ interface VolunteerData {
 
 class VolunteerService {
   public async createVolunteer(volunteerData: VolunteerData) {
+    const { deadline, startDate, endDate } = volunteerData;
+
+    if (deadline > startDate || deadline > endDate || startDate > endDate) {
+      return false;
+    }
     const createVolunteer = await VolunteerModel.create(volunteerData);
 
     if (!createVolunteer) {
       throw new Error('봉사활동 생성에 실패했습니다.');
     }
-    return createVolunteer;
+    return true;
   }
 
   public async readVolunteer() {
