@@ -4,6 +4,7 @@ import {
   VolunteerApplicationService,
 } from '../services/index.js';
 import { ObjectId } from 'mongodb';
+import { makeInstance } from '../utils/makeInstance.js';
 
 interface ReviewData {
   review_id?: ObjectId;
@@ -14,12 +15,14 @@ interface ReviewData {
   volunteer_id?: any; // 나중에 고쳐야함.
 }
 class ReviewController {
-  public reviewService = new ReviewService();
+  private reviewService = makeInstance<ReviewService>(ReviewService);
+  private volunteerApplicationService =
+    makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
 
   public readMyReview = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const user_id = req.id;
@@ -35,7 +38,7 @@ class ReviewController {
   public readReview = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const reviews = await this.reviewService.getReviews();
@@ -50,18 +53,18 @@ class ReviewController {
   public postReview = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const user_id = req.id;
       const { title, content, images, volunteer_id }: ReviewData = req.body;
       const volunteer =
-        await VolunteerApplicationService.readApplicationVolunteerByVId(
-          volunteer_id
+        await this.volunteerApplicationService.readApplicationVolunteerByVId(
+          volunteer_id,
         );
       if (!volunteer[0].isParticipate) {
         throw new Error(
-          '참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.'
+          '참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.',
         );
       }
 
@@ -82,7 +85,7 @@ class ReviewController {
   public updateReview = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       console.log('리뷰 수정 시작');
@@ -107,7 +110,7 @@ class ReviewController {
 
       const updatedReview = await this.reviewService.updateReview(
         review_id,
-        updateInfo
+        updateInfo,
       );
 
       res.status(201).json(updatedReview);
@@ -120,7 +123,7 @@ class ReviewController {
   public deleteReview = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const { review_id }: ReviewData = req.params;
@@ -137,7 +140,7 @@ class ReviewController {
   public changeParticipationStatus = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const user_id = req.id;
@@ -148,7 +151,7 @@ class ReviewController {
       }
       const changed = await this.reviewService.changeParticipateStatus(
         volunteer_id,
-        user_id
+        user_id,
       );
       res.status(201).json(changed);
     } catch (error) {
