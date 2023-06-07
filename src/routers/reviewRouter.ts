@@ -31,6 +31,7 @@ reviewRouter.delete(
   reviewController.deleteReview,
 );
 
+//isParticipate 상태 변경
 reviewRouter.post(
   '/review/users/participation',
   loginRequired,
