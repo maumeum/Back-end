@@ -4,6 +4,7 @@ import {
   VolunteerApplicationService,
 } from '../services/index.js';
 import { ObjectId } from 'mongodb';
+import { makeInstance } from '../utils/makeInstance.js';
 
 interface ReviewData {
   review_id?: ObjectId;
@@ -14,7 +15,7 @@ interface ReviewData {
   volunteer_id?: any; // 나중에 고쳐야함.
 }
 class ReviewController {
-  public reviewService = new ReviewService();
+  private reviewService = makeInstance<ReviewService>(ReviewService);
 
   public readMyReview = async (
     req: Request,

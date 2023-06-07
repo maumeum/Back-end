@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 import { CONSTANTS } from '../utils/Constants.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { makeInstance } from '../utils/makeInstance.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 declare global {
   namespace Express {
     interface Request {
@@ -23,7 +24,7 @@ interface updatedUser {
   nickname?: string;
   nanoid?: string;
   introduction?: string;
-  image?: string;
+  image?: any;
   phone?: string;
   role?: 'user' | 'admin' | 'disabled';
 }
@@ -36,10 +37,8 @@ interface UpdateUserInfoRequest extends Request {
     introduction?: string;
   };
 }
-//@ts-ignore
 
 class UserController {
-  // public userService = new UserService();
   private userService = makeInstance<UserService>(UserService);
 
   //회원가입시 이메일 중복체크
@@ -51,7 +50,7 @@ class UserController {
         throw new Error('중복된 이메일입니다.');
       }
 
-      res.status(200).json(true);
+      res.status(STATUS_CODE.OK).json(true);
     },
   );
 
@@ -70,7 +69,7 @@ class UserController {
         password,
         phone,
       });
-      res.status(201).json(createdUser);
+      res.status(STATUS_CODE.OK).json(createdUser);
     },
   );
 
@@ -79,17 +78,13 @@ class UserController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const user = await this.userService.getUserById(user_id);
-      res.status(200).json(user);
+      res.status(STATUS_CODE.OK).json(user);
     },
   );
 
   //유저 로그인
-  public userLogin = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public userLogin = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { email, password } = <UserLoginInfo>req.body;
       const user = await this.userService.getUserByEmail(email);
       if (!user) {
@@ -109,12 +104,9 @@ class UserController {
         );
       }
       const madeToken = makeJwtToken(user);
-      res.json(madeToken).status(201);
-      console.log('로그인 성공');
-    } catch (error) {
-      next(error);
-    }
-  };
+      res.status(STATUS_CODE.CREATED).json(madeToken);
+    },
+  );
 
   public userAuthorization = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -135,7 +127,7 @@ class UserController {
           '비밀번호가 일치하지 않습니다. 다시 한 번 확인해 주세요.',
         );
       }
-      res.status(200).json();
+      res.status(STATUS_CODE.OK).json();
     },
   );
 
@@ -169,16 +161,12 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(201).json();
+      res.status(STATUS_CODE.CREATED).json();
     },
   );
 
-  public updateIntroduction = async (
-    req: UpdateUserInfoRequest,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public updateIntroduction = asyncHandler(
+    async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const { introduction } = req.body;
       const updateInfo: {
@@ -194,20 +182,18 @@ class UserController {
         updateInfo,
       );
       res.status(200).json();
-      console.log('정보수정완료');
-    } catch (error) {
-      next(error);
-    }
-  };
+    },
+  );
 
-  public updateImage = async (
-    req: UpdateUserInfoRequest,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public updateImage = asyncHandler(
+    async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const { image } = req.body;
+
+      //@ts-ignore
+      const image = `images/${req.file.filename}`;
+      //@ts-ignore
+
+      // const { image } = req.body;
       const updateInfo: {
         image?: string;
       } = {};
@@ -221,18 +207,11 @@ class UserController {
         updateInfo,
       );
       res.status(200).json();
-      console.log('정보수정완료');
-    } catch (error) {
-      next(error);
-    }
-  };
+    },
+  );
 
-  public deleteUser = async (
-    req: UpdateUserInfoRequest,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public deleteUser = asyncHandler(
+    async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const updateInfo: updatedUser = {};
       updateInfo.role = 'disabled';
@@ -242,11 +221,8 @@ class UserController {
         updateInfo,
       );
       res.status(200).json();
-      console.log('role 변경 완료');
-    } catch (error) {
-      next(error);
-    }
-  };
+    },
+  );
 }
 
 export { UserController };

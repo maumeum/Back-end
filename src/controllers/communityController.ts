@@ -131,9 +131,9 @@ export class CommunityController {
   };
 
   public getUserPosts = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const user_id: any = req.id;
     try {
-      const userPosts = await this.communityService.getUserPosts(id);
+      const userPosts = await this.communityService.getUserPosts(user_id);
       res.status(200).send(userPosts);
     } catch {
       res.status(404).send({ message: "오류 발생" });
