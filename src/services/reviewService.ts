@@ -6,6 +6,7 @@ import {
 } from '../db/index.js';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
 import { DateTime } from 'luxon';
+import { CONSTANTS } from '../utils/Constants.js';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -60,30 +61,26 @@ class ReviewService {
       volunteer_id,
       user_id,
     }).populate('volunteer_id');
-    console.log(
-      '🚀 ~ file: reviewService.ts:53 ~ ReviewService ~ matchedApplyVolunteer:',
-      matchedApplyVolunteer,
-    );
 
     if (!matchedApplyVolunteer) {
       throw new Error('Matching volunteer application not found.');
+    }
+    if (matchedApplyVolunteer.isParticipate) {
+      throw new Error("isParticipate is already in status 'true'");
     }
 
     const volunteer = matchedApplyVolunteer.volunteer_id as Volunteer;
     const { endDate } = volunteer;
 
     const now = DateTime.now();
-    console.log('🚀 ~ file: reviewService.ts:64 ~ ReviewService ~ now:', now);
     const endDateTime = DateTime.fromJSDate(endDate);
-    console.log(
-      '🚀 ~ file: reviewService.ts:65 ~ ReviewService ~ endDateTime:',
-      endDateTime,
-    );
+<<<<<<< Updated upstream
     const sevenDaysAfterEnd = endDateTime.plus({ days: 7 });
-    console.log(
-      '🚀 ~ file: reviewService.ts:68 ~ ReviewService ~ sevenDaysAfterEnd:',
-      sevenDaysAfterEnd,
-    );
+=======
+    const sevenDaysAfterEnd = endDateTime.plus({
+      days: CONSTANTS.CHANGING_DATE,
+    });
+>>>>>>> Stashed changes
 
     if (now > endDateTime && now < sevenDaysAfterEnd) {
       if (!matchedApplyVolunteer.isParticipate) {
@@ -106,7 +103,8 @@ class ReviewService {
 
       if (
         volunteer &&
-        DateTime.fromJSDate(volunteer.endDate) < now.minus({ days: 7 })
+        DateTime.fromJSDate(volunteer.endDate) <
+          now.minus({ days: CONSTANTS.CHANGING_DATE })
       ) {
         apply.isParticipate = true;
         await apply.save();

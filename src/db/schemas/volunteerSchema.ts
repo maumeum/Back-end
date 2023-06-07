@@ -28,11 +28,11 @@ class Volunteer {
   @prop({ type: Date })
   public endDate!: Date;
 
-  @prop()
-  public applyCount?: number;
+  @prop({ required: true })
+  public applyCount!: number;
 
-  @prop()
-  public registerCount?: number;
+  @prop({ required: true })
+  public registerCount!: number;
 
   @prop({ required: true })
   public actType!: string;
