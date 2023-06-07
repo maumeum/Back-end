@@ -12,7 +12,7 @@ interface VolunteerCommentDateData {
   createdAt: Date;
 }
 class VolunteerCommentService {
-  static async createComment(volunteerComment: VolunteerCommentData) {
+  public async createComment(volunteerComment: VolunteerCommentData) {
     const comment = await VolunteerCommentModel.create(volunteerComment);
 
     if (!comment) {
@@ -22,7 +22,7 @@ class VolunteerCommentService {
     return true;
   }
 
-  static async readVolunteerByComment(user_id: ObjectId) {
+  public async readVolunteerByComment(user_id: ObjectId) {
     const userComments = await VolunteerCommentModel.find({ user_id }).populate(
       'volunteer_id',
       ['title', 'content']
@@ -48,7 +48,7 @@ class VolunteerCommentService {
     return volunteerList;
   }
 
-  static async readPostComment(volunteerId: string) {
+  public async readPostComment(volunteerId: string) {
     const postCommentList = await VolunteerCommentModel.find({
       volunteer_id: volunteerId,
     });
@@ -60,7 +60,7 @@ class VolunteerCommentService {
     return postCommentList;
   }
 
-  static async updateComment(
+  public async updateComment(
     volunteerCommentId: string,
     volunteerCommentData: VolunteerCommentData
   ) {
@@ -76,7 +76,7 @@ class VolunteerCommentService {
     return true;
   }
 
-  static async deleteComment(volunteerCommentId: string) {
+  public async deleteComment(volunteerCommentId: string) {
     const comment = await VolunteerCommentModel.findByIdAndDelete(
       volunteerCommentId
     );

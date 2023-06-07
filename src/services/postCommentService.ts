@@ -12,7 +12,7 @@ interface PostCommentDateData {
   createdAt: Date;
 }
 class PostCommentService {
-  static async createComment(postCommentData: PostCommentData) {
+  public async createComment(postCommentData: PostCommentData) {
     const postComment = await PostCommentModel.create(postCommentData);
 
     if (!postComment) {
@@ -22,7 +22,7 @@ class PostCommentService {
     return true;
   }
 
-  static async readPostByComment(user_id: ObjectId) {
+  public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
       ['title', 'content', 'postType']
@@ -48,7 +48,7 @@ class PostCommentService {
     return postList;
   }
 
-  static async readComment(post_id: string) {
+  public async readComment(post_id: string) {
     const postCommentList = await PostCommentModel.find({ post_id: post_id });
 
     if (postCommentList.length === 0) {
@@ -58,7 +58,7 @@ class PostCommentService {
     return postCommentList;
   }
 
-  static async updateComment(
+  public async updateComment(
     postCommentId: string,
     postCommentData: PostCommentData
   ) {
@@ -74,7 +74,7 @@ class PostCommentService {
     return true;
   }
 
-  static async deleteComment(postCommentId: string) {
+  public async deleteComment(postCommentId: string) {
     const deletePostComment = await PostCommentModel.findByIdAndDelete(
       postCommentId
     );

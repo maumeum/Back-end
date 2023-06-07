@@ -1,35 +1,40 @@
 import { Router } from 'express';
 import { PostCommentController } from '../controllers/index.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
+import { makeInstance } from '../utils/makeInstance.js';
 const postCommentRouter = Router();
+
+const postCommentController = makeInstance<PostCommentController>(
+  PostCommentController
+);
 
 postCommentRouter.post(
   '/postComments',
   loginRequired,
-  PostCommentController.postComment
+  postCommentController.postComment
 );
 
 postCommentRouter.get(
   '/postComments/users',
   loginRequired,
-  PostCommentController.getPostByComment
+  postCommentController.getPostByComment
 );
 
 postCommentRouter.get(
   '/postComments/:postId',
-  PostCommentController.getComment
+  postCommentController.getComment
 );
 
 postCommentRouter.patch(
   '/postComments/:postCommentId',
   loginRequired,
-  PostCommentController.patchComment
+  postCommentController.patchComment
 );
 
 postCommentRouter.delete(
   '/postComments/:postCommentId',
   loginRequired,
-  PostCommentController.deleteComment
+  postCommentController.deleteComment
 );
 
 export { postCommentRouter };

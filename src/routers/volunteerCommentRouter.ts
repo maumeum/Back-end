@@ -1,38 +1,43 @@
 import { Router } from 'express';
 import { VolunteerCommentController } from '../controllers/index.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
+import { makeInstance } from '../utils/makeInstance.js';
 
 const volunteerCommentRouter = Router();
+
+const volunteerCommentController = makeInstance<VolunteerCommentController>(
+  VolunteerCommentController
+);
 
 volunteerCommentRouter.post(
   '/volunteerComments',
   loginRequired,
-  VolunteerCommentController.postComment
+  volunteerCommentController.postComment
 );
 
 // 사용자가 작성한 댓글 게시물 제목 조회
 volunteerCommentRouter.get(
   '/volunteerComments/users',
   loginRequired,
-  VolunteerCommentController.getVolunteerByComment
+  volunteerCommentController.getVolunteerByComment
 );
 
 //봉사 모집하기 특정 게시글의 댓글 조회
 volunteerCommentRouter.get(
   '/volunteerComments/:volunteerId',
-  VolunteerCommentController.getPostComment
+  volunteerCommentController.getPostComment
 );
 
 volunteerCommentRouter.patch(
   '/volunteerComments/:volunteerCommentId',
   loginRequired,
-  VolunteerCommentController.patchComment
+  volunteerCommentController.patchComment
 );
 
 volunteerCommentRouter.delete(
   '/volunteerComments/:volunteerCommentId',
   loginRequired,
-  VolunteerCommentController.deleteComment
+  volunteerCommentController.deleteComment
 );
 
 export { volunteerCommentRouter };

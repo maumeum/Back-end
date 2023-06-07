@@ -13,7 +13,7 @@ interface doubleCheckApplicationVolunteerData {
 }
 
 class VolunteerApplicationService {
-  static async createApplicationVolunteer({
+  public async createApplicationVolunteer({
     user_id,
     volunteer_id,
     isParticipate,
@@ -36,7 +36,7 @@ class VolunteerApplicationService {
     }
   }
 
-  static async readApplicationVolunteer(userId: ObjectId) {
+  public async readApplicationVolunteer(userId: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
     }).populate('volunteer_id', [
@@ -54,7 +54,7 @@ class VolunteerApplicationService {
     return applicationVolunteerList;
   }
 
-  static async doubleCheckApplicationVolunteer({
+  public async doubleCheckApplicationVolunteer({
     user_id,
     volunteer_id,
   }: doubleCheckApplicationVolunteerData) {
@@ -74,7 +74,7 @@ class VolunteerApplicationService {
     }
   }
 
-  static async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
+  public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       volunteer_id: volunteer_id,
     }).select('isParticipate');

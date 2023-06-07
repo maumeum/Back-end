@@ -2,14 +2,19 @@ import { VolunteerCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { makeInstance } from '../utils/makeInstance.js';
 
 class VolunteerCommentController {
-  static postComment = asyncHandler(
+  private volunteerCommentService = makeInstance<VolunteerCommentService>(
+    VolunteerCommentService
+  );
+
+  public postComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const { volunteer_id, content } = req.body;
 
-      await VolunteerCommentService.createComment({
+      await this.volunteerCommentService.createComment({
         volunteer_id,
         content,
         user_id,
@@ -19,17 +24,17 @@ class VolunteerCommentController {
     }
   );
 
-  static getVolunteerByComment = asyncHandler(
+  public getVolunteerByComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const volunteerComment =
-        await VolunteerCommentService.readVolunteerByComment(user_id);
+        await this.volunteerCommentService.readVolunteerByComment(user_id);
 
       res.status(STATUS_CODE.OK).json(volunteerComment);
     }
   );
 
-  static getPostComment = asyncHandler(
+  public getPostComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
 
@@ -37,7 +42,7 @@ class VolunteerCommentController {
         throw new Error('봉사활동에 대한 정보가 없습니다.');
       }
 
-      const commentList = await VolunteerCommentService.readPostComment(
+      const commentList = await this.volunteerCommentService.readPostComment(
         volunteerId
       );
 
@@ -45,7 +50,7 @@ class VolunteerCommentController {
     }
   );
 
-  static patchComment = asyncHandler(
+  public patchComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
 
@@ -53,7 +58,7 @@ class VolunteerCommentController {
         throw new Error('봉사활동 댓글에 대한 정보가 없습니다.');
       }
       const volunteerCommentData = req.body;
-      await VolunteerCommentService.updateComment(
+      await this.volunteerCommentService.updateComment(
         volunteerCommentId,
         volunteerCommentData
       );
@@ -62,14 +67,14 @@ class VolunteerCommentController {
     }
   );
 
-  static deleteComment = asyncHandler(
+  public deleteComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
         throw new Error('봉사활동 댓글에 대한 정보가 없습니다.');
       }
-      await VolunteerCommentService.deleteComment(volunteerCommentId);
+      await this.volunteerCommentService.deleteComment(volunteerCommentId);
 
       res.status(STATUS_CODE.CREATED).json({ message: 'deleted' });
     }
