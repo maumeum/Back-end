@@ -6,7 +6,7 @@ const postCommentRouter = Router();
 postCommentRouter.post(
   '/postComments',
   loginRequired,
-  PostCommentController.postComment
+  PostCommentController.postComment,
 );
 
 postCommentRouter.get(
@@ -28,9 +28,8 @@ postCommentRouter.patch(
 
 postCommentRouter.delete(
   '/postComments/:postCommentId',
-
   loginRequired,
-  PostCommentController.deleteComment
+  PostCommentController.deleteComment,
 );
 
 export { postCommentRouter };
