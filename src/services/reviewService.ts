@@ -74,6 +74,7 @@ class ReviewService {
 
     const now = DateTime.now();
     const endDateTime = DateTime.fromJSDate(endDate);
+
     const sevenDaysAfterEnd = endDateTime.plus({
       days: CONSTANTS.CHANGING_DATE,
     });
