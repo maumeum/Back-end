@@ -30,7 +30,6 @@ export class CommunityController {
         res.send(newPost);
       } else {
         const user_id: any = req.id;
-
         const newPost = await this.communityService.createPost({
           title,
           content,
@@ -82,19 +81,28 @@ export class CommunityController {
     try {
       const { title, content, postType } = req.body;
 
-      const { originalname, path } = (req as MulterRequest).file;
-      const parts = originalname.split(".");
-      const ext = parts[parts.length - 1];
-      const newPath = path + "." + ext;
-      fs.renameSync(path, newPath);
+      if (req.file) {
+        const { originalname, path } = (req as MulterRequest).file;
+        const parts = originalname.split(".");
+        const ext = parts[parts.length - 1];
+        const newPath = path + "." + ext;
+        fs.renameSync(path, newPath);
 
-      const Posts = await this.communityService.findOneAndUpdate(id, {
-        title,
-        content,
-        images: newPath,
-        postType,
-      });
-      res.send(Posts);
+        const Posts = await this.communityService.findOneAndUpdate(id, {
+          title,
+          content,
+          images: newPath,
+          postType,
+        });
+        res.send(Posts);
+      } else {
+        const Posts = await this.communityService.findOneAndUpdate(id, {
+          title,
+          content,
+          postType,
+        });
+        res.send(Posts);
+      }
     } catch {
       res.status(400).send({ message: "오류 발생" });
     }
