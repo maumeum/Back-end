@@ -5,6 +5,11 @@ import {
 } from '../services/index.js';
 import { ObjectId } from 'mongodb';
 import { makeInstance } from '../utils/makeInstance.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { buildResponse } from '../utils/builderResponse.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
 
 interface ReviewData {
   review_id?: ObjectId;
@@ -19,43 +24,23 @@ class ReviewController {
   private volunteerApplicationService =
     makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
 
-  public readMyReview = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public readMyReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      console.log(user_id);
       const reviews = await this.reviewService.getReviewsById(user_id);
-      console.log(reviews);
-      res.status(200).json(reviews);
-    } catch (error) {
-      next();
-    }
-  };
+      res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
+    },
+  );
 
-  public readReview = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public readReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const reviews = await this.reviewService.getReviews();
-      console.log(reviews);
-      res.status(201).json(reviews);
-      console.log('리뷰 + 닉네임 전체 조회 성공');
-    } catch (error) {
-      next();
-    }
-  };
+      res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
+    },
+  );
 
-  public postReview = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public postReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const { title, content, images, volunteer_id }: ReviewData = req.body;
       const volunteer =
@@ -63,8 +48,10 @@ class ReviewController {
           volunteer_id,
         );
       if (!volunteer[0].isParticipate) {
-        throw new Error(
-          '참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.',
+        throw new AppError(
+          `${commonErrors.requestValidationError} : 참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.`,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
         );
       }
 
@@ -75,29 +62,18 @@ class ReviewController {
         images,
         volunteer_id,
       });
-      res.status(201).json();
-      console.log('리뷰 생성 성공');
-    } catch (error) {
-      next();
-    }
-  };
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    },
+  );
 
-  public updateReview = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      console.log('리뷰 수정 시작');
+  public updateReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { review_id }: ReviewData = req.params;
-
       if (!review_id) {
         throw new Error('리뷰 id가 제공되지 않았습니다.');
       }
-
       const { title, content, images }: ReviewData = req.body;
       const updateInfo: ReviewData = {};
-
       if (title) {
         updateInfo.title = title;
       }
@@ -107,56 +83,47 @@ class ReviewController {
       if (images) {
         updateInfo.images = images;
       }
-
       const updatedReview = await this.reviewService.updateReview(
         review_id,
         updateInfo,
       );
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedReview));
+    },
+  );
 
-      res.status(201).json(updatedReview);
-      console.log('리뷰수정완료');
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public deleteReview = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public deleteReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { review_id }: ReviewData = req.params;
       if (!review_id) {
-        throw new Error('리뷰 id가 제공되지 않았습니다.');
+        throw new AppError(
+          commonErrors.argumentError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
       }
       await this.reviewService.deleteReview(review_id);
-      res.status(204).json();
-    } catch (error) {
-      next();
-    }
-  };
+      res.status(STATUS_CODE.OK).json(buildResponse(null, null));
+    },
+  );
 
-  public changeParticipationStatus = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public changeParticipationStatus = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const { volunteer_id } = req.body;
 
       if (!volunteer_id) {
-        throw new Error('volunteer_id 없음');
+        throw new AppError(
+          commonErrors.argumentError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
       }
       const changed = await this.reviewService.changeParticipateStatus(
         volunteer_id,
         user_id,
       );
-      res.status(201).json(changed);
-    } catch (error) {
-      next();
-    }
-  };
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, changed));
+    },
+  );
 }
 export { ReviewController };

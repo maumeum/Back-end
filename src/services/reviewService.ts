@@ -7,6 +7,9 @@ import {
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
 import { DateTime } from 'luxon';
 import { CONSTANTS } from '../utils/Constants.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { AppError } from '../misc/AppError.js';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -34,7 +37,11 @@ class ReviewService {
       { new: true },
     );
     if (!updatedReview) {
-      throw new Error('해당하는 리뷰가 존재하지 않습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST',
+      );
     }
     return updatedReview;
   }
@@ -42,7 +49,11 @@ class ReviewService {
   public async deleteReview(review_id: ObjectId) {
     const createReview = await ReviewModel.deleteOne({ _id: review_id });
     if (createReview.deletedCount === 0) {
-      throw new Error('해당하는 리뷰가 존재하지 않습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST',
+      );
     }
     return createReview;
   }
@@ -63,10 +74,18 @@ class ReviewService {
     }).populate('volunteer_id');
 
     if (!matchedApplyVolunteer) {
-      throw new Error('Matching volunteer application not found.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST',
+      );
     }
     if (matchedApplyVolunteer.isParticipate) {
-      throw new Error("isParticipate is already in status 'true'");
+      throw new AppError(
+        "isParticipate is already in status 'true'",
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST',
+      );
     }
 
     const volunteer = matchedApplyVolunteer.volunteer_id as Volunteer;
@@ -106,7 +125,6 @@ class ReviewService {
         await apply.save();
       }
     }
-    console.log('실행완료');
   }
 }
 export { ReviewService };

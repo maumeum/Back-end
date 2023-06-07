@@ -12,7 +12,6 @@ const commonErrors = {
   resourceDuplicationError: `Resource Duplication Error`,
   remoteStorageError: `Remote Storage Error`,
   requestValidationError: `Request Validation Error`,
-  duplicationError: `Duplication Error`,
 };
 
 export { commonErrors };
