@@ -1,7 +1,7 @@
-import express from 'express';
-import multer from 'multer';
-import { CommunityController } from '../controllers/communityController.js';
-import { loginRequired } from '../middlewares/loginRequired.js';
+import express from "express";
+import multer from "multer";
+import { CommunityController } from "../controllers/communityController.js";
+import { loginRequired } from "../middlewares/loginRequired.js";
 
 const storage = multer.diskStorage({
   //파일 저장 위치를 결정

@@ -9,27 +9,21 @@ postCommentRouter.post(
   PostCommentController.postComment,
 );
 
-postCommentRouter.post(
-  '/postComments',
-  loginRequired,
-  PostCommentController.postComment,
-);
-
 postCommentRouter.get(
   '/postComments/users',
   loginRequired,
-  PostCommentController.getPostByComment,
+  PostCommentController.getPostByComment
 );
 
 postCommentRouter.get(
   '/postComments/:postId',
-  PostCommentController.getComment,
+  PostCommentController.getComment
 );
 
 postCommentRouter.patch(
   '/postComments/:postCommentId',
   loginRequired,
-  PostCommentController.patchComment,
+  PostCommentController.patchComment
 );
 
 postCommentRouter.delete(
