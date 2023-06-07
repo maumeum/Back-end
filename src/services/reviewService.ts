@@ -1,12 +1,12 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 import {
   ReviewModel,
   VolunteerApplicationModel,
   VolunteerModel,
-} from "../db/index.js";
-import { Volunteer } from "../db/schemas/volunteerSchema.js";
-import { DateTime } from "luxon";
-import { CONSTANTS } from "../utils/Constants.js";
+} from '../db/index.js';
+import { Volunteer } from '../db/schemas/volunteerSchema.js';
+import { DateTime } from 'luxon';
+import { CONSTANTS } from '../utils/Constants.js';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -31,10 +31,10 @@ class ReviewService {
     const updatedReview = await ReviewModel.findOneAndUpdate(
       { _id: review_id },
       updateInfo,
-      { new: true }
+      { new: true },
     );
     if (!updatedReview) {
-      throw new Error("해당하는 리뷰가 존재하지 않습니다.");
+      throw new Error('해당하는 리뷰가 존재하지 않습니다.');
     }
     return updatedReview;
   }
@@ -42,28 +42,28 @@ class ReviewService {
   public async deleteReview(review_id: ObjectId) {
     const createReview = await ReviewModel.deleteOne({ _id: review_id });
     if (createReview.deletedCount === 0) {
-      throw new Error("해당하는 리뷰가 존재하지 않습니다.");
+      throw new Error('해당하는 리뷰가 존재하지 않습니다.');
     }
     return createReview;
   }
 
   public async getReviews() {
-    const reviews = await ReviewModel.find().populate("user_id", "nickname");
+    const reviews = await ReviewModel.find().populate('user_id', 'nickname');
     return reviews;
   }
 
   // endDate 이후 && 7일 지나기 전, 사용자 본인이 상태를 직접 false => true로 변경하는 코드
   public async changeParticipateStatus(
     volunteer_id: ObjectId,
-    user_id: ObjectId
+    user_id: ObjectId,
   ) {
     const matchedApplyVolunteer = await VolunteerApplicationModel.findOne({
       volunteer_id,
       user_id,
-    }).populate("volunteer_id");
+    }).populate('volunteer_id');
 
     if (!matchedApplyVolunteer) {
-      throw new Error("Matching volunteer application not found.");
+      throw new Error('Matching volunteer application not found.');
     }
     if (matchedApplyVolunteer.isParticipate) {
       throw new Error("isParticipate is already in status 'true'");
@@ -89,13 +89,13 @@ class ReviewService {
   public async changeParticipateStatusAtMidnight() {
     const applyVolunteer = await VolunteerApplicationModel.find({
       isParticipate: false,
-    }).select("volunteer_id isParticipate");
+    }).select('volunteer_id isParticipate');
     const now = DateTime.now();
 
     for (const apply of applyVolunteer) {
       const volunteer = await VolunteerModel.findById(
-        apply.volunteer_id
-      ).select("endDate");
+        apply.volunteer_id,
+      ).select('endDate');
 
       if (
         volunteer &&
@@ -106,7 +106,7 @@ class ReviewService {
         await apply.save();
       }
     }
-    console.log("실행완료");
+    console.log('실행완료');
   }
 }
 export { ReviewService };

@@ -4,7 +4,8 @@ import bcrypt from 'bcrypt';
 import { makeJwtToken } from '../utils/jwtTokenMaker.js';
 import { ObjectId } from 'mongodb';
 import { CONSTANTS } from '../utils/Constants.js';
-
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { makeInstance } from '../utils/makeInstance.js';
 declare global {
   namespace Express {
     interface Request {
@@ -35,42 +36,32 @@ interface UpdateUserInfoRequest extends Request {
     introduction?: string;
   };
 }
+//@ts-ignore
 
 class UserController {
-  public userService = new UserService();
+  // public userService = new UserService();
+  private userService = makeInstance<UserService>(UserService);
 
   //회원가입시 이메일 중복체크
-  public checkEmailDuplication = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public checkEmailDuplication = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { email } = req.body;
       const user = await this.userService.getUserByEmail(email);
       if (user) {
-        return res.status(400).json(false);
-      } else if (!user) {
-        return res.status(200).json(true);
+        throw new Error('중복된 이메일입니다.');
       }
-    } catch (error) {
-      console.error(error);
-      next();
-    }
-  };
+
+      res.status(200).json(true);
+    },
+  );
+
   //유저 생성
-  public createUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      console.log('회원가입시작');
+  public createUser = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { nickname, email, password, phone } = req.body;
       const user = await this.userService.getUserByEmail(email);
       if (user) {
-        console.log('이메일 중복으로 status 400');
-        return res.status(400).json({ message: '이미 가입된 계정입니다.' });
+        throw new Error('이미 가입된 계정입니다.');
       }
 
       const createdUser = await this.userService.createUser({
@@ -79,28 +70,18 @@ class UserController {
         password,
         phone,
       });
-      res.json().status(201);
-      console.log('회원 가입 성공');
-    } catch (error) {
-      console.error(error);
-      next(error);
-    }
-  };
+      res.status(201).json(createdUser);
+    },
+  );
 
   //유저 정보 조회
-  public getUser = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      console.log('유저 정보 조회 시작');
+  public getUser = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-
       const user = await this.userService.getUserById(user_id);
-      res.json(user).status(200);
-      console.log('회원 조회 성공');
-    } catch (error) {
-      console.error(error);
-      next(error);
-    }
-  };
+      res.status(200).json(user);
+    },
+  );
 
   //유저 로그인
   public userLogin = async (
@@ -131,17 +112,12 @@ class UserController {
       res.json(madeToken).status(201);
       console.log('로그인 성공');
     } catch (error) {
-      console.error(error);
       next(error);
     }
   };
 
-  public userAuthorization = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
+  public userAuthorization = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const { password } = req.body;
       const user = await this.userService.getUserPasswordById(user_id);
@@ -160,20 +136,12 @@ class UserController {
         );
       }
       res.status(200).json();
-    } catch (error) {
-      console.error(error);
-      next(error);
-    }
-  };
+    },
+  );
 
   //유저 정보 수정(닉네임, 휴대전화번호 , 비밀번호)
-  public updateUserInfo = async (
-    req: UpdateUserInfoRequest,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      console.log('정보 수정 시작');
+  public updateUserInfo = asyncHandler(
+    async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const { nickname, phone, password } = req.body;
       const updateInfo: {
@@ -196,17 +164,14 @@ class UserController {
         );
         updateInfo.password = hashedPassword;
       }
+
       const updatedUser = await this.userService.updateUser(
         user_id,
         updateInfo,
       );
       res.status(201).json();
-      console.log('정보수정완료');
-    } catch (error) {
-      console.error(error);
-      next(error);
-    }
-  };
+    },
+  );
 
   public updateIntroduction = async (
     req: UpdateUserInfoRequest,
@@ -231,7 +196,6 @@ class UserController {
       res.status(200).json();
       console.log('정보수정완료');
     } catch (error) {
-      console.error(error);
       next(error);
     }
   };
@@ -259,7 +223,6 @@ class UserController {
       res.status(200).json();
       console.log('정보수정완료');
     } catch (error) {
-      console.error(error);
       next(error);
     }
   };
@@ -281,7 +244,6 @@ class UserController {
       res.status(200).json();
       console.log('role 변경 완료');
     } catch (error) {
-      console.error(error);
       next(error);
     }
   };

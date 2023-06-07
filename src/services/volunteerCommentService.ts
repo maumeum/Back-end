@@ -1,11 +1,10 @@
 import { VolunteerCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
-import { DateTime } from 'luxon';
 
 interface VolunteerCommentData {
-  volunteer_id: ObjectId | string | null;
-  user_id: ObjectId | string | null;
+  volunteer_id: ObjectId;
+  user_id: ObjectId;
   content: string;
   createdAt: Date;
 }

@@ -28,7 +28,6 @@ class ReviewController {
       console.log(reviews);
       res.status(200).json(reviews);
     } catch (error) {
-      console.error(error);
       next();
     }
   };
@@ -44,7 +43,6 @@ class ReviewController {
       res.status(201).json(reviews);
       console.log('리뷰 + 닉네임 전체 조회 성공');
     } catch (error) {
-      console.error(error);
       next();
     }
   };
@@ -77,7 +75,6 @@ class ReviewController {
       res.status(201).json();
       console.log('리뷰 생성 성공');
     } catch (error) {
-      console.error(error);
       next();
     }
   };
@@ -116,7 +113,6 @@ class ReviewController {
       res.status(201).json(updatedReview);
       console.log('리뷰수정완료');
     } catch (error) {
-      console.error(error);
       next(error);
     }
   };
@@ -134,7 +130,6 @@ class ReviewController {
       await this.reviewService.deleteReview(review_id);
       res.status(204).json();
     } catch (error) {
-      console.error(error);
       next();
     }
   };
@@ -157,7 +152,6 @@ class ReviewController {
       );
       res.status(201).json(changed);
     } catch (error) {
-      console.error(error);
       next();
     }
   };

@@ -1,5 +1,5 @@
-import { Ref } from "@typegoose/typegoose";
-import { PostCommentModel, PostModel } from "../db/index.js";
+import { Ref } from '@typegoose/typegoose';
+import { PostCommentModel, PostModel } from '../db/index.js';
 
 export class CommunityService {
   public async createPost({
@@ -22,6 +22,7 @@ export class CommunityService {
       images,
       user_id,
     });
+
     return newPost;
   }
 
