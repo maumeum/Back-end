@@ -51,7 +51,7 @@ class UserController {
       const user = await this.userService.getUserByEmail(email);
       if (user) {
         throw new AppError(
-          commonErrors.duplicationError,
+          commonErrors.resourceDuplicationError,
           STATUS_CODE.BAD_REQUEST,
           'BAD_REQUEST',
         );
@@ -67,7 +67,7 @@ class UserController {
       const user = await this.userService.getUserByEmail(email);
       if (user) {
         throw new AppError(
-          commonErrors.duplicationError,
+          commonErrors.resourceDuplicationError,
           STATUS_CODE.BAD_REQUEST,
           'BAD_REQUEST',
         );
