@@ -74,13 +74,9 @@ class ReviewService {
 
     const now = DateTime.now();
     const endDateTime = DateTime.fromJSDate(endDate);
-<<<<<<< Updated upstream
-    const sevenDaysAfterEnd = endDateTime.plus({ days: 7 });
-=======
     const sevenDaysAfterEnd = endDateTime.plus({
       days: CONSTANTS.CHANGING_DATE,
     });
->>>>>>> Stashed changes
 
     if (now > endDateTime && now < sevenDaysAfterEnd) {
       if (!matchedApplyVolunteer.isParticipate) {

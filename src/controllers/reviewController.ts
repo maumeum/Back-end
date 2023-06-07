@@ -26,7 +26,7 @@ class ReviewController {
       console.log(user_id);
       const reviews = await this.reviewService.getReviewsById(user_id);
       console.log(reviews);
-      res.sendStatus(200).json(reviews);
+      res.status(200).json(reviews);
     } catch (error) {
       console.error(error);
       next();
@@ -41,7 +41,7 @@ class ReviewController {
     try {
       const reviews = await this.reviewService.getReviews();
       console.log(reviews);
-      res.sendStatus(201).json(reviews);
+      res.status(201).json(reviews);
       console.log('리뷰 + 닉네임 전체 조회 성공');
     } catch (error) {
       console.error(error);
@@ -74,7 +74,7 @@ class ReviewController {
         images,
         volunteer_id,
       });
-      res.sendStatus(201).json();
+      res.status(201).json();
       console.log('리뷰 생성 성공');
     } catch (error) {
       console.error(error);
@@ -113,7 +113,7 @@ class ReviewController {
         updateInfo,
       );
 
-      res.sendStatus(201).json(updatedReview);
+      res.status(201).json(updatedReview);
       console.log('리뷰수정완료');
     } catch (error) {
       console.error(error);
@@ -132,7 +132,7 @@ class ReviewController {
         throw new Error('리뷰 id가 제공되지 않았습니다.');
       }
       await this.reviewService.deleteReview(review_id);
-      res.sendStatus(204).json();
+      res.status(204).json();
     } catch (error) {
       console.error(error);
       next();
@@ -155,7 +155,7 @@ class ReviewController {
         volunteer_id,
         user_id,
       );
-      res.sendStatus(201).json(changed);
+      res.status(201).json(changed);
     } catch (error) {
       console.error(error);
       next();
