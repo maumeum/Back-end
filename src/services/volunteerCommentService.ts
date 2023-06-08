@@ -45,20 +45,20 @@ class VolunteerCommentService {
     return volunteerList;
   }
 
-  public async readPostComment(volunteerId: string) {
+  public async readPostComment(volunteer_id: string) {
     const postCommentList = await VolunteerCommentModel.find({
-      volunteer_id: volunteerId,
+      volunteer_id: volunteer_id,
     });
 
     return postCommentList;
   }
 
   public async updateComment(
-    volunteerCommentId: string,
+    volunteerComment_id: string,
     volunteerCommentData: VolunteerCommentData
   ) {
     const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
-      volunteerCommentId,
+      volunteerComment_id,
       volunteerCommentData
     );
 
@@ -73,9 +73,9 @@ class VolunteerCommentService {
     return updatedComment;
   }
 
-  public async deleteComment(volunteerCommentId: string) {
+  public async deleteComment(volunteerComment_id: string) {
     const deletedComment = await VolunteerCommentModel.findByIdAndDelete(
-      volunteerCommentId
+      volunteerComment_id
     );
 
     if (!deletedComment) {
@@ -88,6 +88,15 @@ class VolunteerCommentService {
 
     return deletedComment;
   }
+
+  //봉사활동 ID에 해당하는 댓글 리스트
+  // public async checkUser(volunteer_id: string) {
+  //   const volunteerList = await VolunteerCommentModel.find({
+  //     volunteer_id,
+  //   });
+
+  //   return volunteerList;
+  // }
 }
 
 export { VolunteerCommentService };

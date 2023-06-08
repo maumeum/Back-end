@@ -23,11 +23,11 @@ volunteerCommentRouter.get(
   volunteerCommentController.getVolunteerByComment
 );
 
-//본인이 작성한 리뷰가 맞는지 확인하는 API
+//본인이 작성한 리뷰가 맞는지 확인하는 API(아직 미구현);
 volunteerCommentRouter.get(
-  '/volunteerComments/check/:volunteerCommentId',
+  '/volunteerComments/check/:volunteerId',
   loginRequired,
-  volunteerCommentController.checkUser
+  volunteerCommentController.getCheckUser
 );
 
 //봉사 모집하기 특정 게시글의 댓글 조회
