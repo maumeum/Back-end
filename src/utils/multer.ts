@@ -14,11 +14,7 @@ const storage = multer.diskStorage({
     cb(null, 'public/images');
   },
   filename: function (req, file, cb) {
-<<<<<<< Updated upstream
-    cb(null, Date.now() + "-" + file.originalname);
-=======
-    cb(null, file.fieldname + '-' + Date.now());
->>>>>>> Stashed changes
+    cb(null, Date.now() + '-' + file.originalname);
   },
 });
 
