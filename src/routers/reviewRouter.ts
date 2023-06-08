@@ -13,6 +13,13 @@ reviewRouter.get(
   reviewController.readReviewDetail,
 );
 
+//본인이 작성한 리뷰가 맞는지 확인하는 API
+reviewRouter.get(
+  '/review/check/:review_id',
+  loginRequired,
+  reviewController.checkUser,
+);
+
 //유저 리뷰 조회 (마이페이지)
 reviewRouter.get(
   '/reviews/users',
