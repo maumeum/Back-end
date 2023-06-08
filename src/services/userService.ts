@@ -2,6 +2,9 @@ import { UserModel } from '../db/index.js';
 import bcrypt from 'bcrypt';
 import { ObjectId } from 'mongodb';
 import { CONSTANTS } from '../utils/Constants.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { AppError } from '../misc/AppError.js';
 
 //인터페이스 분리해서 작성
 interface UserInfo {
@@ -20,7 +23,11 @@ class UserService {
   // 유저 생성
   public async createUser({ nickname, email, password, phone }: UserInfo) {
     if (!password) {
-      throw new Error('password is required');
+      throw new AppError(
+        commonErrors.argumentError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST',
+      );
     }
     const hashedPassword = await bcrypt.hash(password, CONSTANTS.HASHING_TIMES);
     const createdUser = await UserModel.create({

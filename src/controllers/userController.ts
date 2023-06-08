@@ -88,7 +88,7 @@ class UserController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const user = await this.userService.getUserById(user_id);
-      res.status(STATUS_CODE.OK).json(user);
+      res.status(STATUS_CODE.OK).json(buildResponse(null, user));
     },
   );
 
