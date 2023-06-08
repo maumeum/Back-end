@@ -77,6 +77,10 @@ class ReviewService {
       volunteer_id,
       user_id,
     }).populate('volunteer_id');
+    console.log(
+      '🚀 ~ file: reviewService.ts:80 ~ ReviewService ~ matchedApplyVolunteer:',
+      matchedApplyVolunteer,
+    );
 
     if (!matchedApplyVolunteer) {
       throw new AppError(

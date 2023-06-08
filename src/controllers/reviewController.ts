@@ -135,7 +135,7 @@ class ReviewController {
   public changeParticipationStatus = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const { volunteer_id } = req.body;
+      const { volunteer_id }: ReviewData = req.params;
 
       if (!volunteer_id) {
         throw new AppError(
