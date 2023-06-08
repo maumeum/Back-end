@@ -42,7 +42,7 @@ export class CommunityController {
   public checkUser = asyncHandler(async (req: Request, res: Response) => {
     const { postid } = req.params;
     const user_id = req.id;
-
+    //
     const result = await this.communityService.checkUser(postid as string);
     if (result!._id === user_id) {
       res.status(STATUS_CODE.OK).json(buildResponse(null, true));
