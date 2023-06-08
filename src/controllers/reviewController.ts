@@ -70,7 +70,11 @@ class ReviewController {
     async (req: Request, res: Response, next: NextFunction) => {
       const { review_id }: ReviewData = req.params;
       if (!review_id) {
-        throw new Error('리뷰 id가 제공되지 않았습니다.');
+        throw new AppError(
+          commonErrors.argumentError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
       }
       const { title, content, images }: ReviewData = req.body;
       const updateInfo: ReviewData = {};
