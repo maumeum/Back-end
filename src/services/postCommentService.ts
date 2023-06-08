@@ -11,7 +11,8 @@ interface PostCommentData {
   content: string;
 }
 
-interface PostCommentDateData {
+interface PostCommentExtraData {
+  post_id: ObjectId;
   createdAt: Date;
 }
 class PostCommentService {
@@ -33,7 +34,7 @@ class PostCommentService {
   public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
-      ['_id', 'title', 'content', 'postType', 'createdAt'],
+      ['title', 'content', 'postType', 'createdAt']
     );
 
     if (userComments.length === 0) {
@@ -42,15 +43,8 @@ class PostCommentService {
 
     const postList = userComments.map((userComment) => {
       const postId = userComment.post_id as Post;
-      const userCommentObj = userComment.toObject() as PostCommentDateData;
-      const createdAt = userCommentObj.createdAt;
 
-      return {
-        title: postId.title,
-        content: postId.content,
-        postType: postId.postType,
-        createdAt: createdAt,
-      };
+      return postId;
     });
 
     return postList;
@@ -68,11 +62,11 @@ class PostCommentService {
 
   public async updateComment(
     postCommentId: string,
-    postCommentData: PostCommentData,
+    postCommentData: PostCommentData
   ) {
     const newPostComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
-      postCommentData,
+      postCommentData
     );
 
     if (!newPostComment) {
@@ -84,7 +78,7 @@ class PostCommentService {
 
   public async deleteComment(postCommentId: string) {
     const deletePostComment = await PostCommentModel.findByIdAndDelete(
-      postCommentId,
+      postCommentId
     );
 
     if (!deletePostComment) {
