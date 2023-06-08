@@ -8,6 +8,11 @@ const reviewController = new ReviewController();
 //리뷰 전체 조회 (일반유저)
 reviewRouter.get('/review', reviewController.readReview);
 
+reviewRouter.get(
+  '/review/detail/:review_id',
+  reviewController.readReviewDetail,
+);
+
 //유저 리뷰 조회 (마이페이지)
 reviewRouter.get(
   '/reviews/users',
