@@ -46,11 +46,11 @@ app.use('/api', volunteerCommentRouter);
 app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
-app.use(
-  morgan('common', {
-    stream: { write: (message) => logger.info(message.trim()) },
-  }),
-);
+// app.use(
+//   morgan('common', {
+//     stream: { write: (message) => logger.info(message.trim()) },
+//   }),
+// );
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   // @ts-ignore
