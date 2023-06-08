@@ -13,6 +13,7 @@ import {
 import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
 import { postCommentRouter } from './routers/postCommentRouter.js';
 import { error } from 'console';
+import { logger } from './utils/logger.js';
 
 dotenv.config();
 
@@ -29,11 +30,12 @@ const DB_URL =
   'MongoDB 서버 주소가 설정되지 않았거나, env 파일도 필요합니다.\n';
 mongoose.connect(DB_URL, { dbName: 'maum' });
 const db = mongoose.connection;
+
 db.on('connected', () =>
-  console.log('정상적으로 MongoDB 서버에 연결되었습니다.  ' + DB_URL)
+  logger.info('정상적으로 MongoDB 서버에 연결되었습니다.'),
 );
 db.on('error', (error) =>
-  console.error('\nMongoDB 연결에 실패하였습니다...\n' + DB_URL + '\n' + error)
+  logger.info('\nMongoDB 연결에 실패하였습니다...' + '\n' + error),
 );
 
 app.use('/api', userRouter);
