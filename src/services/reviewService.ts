@@ -20,9 +20,14 @@ interface ReviewData {
 }
 
 class ReviewService {
-  public async getReviewsById(user_id: ObjectId) {
+  public async getReviewsByUserId(user_id: ObjectId) {
     const reviews = await ReviewModel.find({ user_id: user_id });
     return reviews;
+  }
+
+  public async getReviewById(review_id: ObjectId) {
+    const review = await ReviewModel.findById(review_id);
+    return review;
   }
 
   public async createReview(createInfo: ReviewData) {

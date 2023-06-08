@@ -27,8 +27,30 @@ class ReviewController {
   public readMyReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const reviews = await this.reviewService.getReviewsById(user_id);
+      const reviews = await this.reviewService.getReviewsByUserId(user_id);
       res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
+    },
+  );
+
+  public readReviewDetail = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { review_id }: ReviewData = req.params;
+      if (!review_id) {
+        throw new AppError(
+          commonErrors.argumentError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
+      }
+      const review = await this.reviewService.getReviewById(review_id);
+      if (!review) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
+      }
+      res.status(STATUS_CODE.OK).json(buildResponse(null, review));
     },
   );
 
