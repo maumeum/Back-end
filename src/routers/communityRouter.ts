@@ -4,27 +4,25 @@ import { CommunityController } from "../controllers/communityController.js";
 import { loginRequired } from "../middlewares/loginRequired.js";
 import { imageUploader } from "../utils/multer.js";
 
-const storage = multer.diskStorage({
-  //파일 저장 위치를 결정
-  destination: function (req, file, cb) {
-    cb(null, "../frontend/public/Images");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now());
-  },
-});
+// const storage = multer.diskStorage({
+//   //파일 저장 위치를 결정
+//   destination: function (req, file, cb) {
+//     cb(null, "../frontend/public/Images");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.fieldname + "-" + Date.now());
+//   },
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 export const communityRouter = express.Router();
 const communityController = new CommunityController();
-//카테고리별 조회
+//카테고리별 조회 //완료
 communityRouter.get(
   "/community/category/:category",
   communityController.getPostByCategory
 );
-
-//동행구해요/궁금해요
 
 //유저 게시물 검색 //완료
 communityRouter.get("/community/search", communityController.searchPost);
@@ -42,7 +40,7 @@ communityRouter.get("/community/:id", communityController.getPost);
 //특정 게시물 수정
 communityRouter.patch(
   "/community/:id",
-  upload.single("image"),
+  imageUploader,
   loginRequired,
   communityController.patchPost
 );
@@ -58,7 +56,7 @@ communityRouter.delete(
 communityRouter.post(
   "/community/create",
   loginRequired,
-  upload.single("image"),
+  imageUploader,
   communityController.createPost
 );
 
