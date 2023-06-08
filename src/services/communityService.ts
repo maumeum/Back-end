@@ -30,14 +30,12 @@ export class CommunityService {
     return await PostModel.find();
   }
   public async getPostByCat(category: string) {
-    return await PostModel.find({ postType: category });
+    var decodeName = decodeURI(decodeURIComponent(category));
+    return await PostModel.find({ postType: decodeName });
   }
 
   public async searchPost(keyword: string) {
-    const options = [
-      { title: { $regex: `${keyword}` } },
-      { content: { $regex: `${keyword}` } },
-    ];
+    const options = [{ title: { $regex: `${keyword}` } }];
 
     const posts = await PostModel.find({ $or: options });
     return posts;

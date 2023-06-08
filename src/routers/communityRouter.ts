@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import { CommunityController } from "../controllers/communityController.js";
 import { loginRequired } from "../middlewares/loginRequired.js";
+import { imageUploader } from "../utils/multer.js";
 
 const storage = multer.diskStorage({
   //파일 저장 위치를 결정
@@ -21,29 +22,30 @@ const communityController = new CommunityController();
 //유저 게시물 검색
 communityRouter.get("/community/search", communityController.searchPost);
 
-//유저 게시물 조회
+//카테고리별 조회
+communityRouter.get(
+  "community/category/:category",
+  communityController.getPostByCategory
+);
+//유저 게시물 조회 //완료
 communityRouter.get(
   "/community/user",
   loginRequired,
   communityController.getUserPosts
 );
 
-//특정 게시물 조회
+//특정 게시물 조회 // 완료
 communityRouter.get("/community/:id", communityController.getPost);
 
 //특정 게시물 수정
 communityRouter.patch(
   "/community/:id",
-  upload.single("file"),
+  upload.single("image"),
   loginRequired,
   communityController.patchPost
 );
-//카테고리별 조회
-communityRouter.post(
-  "commnity/:category",
-  communityController.getPostByCategory
-);
-//특정 게시물 삭제
+
+//특정 게시물 삭제 //완료
 communityRouter.delete(
   "/community/:id",
   loginRequired,
@@ -53,10 +55,10 @@ communityRouter.delete(
 //게시물 작성
 communityRouter.post(
   "/community/create",
-  upload.single("file"),
   loginRequired,
+  upload.single("image"),
   communityController.createPost
 );
 
-//게시글 조회
+//게시글 조회 //완료
 communityRouter.get("/community", communityController.getAllPosts);
