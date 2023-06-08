@@ -43,6 +43,13 @@ class ReviewController {
         );
       }
       const review = await this.reviewService.getReviewById(review_id);
+      if (!review) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
+      }
       res.status(STATUS_CODE.OK).json(buildResponse(null, review));
     },
   );
