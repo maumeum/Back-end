@@ -27,7 +27,10 @@ class ReviewService {
   }
 
   public async getReviewById(review_id: ObjectId) {
-    const review = await ReviewModel.findById(review_id);
+    const review = await ReviewModel.findById(review_id).populate(
+      'user_id',
+      'nickname',
+    );
     return review;
   }
 
