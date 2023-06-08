@@ -46,7 +46,11 @@ communityRouter.patch(
 );
 
 //게시물 맞는지 확인
-communityRouter.get("/community/check/:id", communityController.checkUser);
+communityRouter.get(
+  "/community/check/:postid",
+  loginRequired,
+  communityController.checkUser
+);
 
 //특정 게시물 삭제 //완료
 communityRouter.delete(

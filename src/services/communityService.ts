@@ -27,7 +27,7 @@ export class CommunityService {
   }
   public async checkUser(postid: string) {
     const post = await PostModel.findOne({ _id: postid });
-    const user = await PostModel.findOne({ _id: post!.user_id });
+    const user = await UserModel.findOne({ _id: post!.user_id });
     return user;
   }
 
