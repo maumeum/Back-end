@@ -25,7 +25,7 @@ class VolunteerCommentService {
   public async readVolunteerByComment(user_id: ObjectId) {
     const userComments = await VolunteerCommentModel.find({ user_id }).populate(
       'volunteer_id',
-      ['title', 'content']
+      ['_id', 'title', 'content', 'createdAt'],
     );
 
     if (userComments.length === 0) {
@@ -62,11 +62,11 @@ class VolunteerCommentService {
 
   public async updateComment(
     volunteerCommentId: string,
-    volunteerCommentData: VolunteerCommentData
+    volunteerCommentData: VolunteerCommentData,
   ) {
     const newComment = await VolunteerCommentModel.findByIdAndUpdate(
       volunteerCommentId,
-      volunteerCommentData
+      volunteerCommentData,
     );
 
     if (!newComment) {
@@ -78,7 +78,7 @@ class VolunteerCommentService {
 
   public async deleteComment(volunteerCommentId: string) {
     const comment = await VolunteerCommentModel.findByIdAndDelete(
-      volunteerCommentId
+      volunteerCommentId,
     );
 
     if (!comment) {

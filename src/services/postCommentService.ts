@@ -33,7 +33,7 @@ class PostCommentService {
   public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
-      ['title', 'content', 'postType']
+      ['_id', 'title', 'content', 'postType', 'createdAt'],
     );
 
     if (userComments.length === 0) {
@@ -68,11 +68,11 @@ class PostCommentService {
 
   public async updateComment(
     postCommentId: string,
-    postCommentData: PostCommentData
+    postCommentData: PostCommentData,
   ) {
     const newPostComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
-      postCommentData
+      postCommentData,
     );
 
     if (!newPostComment) {
@@ -84,7 +84,7 @@ class PostCommentService {
 
   public async deleteComment(postCommentId: string) {
     const deletePostComment = await PostCommentModel.findByIdAndDelete(
-      postCommentId
+      postCommentId,
     );
 
     if (!deletePostComment) {
