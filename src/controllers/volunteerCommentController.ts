@@ -3,6 +3,9 @@ import { NextFunction, Request, Response } from 'express';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { makeInstance } from '../utils/makeInstance.js';
+import { buildResponse } from '../utils/builderResponse.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
 
 class VolunteerCommentController {
   private volunteerCommentService = makeInstance<VolunteerCommentService>(
@@ -20,7 +23,7 @@ class VolunteerCommentController {
         user_id,
       });
 
-      res.status(STATUS_CODE.OK).json({ message: 'created' });
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 
@@ -30,7 +33,7 @@ class VolunteerCommentController {
       const volunteerComment =
         await this.volunteerCommentService.readVolunteerByComment(user_id);
 
-      res.status(STATUS_CODE.OK).json(volunteerComment);
+      res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerComment));
     }
   );
 
@@ -39,14 +42,18 @@ class VolunteerCommentController {
       const { volunteerId } = req.params;
 
       if (!volunteerId) {
-        throw new Error('봉사활동에 대한 정보가 없습니다.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
 
       const commentList = await this.volunteerCommentService.readPostComment(
         volunteerId
       );
 
-      res.status(STATUS_CODE.OK).json(commentList);
+      res.status(STATUS_CODE.OK).json(buildResponse(null, commentList));
     }
   );
 
@@ -55,7 +62,11 @@ class VolunteerCommentController {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
-        throw new Error('봉사활동 댓글에 대한 정보가 없습니다.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
       const volunteerCommentData = req.body;
       await this.volunteerCommentService.updateComment(
@@ -63,7 +74,7 @@ class VolunteerCommentController {
         volunteerCommentData
       );
 
-      res.status(STATUS_CODE.OK).json({ message: 'updated' });
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 
@@ -72,11 +83,44 @@ class VolunteerCommentController {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
-        throw new Error('봉사활동 댓글에 대한 정보가 없습니다.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
       await this.volunteerCommentService.deleteComment(volunteerCommentId);
 
-      res.status(STATUS_CODE.CREATED).json({ message: 'deleted' });
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  public getCheckUser = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+      const user_id = req.id;
+
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const volunteerList = await this.volunteerCommentService.readPostComment(
+        volunteerId
+      );
+
+      //const userList = await this.
+      //const userList =
+      // const isUpdateComments = volunteerList.map((volunteer) => {
+      //   if (volunteer.user_id === user_id) {
+      //     res.status(STATUS_CODE.OK).json(buildResponse(null, true));
+      //   } else {
+      //     res.status(STATUS_CODE.OK).json(buildResponse(null, false));
+      //   }
+      // });
     }
   );
 }

@@ -1,5 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { VolunteerApplicationModel } from '../db/index.js';
+import { AppError } from '../misc/AppError.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface ApplicationVolunteerData {
   user_id: ObjectId;
@@ -49,10 +51,6 @@ class VolunteerApplicationService {
       'images',
     ]);
 
-    if (applicationVolunteerList.length === 0) {
-      return [];
-    }
-
     return applicationVolunteerList;
   }
 
@@ -60,20 +58,20 @@ class VolunteerApplicationService {
     user_id,
     volunteer_id,
   }: doubleCheckApplicationVolunteerData) {
-    try {
-      const volunteerApplication = await VolunteerApplicationModel.find({
-        user_id: user_id,
-        volunteer_id: volunteer_id,
-      });
+    const volunteerApplication = await VolunteerApplicationModel.find({
+      user_id: user_id,
+      volunteer_id: volunteer_id,
+    });
 
-      if (volunteerApplication.length !== 0) {
-        throw new Error('이미 신청이 완료된 봉사활동입니다.');
-      }
-
-      return true;
-    } catch (error) {
-      console.log(error);
+    if (volunteerApplication.length !== 0) {
+      throw new AppError(
+        '이미 신청이 완료된 봉사활동입니다.',
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
+
+    return true;
   }
 
   public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
@@ -81,9 +79,6 @@ class VolunteerApplicationService {
       volunteer_id: volunteer_id,
     }).select('isParticipate');
 
-    if (applicationVolunteerList.length === 0) {
-      return [];
-    }
     return applicationVolunteerList;
   }
 }

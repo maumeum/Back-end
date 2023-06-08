@@ -4,6 +4,8 @@ import { STATUS_CODE } from '../utils/statusCode.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { makeInstance } from '../utils/makeInstance.js';
 import { buildResponse } from '../utils/builderResponse.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
 
 class VolunteerController {
   private volunteerService = makeInstance<VolunteerService>(VolunteerService);
@@ -17,8 +19,7 @@ class VolunteerController {
 
       await this.volunteerService.createVolunteer(volunteerData);
 
-      //res.status(STATUS_CODE.CREATED).json({ message: 'created' });
-      //res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 
@@ -26,7 +27,6 @@ class VolunteerController {
     async (req: Request, res: Response, next: NextFunction) => {
       const volunteerList = await this.volunteerService.readVolunteer();
 
-      //res.status(STATUS_CODE.OK).json(volunteerList);
       res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerList));
     }
   );
@@ -36,13 +36,17 @@ class VolunteerController {
       const { volunteerId } = req.params;
 
       if (!volunteerId) {
-        throw new Error('봉사활동 ID 정보를 다시 확인해주세요.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
       const volunteer = await this.volunteerService.readVolunteerById(
         volunteerId
       );
 
-      res.status(STATUS_CODE.OK).json(volunteer);
+      res.status(STATUS_CODE.OK).json(buildResponse(null, volunteer));
     }
   );
 
@@ -54,9 +58,9 @@ class VolunteerController {
         const searchVolunteers =
           await this.volunteerService.readSearchVolunteer(keyword as string);
 
-        res.status(STATUS_CODE.OK).json(searchVolunteers);
+        res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
       } else {
-        res.status(STATUS_CODE.OK).json([]);
+        res.status(STATUS_CODE.OK).json(buildResponse(null, []));
       }
     }
   );
@@ -68,7 +72,9 @@ class VolunteerController {
       const registerationVolunteers =
         await this.volunteerService.readRegistrationVolunteer(user_id);
 
-      res.status(STATUS_CODE.OK).json(registerationVolunteers);
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, registerationVolunteers));
     }
   );
 
@@ -78,12 +84,16 @@ class VolunteerController {
       const { volunteerId } = req.params;
 
       if (!volunteerId) {
-        throw new Error('봉사활동 ID 정보를 다시 확인해주세요.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
 
       await this.volunteerService.updateVolunteer(VolunteerData, volunteerId);
 
-      res.status(STATUS_CODE.CREATED).json({ message: 'updated' });
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 }

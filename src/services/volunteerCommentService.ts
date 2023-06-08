@@ -1,6 +1,9 @@
 import { VolunteerCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface VolunteerCommentData {
   volunteer_id: ObjectId;
@@ -8,18 +11,19 @@ interface VolunteerCommentData {
   content: string;
 }
 
-interface VolunteerCommentDateData {
-  createdAt: Date;
-}
 class VolunteerCommentService {
   public async createComment(volunteerComment: VolunteerCommentData) {
     const comment = await VolunteerCommentModel.create(volunteerComment);
 
     if (!comment) {
-      throw new Error('댓글 작성에 실패하였습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return comment;
   }
 
   public async readVolunteerByComment(user_id: ObjectId) {
@@ -41,45 +45,58 @@ class VolunteerCommentService {
     return volunteerList;
   }
 
-  public async readPostComment(volunteerId: string) {
+  public async readPostComment(volunteer_id: string) {
     const postCommentList = await VolunteerCommentModel.find({
-      volunteer_id: volunteerId,
+      volunteer_id: volunteer_id,
     });
-
-    if (postCommentList.length === 0) {
-      return [];
-    }
 
     return postCommentList;
   }
 
   public async updateComment(
-    volunteerCommentId: string,
+    volunteerComment_id: string,
     volunteerCommentData: VolunteerCommentData
   ) {
-    const newComment = await VolunteerCommentModel.findByIdAndUpdate(
-      volunteerCommentId,
+    const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
+      volunteerComment_id,
       volunteerCommentData
     );
 
-    if (!newComment) {
-      throw new Error('댓글 수정에 실패햐였습니다.');
+    if (!updatedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return updatedComment;
   }
 
-  public async deleteComment(volunteerCommentId: string) {
-    const comment = await VolunteerCommentModel.findByIdAndDelete(
-      volunteerCommentId
+  public async deleteComment(volunteerComment_id: string) {
+    const deletedComment = await VolunteerCommentModel.findByIdAndDelete(
+      volunteerComment_id
     );
 
-    if (!comment) {
-      throw new Error('댓글 삭제에 실패하였습니다.');
+    if (!deletedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return deletedComment;
   }
+
+  //봉사활동 ID에 해당하는 댓글 리스트
+  // public async checkUser(volunteer_id: string) {
+  //   const volunteerList = await VolunteerCommentModel.find({
+  //     volunteer_id,
+  //   });
+
+  //   return volunteerList;
+  // }
 }
 
 export { VolunteerCommentService };
