@@ -40,16 +40,15 @@ const logger = createLogger({
     }),
     new transports.File({
       level: 'error',
-      filename: 'config/error.log', // 에러 로그를 저장할 파일 경로
+      filename: 'config/error.log',
       format: format.combine(
         format.label({ label: '[maum-eum]' }),
-        format.timestamp({
-          format: 'YYYY-MM-DD HH:mm:ss',
+        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        format.printf((info: TransformableInfo) => {
+          const errorMessage = `${info.timestamp} - ${info.level}: ${info.label} ${info.message} ${info.name}`;
+          const stackTrace = info.stack ? `\n${info.stack}` : '';
+          return errorMessage + stackTrace;
         }),
-        format.printf(
-          (info: TransformableInfo) =>
-            `${info.timestamp} - ${info.level}: ${info.label} ${info.message}`,
-        ),
       ),
       maxFiles: maxFiles,
     }),

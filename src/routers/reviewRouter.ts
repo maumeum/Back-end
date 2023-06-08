@@ -33,7 +33,7 @@ reviewRouter.delete(
 
 //isParticipate 상태 변경
 reviewRouter.post(
-  '/review/users/participation',
+  '/review/users/participation/:volunteer_id',
   loginRequired,
   reviewController.changeParticipationStatus,
 );
