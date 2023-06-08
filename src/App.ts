@@ -14,6 +14,7 @@ import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
 import { postCommentRouter } from './routers/postCommentRouter.js';
 import { error } from 'console';
 import { logger } from './utils/logger.js';
+import morgan from 'morgan';
 
 dotenv.config();
 
@@ -45,15 +46,25 @@ app.use('/api', volunteerCommentRouter);
 app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
+app.use(
+  morgan('common', {
+    stream: { write: (message) => logger.info(message.trim()) },
+  }),
+);
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  //@ts-ignore
+  // @ts-ignore
   res.statusCode = error.httpCode ?? 500;
+  logger.error({
+    message: error.message,
+    name: error.name,
+    stack: error.stack,
+  });
   res.json({
     name: error.name,
     httpMessage: error.message,
     data: null,
   });
-}); // 마지막에 붙이는 에러핸들러
+});
 
 export { app };
