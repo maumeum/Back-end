@@ -140,6 +140,8 @@ export class CommunityController {
   public getPostByCategory = asyncHandler(
     async (req: Request, res: Response) => {
       const { category } = req.params;
+      console.log(category);
+
       if (!category) {
         throw new AppError(
           commonErrors.argumentError,
@@ -147,9 +149,7 @@ export class CommunityController {
           "BAD_REQUEST"
         );
       }
-      const categoryPost = await this.communityService.getPostByCat(
-        category as string
-      );
+      const categoryPost = await this.communityService.getPostByCat(category);
       res.status(STATUS_CODE.OK).json(buildResponse(null, categoryPost));
     }
   );

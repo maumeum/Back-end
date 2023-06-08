@@ -18,15 +18,17 @@ const upload = multer({ storage: storage });
 
 export const communityRouter = express.Router();
 const communityController = new CommunityController();
-
-//유저 게시물 검색
-communityRouter.get("/community/search", communityController.searchPost);
-
 //카테고리별 조회
 communityRouter.get(
-  "community/category/:category",
+  "/community/category/:category",
   communityController.getPostByCategory
 );
+
+//동행구해요/궁금해요
+
+//유저 게시물 검색 //완료
+communityRouter.get("/community/search", communityController.searchPost);
+
 //유저 게시물 조회 //완료
 communityRouter.get(
   "/community/user",

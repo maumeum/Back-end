@@ -30,8 +30,8 @@ export class CommunityService {
     return await PostModel.find();
   }
   public async getPostByCat(category: string) {
-    var decodeName = decodeURI(decodeURIComponent(category));
-    return await PostModel.find({ postType: decodeName });
+    console.log(category);
+    return await PostModel.find({ postType: category });
   }
 
   public async searchPost(keyword: string) {
