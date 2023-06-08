@@ -35,7 +35,7 @@ communityRouter.get(
 );
 
 //특정 게시물 조회 // 완료
-communityRouter.get("/community/:id", communityController.getPost);
+communityRouter.get("/community/:postid", communityController.getPost);
 
 //특정 게시물 수정
 communityRouter.patch(
@@ -44,6 +44,9 @@ communityRouter.patch(
   loginRequired,
   communityController.patchPost
 );
+
+//게시물 맞는지 확인
+communityRouter.get("/community/check/:id", communityController.checkUser);
 
 //특정 게시물 삭제 //완료
 communityRouter.delete(
