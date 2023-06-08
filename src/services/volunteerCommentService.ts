@@ -1,6 +1,9 @@
 import { VolunteerCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface VolunteerCommentData {
   volunteer_id: ObjectId;
@@ -8,18 +11,19 @@ interface VolunteerCommentData {
   content: string;
 }
 
-interface VolunteerCommentDateData {
-  createdAt: Date;
-}
 class VolunteerCommentService {
   public async createComment(volunteerComment: VolunteerCommentData) {
     const comment = await VolunteerCommentModel.create(volunteerComment);
 
     if (!comment) {
-      throw new Error('댓글 작성에 실패하였습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return comment;
   }
 
   public async readVolunteerByComment(user_id: ObjectId) {
@@ -46,10 +50,6 @@ class VolunteerCommentService {
       volunteer_id: volunteerId,
     });
 
-    if (postCommentList.length === 0) {
-      return [];
-    }
-
     return postCommentList;
   }
 
@@ -57,28 +57,36 @@ class VolunteerCommentService {
     volunteerCommentId: string,
     volunteerCommentData: VolunteerCommentData
   ) {
-    const newComment = await VolunteerCommentModel.findByIdAndUpdate(
+    const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
       volunteerCommentId,
       volunteerCommentData
     );
 
-    if (!newComment) {
-      throw new Error('댓글 수정에 실패햐였습니다.');
+    if (!updatedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return updatedComment;
   }
 
   public async deleteComment(volunteerCommentId: string) {
-    const comment = await VolunteerCommentModel.findByIdAndDelete(
+    const deletedComment = await VolunteerCommentModel.findByIdAndDelete(
       volunteerCommentId
     );
 
-    if (!comment) {
-      throw new Error('댓글 삭제에 실패하였습니다.');
+    if (!deletedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return deletedComment;
   }
 }
 

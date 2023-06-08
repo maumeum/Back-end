@@ -9,6 +9,7 @@ const volunteerCommentController = makeInstance<VolunteerCommentController>(
   VolunteerCommentController
 );
 
+// 봉사활동 상세정보에 댓글 생성
 volunteerCommentRouter.post(
   '/volunteerComments',
   loginRequired,
@@ -22,18 +23,27 @@ volunteerCommentRouter.get(
   volunteerCommentController.getVolunteerByComment
 );
 
+//본인이 작성한 리뷰가 맞는지 확인하는 API
+volunteerCommentRouter.get(
+  '/volunteerComments/check/:volunteerCommentId',
+  loginRequired,
+  volunteerCommentController.checkUser
+);
+
 //봉사 모집하기 특정 게시글의 댓글 조회
 volunteerCommentRouter.get(
   '/volunteerComments/:volunteerId',
   volunteerCommentController.getPostComment
 );
 
+//봉사 모집하기 특정 게시글의 댓글 수정
 volunteerCommentRouter.patch(
   '/volunteerComments/:volunteerCommentId',
   loginRequired,
   volunteerCommentController.patchComment
 );
 
+//봉사 모집하기 특정 게시글의 댓글 삭제
 volunteerCommentRouter.delete(
   '/volunteerComments/:volunteerCommentId',
   loginRequired,
