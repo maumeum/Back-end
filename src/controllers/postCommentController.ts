@@ -25,15 +25,13 @@ class PostCommentController {
 
   public getComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { post_id } = req.params;
+      const { postId } = req.params;
 
-      if (!post_id) {
+      if (!postId) {
         throw new Error('post_id 값이 올바르지 않습니다.');
       }
 
-      const postCommentList = await this.postCommentService.readComment(
-        post_id
-      );
+      const postCommentList = await this.postCommentService.readComment(postId);
 
       res.status(STATUS_CODE.OK).json(postCommentList);
     }
