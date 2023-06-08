@@ -43,6 +43,8 @@ class VolunteerApplicationService {
       'title',
       'centName',
       'deadline',
+      'endDate',
+      'startDate',
       'statusName',
       'images',
     ]);
