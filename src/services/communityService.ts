@@ -25,6 +25,11 @@ export class CommunityService {
 
     return newPost;
   }
+  public async checkUser(postid: string) {
+    const post = await PostModel.findOne({ _id: postid });
+    const user = await PostModel.findOne({ _id: post!.user_id });
+    return user;
+  }
 
   public async findAllPost() {
     return await PostModel.find();
@@ -46,7 +51,7 @@ export class CommunityService {
   }
   public async indByPostIdPost(id: string) {
     const post = await PostModel.findOne({ _id: id });
-    const user = await UserModel.findOne({ _id: post?.user_id });
+    const user = await UserModel.findOne({ _id: post!.user_id });
     const total = {
       user: user!.nickname,
       post,

@@ -18,12 +18,8 @@ export class CommunityController {
     const user_id = req.id;
     const { title, content, postType } = req.body;
     if (req.file) {
-      const { originalname, path } = (req as MulterRequest).file;
-      const parts = originalname.split(".");
-      const ext = parts[parts.length - 1];
-      const newPath = path + "." + ext;
-      fs.renameSync(path, newPath);
-
+      const { path } = (req as MulterRequest).file;
+      const newPath = path.replace("public/", "");
       const newPost = await this.communityService.createPost({
         title,
         content,
@@ -41,6 +37,17 @@ export class CommunityController {
         user_id,
       });
       res.status(STATUS_CODE.OK).json(buildResponse(null, newPost));
+    }
+  });
+  public checkUser = asyncHandler(async (req: Request, res: Response) => {
+    const { postid } = req.params;
+    const user_id = req.id;
+
+    const result = await this.communityService.checkUser(postid as string);
+    if (result!._id === user_id) {
+      res.status(STATUS_CODE.OK).json(buildResponse(null, true));
+    } else {
+      res.status(STATUS_CODE.OK).json(buildResponse(null, false));
     }
   });
 
@@ -112,18 +119,18 @@ export class CommunityController {
 
       if (req.file) {
         const { originalname, path } = (req as MulterRequest).file;
-        const parts = originalname.split(".");
-        const ext = parts[parts.length - 1];
-        const newPath = path + "." + ext;
-        fs.renameSync(path, newPath);
+        // const parts = originalname.split(".");
 
-        const Posts = await this.communityService.findOneAndUpdate(id, {
-          title,
-          content,
-          images: newPath,
-          postType,
-        });
-        res.send(Posts);
+        // const newPath = path + "." + ext;
+        // fs.renameSync(path, originalname);
+
+        // const Posts = await this.communityService.findOneAndUpdate(id, {
+        //   title,
+        //   content,
+        //   images: originalname,
+        //   postType,
+        // });
+        res.send({ originalname });
       } else {
         const Posts = await this.communityService.findOneAndUpdate(id, {
           title,
