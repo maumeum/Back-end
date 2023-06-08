@@ -56,7 +56,7 @@ export class CommunityService {
     return total;
   }
   public async delete(id: string) {
-    PostModel.deleteOne({ _id: id });
+    await PostModel.deleteOne({ _id: id });
   }
 
   public async findOneAndUpdate(
