@@ -57,8 +57,20 @@ class ReviewController {
 
   public readReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const reviews = await this.reviewService.getReviews();
-      res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
+      const { skip, limit } = req.query;
+
+      const reviews = await this.reviewService.getReviews(
+        Number(skip),
+        Number(limit),
+      );
+
+      logger.debug(`skip: ${skip}`);
+      logger.debug(`limit: ${limit}`);
+      const hasMore = reviews.length === Number(limit);
+      logger.debug(`hasMore : ${hasMore}`);
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { reviews, hasMore }));
     },
   );
 

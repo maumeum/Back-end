@@ -67,8 +67,15 @@ class ReviewService {
     return createReview;
   }
 
-  public async getReviews() {
-    const reviews = await ReviewModel.find().populate('user_id', 'nickname');
+  public async getReviews(skip: number, limit: number) {
+    const reviews = await ReviewModel.find()
+      .populate({
+        path: 'user_id',
+        select: 'nickname nanoid',
+      })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
     return reviews;
   }
 
@@ -80,10 +87,11 @@ class ReviewService {
     const matchedApplyVolunteer = await VolunteerApplicationModel.findOne({
       volunteer_id,
       user_id,
-    }).populate('volunteer_id');
-    if (!matchedApplyVolunteer) {
+    }).populate({ path: 'volunteer_id', select: 'endDate statusName' });
+    const matchedVolunteer = await VolunteerModel.findById(volunteer_id);
+    if (!matchedApplyVolunteer || !matchedVolunteer) {
       throw new AppError(
-        commonErrors.resourceNotFoundError,
+        `${commonErrors.resourceNotFoundError} : 일치하는 데이터 없음.`,
         STATUS_CODE.BAD_REQUEST,
         'BAD_REQUEST',
       );
@@ -95,10 +103,13 @@ class ReviewService {
         'BAD_REQUEST',
       );
     }
+    logger.debug(`matchedApplyVolunteer : ${matchedApplyVolunteer}`);
 
     const volunteer = matchedApplyVolunteer.volunteer_id as Volunteer;
-    logger.debug(volunteer);
-    const { endDate } = volunteer;
+    logger.debug(`volunteer : ${volunteer}`);
+    const { endDate, statusName } = volunteer;
+
+    logger.debug(`statusName : ${statusName}`);
     logger.debug(endDate);
     const now = DateTime.now();
     logger.debug(`now : ${now}`);
@@ -112,6 +123,11 @@ class ReviewService {
     if (now > endDateTime && now < sevenDaysAfterEnd) {
       if (!matchedApplyVolunteer.isParticipate) {
         matchedApplyVolunteer.isParticipate = true;
+        matchedVolunteer.statusName = '모집완료';
+        //@ts-ignore
+        logger.debug(volunteer.statusName);
+        await matchedVolunteer.save();
+        logger.debug(`matchedVolunteer : ${matchedVolunteer}`);
         await matchedApplyVolunteer.save();
       } else {
         throw new AppError(
@@ -133,20 +149,26 @@ class ReviewService {
     const applyVolunteer = await VolunteerApplicationModel.find({
       isParticipate: false,
     }).select('volunteer_id isParticipate');
+
     const now = DateTime.now();
 
     for (const apply of applyVolunteer) {
       const volunteer = await VolunteerModel.findById(
         apply.volunteer_id,
-      ).select('endDate');
-
+      ).select('endDate statusName');
+      logger.debug(`volunteer : ${volunteer}`);
       if (
         volunteer &&
+        volunteer.statusName !== '모집중단' &&
         DateTime.fromJSDate(volunteer.endDate) <
           now.minus({ days: CONSTANTS.CHANGING_DATE })
       ) {
         apply.isParticipate = true;
+        volunteer.statusName = '모집완료';
+        await volunteer.save();
         await apply.save();
+        logger.debug(`volunteer : ${volunteer}`);
+        logger.debug(`apply : ${apply}`);
       }
     }
   }
