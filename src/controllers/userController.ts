@@ -256,6 +256,32 @@ class UserController {
   public deleteUser = asyncHandler(
     async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
       const user_id = req.id;
+      const { email, password } = <UserLoginInfo>req.body;
+      const user = await this.userService.getUserByEmail(email);
+      if (!user) {
+        throw new AppError(
+          `${commonErrors.authenticationError} : 가입내역 없음`,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
+      }
+
+      if (user.role === 'disabled') {
+        throw new AppError(
+          `${commonErrors.authorizationError} : 탈퇴`,
+          STATUS_CODE.FORBIDDEN,
+          'FORBIDDEN',
+        );
+      }
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        throw new AppError(
+          `${commonErrors.authorizationError} : 비밀번호 불일치`,
+          STATUS_CODE.FORBIDDEN,
+          'FORBIDDEN',
+        );
+      }
+
       const updateInfo: updatedUser = {};
       updateInfo.role = 'disabled';
 
@@ -263,7 +289,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(STATUS_CODE.OK).json(buildResponse(null, updatedUser));
+      res.status(STATUS_CODE.OK).json(buildResponse(null, null));
     },
   );
 }
