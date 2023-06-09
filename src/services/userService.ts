@@ -47,7 +47,7 @@ class UserService {
   //object_id로 유저 찾기 (이메일, 닉네임, 폰)
   public async getUserById(_id: ObjectId) {
     const user = await UserModel.findById({ _id }).select(
-      'email nickname phone introduction image',
+      'email nickname phone introduction image role',
     );
     return user;
   }
