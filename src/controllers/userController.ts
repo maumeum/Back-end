@@ -10,6 +10,7 @@ import { STATUS_CODE } from '../utils/statusCode.js';
 import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
+import { logger } from '../utils/logger.js';
 declare global {
   namespace Express {
     interface Request {
@@ -213,6 +214,7 @@ class UserController {
       const user_id = req.id;
       //@ts-ignore
       const image = `images/${req.file.filename}`;
+      logger.debug(image);
       //@ts-ignore
       const updateInfo: {
         image?: string;

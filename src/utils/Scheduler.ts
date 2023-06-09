@@ -6,7 +6,8 @@ const reviewService = new ReviewService();
 //매일 자정 실행되는 함수
 const changeParticipateStatus = () => {
   schedule.scheduleJob(
-    '0 0 * * *',
+    // '0 0 * * *',
+    '*/5 * * * * *',
     reviewService.changeParticipateStatusAtMidnight,
   );
 };
