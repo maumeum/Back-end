@@ -41,15 +41,17 @@ class VolunteerApplicationService {
   public async readApplicationVolunteer(userId: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
-    }).populate('volunteer_id', [
-      'title',
-      'centName',
-      'deadline',
-      'endDate',
-      'startDate',
-      'statusName',
-      'images',
-    ]);
+    })
+      .populate('user_id', 'image')
+      .populate('volunteer_id', [
+        'title',
+        'centName',
+        'deadline',
+        'endDate',
+        'startDate',
+        'statusName',
+        'images',
+      ]);
 
     return applicationVolunteerList;
   }

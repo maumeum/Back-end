@@ -8,6 +8,12 @@ import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { logger } from '../utils/logger.js';
 
+interface MyFile extends Express.Multer.File {
+  // 추가적인 사용자 정의 속성을 선언할 수도 있습니다
+  // 예: 필요한 경우 가공된 파일 경로 등
+  processedPath: string;
+}
+
 class VolunteerController {
   private volunteerService = makeInstance<VolunteerService>(VolunteerService);
 
@@ -16,9 +22,21 @@ class VolunteerController {
       const register_user_id = req.id;
       const volunteerBodyData = req.body;
 
-      const volunteerData = { ...volunteerBodyData, register_user_id };
+      if (req.files) {
+        const files = req.files as MyFile[];
+        logger.debug(files);
+        const newPath = files.map((file) => {
+          return file.path.replace('public/', '');
+        });
 
-      await this.volunteerService.createVolunteer(volunteerData);
+        const volunteerData = {
+          ...volunteerBodyData,
+          images: newPath,
+          register_user_id,
+        };
+
+        await this.volunteerService.createVolunteer(volunteerData);
+      }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
@@ -28,6 +46,7 @@ class VolunteerController {
     async (req: Request, res: Response, next: NextFunction) => {
       const volunteerList = await this.volunteerService.readVolunteer();
 
+      console.log(volunteerList);
       res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerList));
     }
   );
@@ -103,7 +122,7 @@ class VolunteerController {
 
   public patchVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const VolunteerData = req.body;
+      const volunteerBodyData = req.body;
       const { volunteerId } = req.params;
 
       if (!volunteerId) {
@@ -114,7 +133,15 @@ class VolunteerController {
         );
       }
 
-      await this.volunteerService.updateVolunteer(volunteerId, VolunteerData);
+      if (req.files) {
+        const files = req.files as MyFile[];
+        const newPath = files.map((file) => {
+          return file.path.replace('public/', '');
+        });
+
+        const volunteerData = { ...volunteerBodyData, images: newPath };
+        await this.volunteerService.updateVolunteer(volunteerId, volunteerData);
+      }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
