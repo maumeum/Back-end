@@ -24,6 +24,11 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(cors()); //cors에러 방지
 app.use(express.json()); // 바디파서
 app.use(express.urlencoded({ extended: true }));
+<<<<<<< Updated upstream
+=======
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+>>>>>>> Stashed changes
 
 // DB연결
 const DB_URL =
@@ -46,6 +51,7 @@ app.use('/api', volunteerCommentRouter);
 app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
+
 // app.use(
 //   morgan('common', {
 //     stream: { write: (message) => logger.info(message.trim()) },
