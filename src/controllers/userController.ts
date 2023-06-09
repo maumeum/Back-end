@@ -226,7 +226,7 @@ class UserController {
         user_id,
         updateInfo,
       );
-      res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedUser));
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     },
   );
 
