@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import { CommunityController } from "../controllers/communityController.js";
 import { loginRequired } from "../middlewares/loginRequired.js";
-import { imageUploader } from "../utils/multer.js";
+import { imageUploader, imagesUploader } from "../utils/multer.js";
 
 // const storage = multer.diskStorage({
 //   //파일 저장 위치를 결정
@@ -41,7 +41,7 @@ communityRouter.get("/community/:id", communityController.getPost);
 communityRouter.patch(
   "/community/:id",
   imageUploader,
-  loginRequired,
+  imagesUploader,
   communityController.patchPost
 );
 
@@ -63,7 +63,7 @@ communityRouter.delete(
 communityRouter.post(
   "/community/create",
   loginRequired,
-  imageUploader,
+  imagesUploader,
   communityController.createPost
 );
 

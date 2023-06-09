@@ -8,7 +8,7 @@ import { AppError } from "../misc/AppError.js";
 import { commonErrors } from "../misc/commonErrors.js";
 
 interface MulterRequest extends Request {
-  file: any;
+  files: any;
 }
 
 export class CommunityController {
@@ -17,9 +17,13 @@ export class CommunityController {
   public createPost = asyncHandler(async (req: Request, res: Response) => {
     const user_id = req.id;
     const { title, content, postType } = req.body;
-    if (req.file) {
-      const { path } = (req as MulterRequest).file;
-      const newPath = path.replace("public/", "");
+    if (req.files) {
+      const files = (req as MulterRequest).files;
+      console.log(files);
+      const newPath = files.map((v: any) => {
+        return v.path.replace("public/", "");
+      });
+
       const newPost = await this.communityService.createPost({
         title,
         content,
@@ -27,6 +31,7 @@ export class CommunityController {
         images: newPath,
         user_id,
       });
+
       res.status(STATUS_CODE.OK).json(buildResponse(null, { newPost }));
     } else {
       const newPost = await this.communityService.createPost({
@@ -51,42 +56,6 @@ export class CommunityController {
       res.status(STATUS_CODE.OK).json(buildResponse(null, false));
     }
   });
-
-  //멀터
-  // public createPost = asyncHandler(
-  //   async (req: Request, res: Response) => {
-  //     const { title, content, postType } = req.body;
-
-  //     if (req.file) {
-  //       const { originalname, path } = (req as MulterRequest).file;
-  //       const parts = originalname.split(".");
-  //       const ext = parts[parts.length - 1];
-  //       const newPath = path + "." + ext;
-  //       fs.renameSync(path, newPath);
-  //       const user_id: any = req.id;
-  //       const newPost = await this.communityService.createPost({
-  //         title,
-  //         content,
-  //         postType,
-  //         images: newPath,
-  //         user_id,
-  //       });
-  //       console.log("저장성공");
-  //       res.status(STATUS_CODE.OK).json(buildResponse(null, newPost));
-  //     } else {
-  //       const user_id: any = req.id;
-  //       const newPost = await this.communityService.createPost({
-  //         title,
-  //         content,
-  //         postType,
-  //         images: [],
-  //         user_id,
-  //       });
-  //       console.log("저장성공");
-  //       res.status(STATUS_CODE.OK).json(buildResponse(null, newPost));
-  //     }
-  //   }
-  // );
 
   // 모든 게시물 조회
   public getAllPosts = asyncHandler(async (req: Request, res: Response) => {
@@ -118,20 +87,20 @@ export class CommunityController {
     try {
       const { title, content, postType } = req.body;
 
-      if (req.file) {
-        const { originalname, path } = (req as MulterRequest).file;
-        // const parts = originalname.split(".");
+      if (req.files) {
+        const files = (req as MulterRequest).files;
+        console.log(files);
+        const newPath = files.map((v: any) => {
+          return v.path.replace("public/", "");
+        });
 
-        // const newPath = path + "." + ext;
-        // fs.renameSync(path, originalname);
-
-        // const Posts = await this.communityService.findOneAndUpdate(id, {
-        //   title,
-        //   content,
-        //   images: originalname,
-        //   postType,
-        // });
-        res.send({ originalname });
+        const patchPosts = await this.communityService.findOneAndUpdate(id, {
+          title,
+          content,
+          images: newPath,
+          postType,
+        });
+        res.status(STATUS_CODE.OK).send(buildResponse(null, patchPosts));
       } else {
         const Posts = await this.communityService.findOneAndUpdate(id, {
           title,

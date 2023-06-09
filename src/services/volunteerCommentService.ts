@@ -48,7 +48,7 @@ class VolunteerCommentService {
   public async readPostComment(volunteer_id: string) {
     const postCommentList = await VolunteerCommentModel.find({
       volunteer_id: volunteer_id,
-    });
+    }).populate('user_id', 'nickname');
 
     return postCommentList;
   }
