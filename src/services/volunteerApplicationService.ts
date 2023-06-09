@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import { VolunteerApplicationModel } from '../db/index.js';
 import { AppError } from '../misc/AppError.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
+import { commonErrors } from '../misc/commonErrors.js';
 
 interface ApplicationVolunteerData {
   user_id: ObjectId;
@@ -67,7 +68,7 @@ class VolunteerApplicationService {
       throw new AppError(
         '이미 신청이 완료된 봉사활동입니다.',
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -78,7 +79,6 @@ class VolunteerApplicationService {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       volunteer_id: volunteer_id,
     }).select('isParticipate');
-
     return applicationVolunteerList;
   }
 }

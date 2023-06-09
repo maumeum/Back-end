@@ -12,6 +12,12 @@ import { commonErrors } from '../misc/commonErrors.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { logger } from '../utils/logger.js';
 
+interface MyFile extends Express.Multer.File {
+  // 추가적인 사용자 정의 속성을 선언할 수도 있습니다
+  // 예: 필요한 경우 가공된 파일 경로 등
+  processedPath: string;
+}
+
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -63,10 +69,13 @@ class ReviewController {
         Number(skip),
         Number(limit),
       );
-
+      const totalReviewsCount = await this.reviewService.totalReviewsCount();
+      logger.debug(`totalReviewsCount : ${totalReviewsCount}`);
       logger.debug(`skip: ${skip}`);
       logger.debug(`limit: ${limit}`);
-      const hasMore = reviews.length === Number(limit);
+
+      const hasMore = Number(skip) + Number(limit) < totalReviewsCount;
+      logger.debug(`review.length : ${reviews.length}`);
       logger.debug(`hasMore : ${hasMore}`);
       res
         .status(STATUS_CODE.OK)
@@ -77,11 +86,20 @@ class ReviewController {
   public postReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const { title, content, images, volunteer_id }: ReviewData = req.body;
+      const { title, content, volunteer_id }: ReviewData = req.body;
+
+      const files = (req.files as MyFile[]) || [];
+      logger.debug(files);
+      const newPath = files.map((file: any) => {
+        return file.path.replace('public/', '');
+      });
+
       const volunteer =
         await this.volunteerApplicationService.readApplicationVolunteerByVId(
           volunteer_id,
         );
+      logger.debug(`volunteer : ${volunteer}`);
+
       if (!volunteer[0].isParticipate) {
         throw new AppError(
           `${commonErrors.requestValidationError} : 참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.`,
@@ -94,9 +112,10 @@ class ReviewController {
         user_id,
         title,
         content,
-        images,
+        images: newPath,
         volunteer_id,
       });
+
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     },
   );
@@ -111,7 +130,12 @@ class ReviewController {
           'BAD_REQUEST',
         );
       }
-      const { title, content, images }: ReviewData = req.body;
+      const files = (req.files as MyFile[]) || [];
+      logger.debug(files);
+      const newPath = files.map((file: any) => {
+        return file.path.replace('public/', '');
+      });
+      const { title, content }: ReviewData = req.body;
       const updateInfo: ReviewData = {};
       if (title) {
         updateInfo.title = title;
@@ -119,9 +143,10 @@ class ReviewController {
       if (content) {
         updateInfo.content = content;
       }
-      if (images) {
-        updateInfo.images = images;
+      if (newPath) {
+        updateInfo.images = newPath;
       }
+
       const updatedReview = await this.reviewService.updateReview(
         review_id,
         updateInfo,

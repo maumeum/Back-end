@@ -1,20 +1,20 @@
-import express, { Request, Response, NextFunction } from "express";
-import multer, { FileFilterCallback } from "multer";
-import fs from "fs";
-import { error } from "console";
-import path from "path";
+import express, { Request, Response, NextFunction } from 'express';
+import multer, { FileFilterCallback } from 'multer';
+import fs from 'fs';
+import { error } from 'console';
+import path from 'path';
 
-if (!fs.existsSync("public/images")) {
-  fs.mkdirSync("public/images");
+if (!fs.existsSync('public/images')) {
+  fs.mkdirSync('public/images');
 }
 
 // 파일 타입 및 파일 크기 제한 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/images");
+    cb(null, 'public/images');
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, Date.now() + '-' + file.originalname);
   },
 });
 
@@ -22,16 +22,16 @@ const storage = multer.diskStorage({
 const fileFilter = (
   req: Request,
   file: Express.Multer.File,
-  cb: FileFilterCallback
+  cb: FileFilterCallback,
 ) => {
-  const allowedFileTypes = [".jpg", ".jpeg", ".png"];
+  const allowedFileTypes = ['.jpg', '.jpeg', '.png'];
   const ext = path.extname(file.originalname).toLowerCase();
   const maxSize = 10 * 1024 * 1024;
 
   if (allowedFileTypes.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error("올바른 파일 형식 및 크기를 선택하세요."));
+    cb(new Error('올바른 파일 형식 및 크기를 선택하세요.'));
   }
 };
 
@@ -41,7 +41,7 @@ const upload = multer({
 });
 
 const imageUploader = (req: Request, res: Response, next: NextFunction) => {
-  upload.single("image")(req, res, (err) => {
+  upload.single('image')(req, res, (err) => {
     if (err) {
       console.error(err);
       return res.status(400).json({ error: err.message });
@@ -52,7 +52,7 @@ const imageUploader = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const imagesUploader = (req: Request, res: Response, next: NextFunction) => {
-  upload.array("images")(req, res, (err) => {
+  upload.array('images')(req, res, (err) => {
     if (err) {
       console.error(err);
       return res.status(400).json({ error: err.message });
