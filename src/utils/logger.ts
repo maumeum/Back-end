@@ -1,5 +1,6 @@
 import { createLogger, transports, format } from 'winston';
 import dotenv from 'dotenv';
+dotenv.config();
 interface TransformableInfo {
   level: string;
   message: string;
@@ -10,7 +11,6 @@ const maxFiles = 5;
 
 // 환경 변수를 통해 현재 환경을 가져옵니다 (예: development, production)
 const currentEnvironment = process.env.LOGGER;
-
 const loggerTransports = [];
 
 // 프로덕션 환경인 경우

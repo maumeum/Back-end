@@ -15,7 +15,6 @@ import { postCommentRouter } from './routers/postCommentRouter.js';
 import { error } from 'console';
 import { logger } from './utils/logger.js';
 import morgan from 'morgan';
-import bodyParser from 'body-parser';
 
 dotenv.config();
 
@@ -24,14 +23,7 @@ const __dirname = path.resolve();
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(cors()); //cors에러 방지
 app.use(express.json()); // 바디파서
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
-<<<<<<< Updated upstream
-=======
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
->>>>>>> Stashed changes
 
 // DB연결
 const DB_URL =
