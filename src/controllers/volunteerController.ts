@@ -6,6 +6,7 @@ import { makeInstance } from '../utils/makeInstance.js';
 import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
+import { logger } from '../utils/logger.js';
 
 class VolunteerController {
   private volunteerService = makeInstance<VolunteerService>(VolunteerService);
@@ -53,6 +54,8 @@ class VolunteerController {
   public getSearchVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { keyword } = req.query;
+
+      logger.debug(typeof keyword);
 
       if (keyword) {
         const searchVolunteers =
