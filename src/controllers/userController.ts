@@ -230,6 +230,27 @@ class UserController {
     },
   );
 
+  public toDefaultImage = asyncHandler(
+    async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
+      const user_id = req.id;
+      //@ts-ignore
+      const image = 'images/default-profile-image.png';
+      const updateInfo: {
+        image?: string;
+      } = {};
+
+      if (image) {
+        updateInfo.image = image;
+      }
+
+      const updatedUser = await this.userService.updateUser(
+        user_id,
+        updateInfo,
+      );
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedUser));
+    },
+  );
+
   public deleteUser = asyncHandler(
     async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
       const user_id = req.id;

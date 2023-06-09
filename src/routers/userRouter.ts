@@ -37,6 +37,14 @@ userRouter.patch(
   imageUploader,
   userController.updateImage,
 );
+
+//사용자 정보 수정(기본 이미지로)
+userRouter.patch(
+  '/users/original/image',
+  loginRequired,
+  userController.toDefaultImage,
+);
+
 //사용자 회원 탈퇴
 userRouter.delete('/users', loginRequired, userController.deleteUser);
 
