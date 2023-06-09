@@ -67,8 +67,15 @@ class ReviewService {
     return createReview;
   }
 
-  public async getReviews() {
-    const reviews = await ReviewModel.find().populate('user_id', 'nickname');
+  public async getReviews(skip: number, limit: number) {
+    const reviews = await ReviewModel.find()
+      .populate({
+        path: 'user_id',
+        select: 'nickname nanoid',
+      })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
     return reviews;
   }
 
