@@ -10,6 +10,7 @@ import { CONSTANTS } from '../utils/Constants.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { AppError } from '../misc/AppError.js';
+import { logger } from '../utils/logger.js';
 interface ReviewData {
   review_id?: ObjectId;
   user_id?: ObjectId;
@@ -20,9 +21,17 @@ interface ReviewData {
 }
 
 class ReviewService {
-  public async getReviewsById(user_id: ObjectId) {
+  public async getReviewsByUserId(user_id: ObjectId) {
     const reviews = await ReviewModel.find({ user_id: user_id });
     return reviews;
+  }
+
+  public async getReviewById(review_id: ObjectId) {
+    const review = await ReviewModel.findById(review_id).populate(
+      'user_id',
+      'nickname',
+    );
+    return review;
   }
 
   public async createReview(createInfo: ReviewData) {
@@ -72,7 +81,6 @@ class ReviewService {
       volunteer_id,
       user_id,
     }).populate('volunteer_id');
-
     if (!matchedApplyVolunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
@@ -89,19 +97,35 @@ class ReviewService {
     }
 
     const volunteer = matchedApplyVolunteer.volunteer_id as Volunteer;
+    logger.debug(volunteer);
     const { endDate } = volunteer;
-
+    logger.debug(endDate);
     const now = DateTime.now();
+    logger.debug(`now : ${now}`);
     const endDateTime = DateTime.fromJSDate(endDate);
+    logger.debug(`endDate : ${endDateTime}`);
     const sevenDaysAfterEnd = endDateTime.plus({
       days: CONSTANTS.CHANGING_DATE,
     });
+    logger.debug(`sevenDaysAfterEnd:${sevenDaysAfterEnd}`);
 
     if (now > endDateTime && now < sevenDaysAfterEnd) {
       if (!matchedApplyVolunteer.isParticipate) {
         matchedApplyVolunteer.isParticipate = true;
         await matchedApplyVolunteer.save();
+      } else {
+        throw new AppError(
+          '조건에 만족하는 요청이 아닙니다. No changes were made',
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
       }
+    } else {
+      throw new AppError(
+        '조건에 만족하는 요청이 아닙니다. No changes were made',
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST',
+      );
     }
   }
 

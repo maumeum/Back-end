@@ -35,7 +35,7 @@ communityRouter.get(
 );
 
 //특정 게시물 조회 // 완료
-communityRouter.get("/community/:postid", communityController.getPost);
+communityRouter.get("/community/:id", communityController.getPost);
 
 //특정 게시물 수정
 communityRouter.patch(

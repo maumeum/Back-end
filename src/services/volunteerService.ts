@@ -1,5 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { VolunteerModel } from '../db/index.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface VolunteerData {
   title: string;
@@ -20,21 +23,39 @@ interface VolunteerData {
 
 class VolunteerService {
   public async createVolunteer(volunteerData: VolunteerData) {
-    const { deadline, startDate, endDate } = volunteerData;
+    const { deadline, startDate, endDate, applyCount, registerCount } =
+      volunteerData;
 
     if (deadline > startDate || deadline > endDate || startDate > endDate) {
-      return false;
+      throw new AppError(
+        commonErrors.inputError,
+        STATUS_CODE.FORBIDDEN,
+        'BAD_REQUEST'
+      );
+    }
+
+    if (applyCount > registerCount) {
+      throw new AppError(
+        commonErrors.inputError,
+        STATUS_CODE.FORBIDDEN,
+        'BAD_REQUEST'
+      );
     }
     const createVolunteer = await VolunteerModel.create(volunteerData);
 
     if (!createVolunteer) {
-      throw new Error('봉사활동 생성에 실패했습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
-    return true;
+    return createVolunteer;
   }
 
   public async readVolunteer() {
     const volunteerList = await VolunteerModel.find({});
+
     return volunteerList;
   }
 
@@ -44,7 +65,11 @@ class VolunteerService {
     });
 
     if (!volunteer) {
-      throw new Error('특정 봉사활동 조회를 실패했습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
     return volunteer;
@@ -71,10 +96,6 @@ class VolunteerService {
       register_user_id: user_id,
     }).populate('register_user_id');
 
-    if (volunteerList.length === 0) {
-      return [];
-    }
-
     return volunteerList;
   }
 
@@ -88,7 +109,11 @@ class VolunteerService {
     );
 
     if (!newVolunteer) {
-      throw new Error('봉사활동 정보 업데이트에 실패했습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
     return true;
   }

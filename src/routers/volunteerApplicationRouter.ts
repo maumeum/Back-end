@@ -8,12 +8,14 @@ const volunteerApplicationRouter = Router();
 const volunteerApplicationController =
   makeInstance<VolunteerApplicationController>(VolunteerApplicationController);
 
+// 봉사활동 신청
 volunteerApplicationRouter.post(
   '/applications',
   loginRequired,
   volunteerApplicationController.postApplicationVolunteer
 );
 
+// 신청한 봉사활동 정보 확인
 volunteerApplicationRouter.get(
   '/applications',
   loginRequired,

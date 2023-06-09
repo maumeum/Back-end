@@ -11,29 +11,16 @@ interface PostCommentData {
   content: string;
 }
 
-interface PostCommentDateData {
-  createdAt: Date;
-}
 class PostCommentService {
   public async createComment(postCommentData: PostCommentData) {
     const postComment = await PostCommentModel.create(postCommentData);
-
-    if (!postComment) {
-      //throw new Error('댓글 작성에 실패하였습니다.');
-      // throw new AppError(
-      //   commonErrors.inputError,
-      //   STATUS_CODE.NOT_FOUND,
-      //   'NOT FOUND'
-      // );
-    }
-
-    return true;
+    return postComment;
   }
 
   public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
-      ['_id', 'title', 'content', 'postType', 'createdAt'],
+      ['title', 'content', 'postType', 'createdAt']
     );
 
     if (userComments.length === 0) {
@@ -42,15 +29,7 @@ class PostCommentService {
 
     const postList = userComments.map((userComment) => {
       const postId = userComment.post_id as Post;
-      const userCommentObj = userComment.toObject() as PostCommentDateData;
-      const createdAt = userCommentObj.createdAt;
-
-      return {
-        title: postId.title,
-        content: postId.content,
-        postType: postId.postType,
-        createdAt: createdAt,
-      };
+      return postId;
     });
 
     return postList;
@@ -58,40 +37,43 @@ class PostCommentService {
 
   public async readComment(post_id: string) {
     const postCommentList = await PostCommentModel.find({ post_id: post_id });
-
-    if (postCommentList.length === 0) {
-      return [];
-    }
-
     return postCommentList;
   }
 
   public async updateComment(
     postCommentId: string,
-    postCommentData: PostCommentData,
+    postCommentData: PostCommentData
   ) {
     const newPostComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
-      postCommentData,
+      postCommentData
     );
 
     if (!newPostComment) {
-      throw new Error('댓글 수정에 실패하였습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return newPostComment;
   }
 
   public async deleteComment(postCommentId: string) {
     const deletePostComment = await PostCommentModel.findByIdAndDelete(
-      postCommentId,
+      postCommentId
     );
 
     if (!deletePostComment) {
-      throw new Error('댓글 삭제에 실패하였습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return deletePostComment;
   }
 }
 

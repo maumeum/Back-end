@@ -3,6 +3,9 @@ import { PostCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { makeInstance } from '../utils/makeInstance.js';
+import { buildResponse } from '../utils/builderResponse.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
 
 class PostCommentController {
   private postCommentService =
@@ -19,23 +22,25 @@ class PostCommentController {
         user_id,
       });
 
-      res.status(STATUS_CODE.OK).json({ message: 'created' });
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 
   public getComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { post_id } = req.params;
+      const { postId } = req.params;
 
-      if (!post_id) {
-        throw new Error('post_id 값이 올바르지 않습니다.');
+      if (!postId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
 
-      const postCommentList = await this.postCommentService.readComment(
-        post_id
-      );
+      const postCommentList = await this.postCommentService.readComment(postId);
 
-      res.status(STATUS_CODE.OK).json(postCommentList);
+      res.status(STATUS_CODE.OK).json(buildResponse(null, postCommentList));
     }
   );
 
@@ -47,7 +52,7 @@ class PostCommentController {
         user_id
       );
 
-      res.status(STATUS_CODE.OK).json(postComment);
+      res.status(STATUS_CODE.OK).json(buildResponse(null, postComment));
     }
   );
 
@@ -56,7 +61,11 @@ class PostCommentController {
       const { postCommentId } = req.params;
 
       if (!postCommentId) {
-        throw new Error('post_id 값이 올바르지 않습니다.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
       const postCommentData = req.body;
 
@@ -65,7 +74,7 @@ class PostCommentController {
         postCommentData
       );
 
-      res.status(STATUS_CODE.CREATED).json({ message: 'updated' });
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 
@@ -74,12 +83,16 @@ class PostCommentController {
       const { postCommentId } = req.params;
 
       if (!postCommentId) {
-        throw new Error('post_id 값이 올바르지 않습니다.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
 
       await this.postCommentService.deleteComment(postCommentId);
 
-      res.status(STATUS_CODE.CREATED).json({ message: 'deleted' });
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 }

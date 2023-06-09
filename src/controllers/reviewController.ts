@@ -10,6 +10,7 @@ import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { logger } from '../utils/logger.js';
 
 interface ReviewData {
   review_id?: ObjectId;
@@ -27,8 +28,30 @@ class ReviewController {
   public readMyReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const reviews = await this.reviewService.getReviewsById(user_id);
+      const reviews = await this.reviewService.getReviewsByUserId(user_id);
       res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
+    },
+  );
+
+  public readReviewDetail = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { review_id }: ReviewData = req.params;
+      if (!review_id) {
+        throw new AppError(
+          commonErrors.argumentError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
+      }
+      const review = await this.reviewService.getReviewById(review_id);
+      if (!review) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
+      }
+      res.status(STATUS_CODE.OK).json(buildResponse(null, review));
     },
   );
 
@@ -95,6 +118,27 @@ class ReviewController {
     },
   );
 
+  public checkUser = asyncHandler(async (req: Request, res: Response) => {
+    const { review_id }: ReviewData = req.params;
+    const user_id = req.id;
+    if (!review_id) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST',
+      );
+    }
+    const review = await this.reviewService.getReviewById(review_id);
+    logger.debug(`review : ${review}`);
+    logger.debug(`user_id : ${user_id}`);
+    logger.debug(`review?.user_id?._id : ${review?.user_id?._id}`);
+    if (String(user_id) === String(review?.user_id?._id)) {
+      res.status(STATUS_CODE.OK).json(buildResponse(null, true));
+    } else {
+      res.status(STATUS_CODE.OK).json(buildResponse(null, false));
+    }
+  });
+
   public deleteReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { review_id }: ReviewData = req.params;
@@ -113,7 +157,7 @@ class ReviewController {
   public changeParticipationStatus = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const { volunteer_id } = req.body;
+      const { volunteer_id }: ReviewData = req.params;
 
       if (!volunteer_id) {
         throw new AppError(

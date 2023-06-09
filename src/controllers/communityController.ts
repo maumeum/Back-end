@@ -44,7 +44,8 @@ export class CommunityController {
     const user_id = req.id;
     //
     const result = await this.communityService.checkUser(postid as string);
-    if (result!._id === user_id) {
+
+    if (result!._id.toString() === user_id.toString()) {
       res.status(STATUS_CODE.OK).json(buildResponse(null, true));
     } else {
       res.status(STATUS_CODE.OK).json(buildResponse(null, false));

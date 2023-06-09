@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { makeInstance } from '../utils/makeInstance.js';
+import { buildResponse } from '../utils/builderResponse.js';
 class VolunteerApplicationController {
   private volunteerApplicationService =
     makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
@@ -19,7 +20,7 @@ class VolunteerApplicationController {
         isParticipate,
       });
 
-      res.status(STATUS_CODE.CREATED).json({ message: 'created' });
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 
@@ -31,7 +32,9 @@ class VolunteerApplicationController {
           user_id
         );
 
-      res.status(STATUS_CODE.OK).json(applicationVolunteerList);
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, applicationVolunteerList));
     }
   );
 }
