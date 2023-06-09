@@ -29,6 +29,11 @@ volunteerRouter.get(
   volunteerController.getRegisterationVolunteer
 );
 
+volunteerRouter.get(
+  '/volunteers/check/:volunteerId',
+  loginRequired,
+  volunteerController.getCheckUser
+);
 // 특정 봉사활동 정보 조회
 volunteerRouter.get(
   '/volunteers/:volunteerId',

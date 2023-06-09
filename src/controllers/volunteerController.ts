@@ -32,6 +32,26 @@ class VolunteerController {
     }
   );
 
+  public getCheckUser = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+      const user_id = req.id;
+
+      const volunteer = await this.volunteerService.readVolunteerById(
+        volunteerId
+      );
+
+      logger.debug(String(user_id));
+      logger.debug(String(volunteer.register_user_id));
+
+      if (String(user_id) === String(volunteer.register_user_id)) {
+        res.status(STATUS_CODE.OK).json(buildResponse(null, true));
+      } else {
+        res.status(STATUS_CODE.OK).json(buildResponse(null, false));
+      }
+    }
+  );
+
   public getVolunteerById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
