@@ -91,7 +91,30 @@ class VolunteerController {
         );
       }
 
-      await this.volunteerService.updateVolunteer(VolunteerData, volunteerId);
+      await this.volunteerService.updateVolunteer(volunteerId, VolunteerData);
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  public patchRegisterationStatusName = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const { statusName } = req.body;
+
+      await this.volunteerService.updateRegisterationVolunteer(
+        volunteerId,
+        statusName
+      );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }

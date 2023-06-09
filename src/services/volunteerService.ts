@@ -3,6 +3,7 @@ import { VolunteerModel } from '../db/index.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
+import { logger } from '../utils/logger.js';
 
 interface VolunteerData {
   title: string;
@@ -19,6 +20,10 @@ interface VolunteerData {
   teenager: boolean;
   images: string[];
   register_user_id: ObjectId;
+}
+
+interface VolunteerStatus {
+  statusName: string;
 }
 
 class VolunteerService {
@@ -100,21 +105,40 @@ class VolunteerService {
   }
 
   public async updateVolunteer(
-    volunteerData: VolunteerData,
-    volunteerId: string
+    volunteerId: string,
+    volunteerData: VolunteerData
   ) {
-    const newVolunteer = await VolunteerModel.findByIdAndUpdate(
+    const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
       volunteerData
     );
 
-    if (!newVolunteer) {
+    if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
         'BAD_REQUEST'
       );
     }
+    return true;
+  }
+
+  public async updateRegisterationVolunteer(
+    volunteerId: string,
+    statusName: VolunteerStatus
+  ) {
+    const volunteer = await VolunteerModel.findByIdAndUpdate(volunteerId, {
+      statusName,
+    });
+
+    if (!volunteer) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
     return true;
   }
 }
