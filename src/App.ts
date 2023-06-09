@@ -15,7 +15,6 @@ import { postCommentRouter } from './routers/postCommentRouter.js';
 import { error } from 'console';
 import { logger } from './utils/logger.js';
 import morgan from 'morgan';
-import bodyParser from 'body-parser';
 
 dotenv.config();
 
@@ -24,8 +23,6 @@ const __dirname = path.resolve();
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(cors()); //cors에러 방지
 app.use(express.json()); // 바디파서
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // DB연결
@@ -49,6 +46,7 @@ app.use('/api', volunteerCommentRouter);
 app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
+
 // app.use(
 //   morgan('common', {
 //     stream: { write: (message) => logger.info(message.trim()) },
