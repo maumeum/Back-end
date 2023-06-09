@@ -1,6 +1,7 @@
 import express, { NextFunction } from 'express';
 import { ReviewController } from '../controllers/reviewController.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
+import { imagesUploader } from '../utils/multer.js';
 
 const reviewRouter = express.Router();
 const reviewController = new ReviewController();
@@ -27,12 +28,18 @@ reviewRouter.get(
   reviewController.readMyReview,
 );
 //리뷰 생성
-reviewRouter.post('/review', loginRequired, reviewController.postReview);
+reviewRouter.post(
+  '/review',
+  loginRequired,
+  imagesUploader,
+  reviewController.postReview,
+);
 
 //리뷰 수정
 reviewRouter.patch(
   '/review/users/:review_id',
   loginRequired,
+  imagesUploader,
   reviewController.updateReview,
 );
 

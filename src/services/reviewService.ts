@@ -76,7 +76,13 @@ class ReviewService {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
+
     return reviews;
+  }
+
+  public async totalReviewsCount() {
+    const counts = await ReviewModel.countDocuments();
+    return counts;
   }
 
   // endDate 이후 && 7일 지나기 전, 사용자 본인이 상태를 직접 false => true로 변경하는 코드
