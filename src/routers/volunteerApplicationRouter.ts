@@ -15,7 +15,7 @@ volunteerApplicationRouter.post(
   volunteerApplicationController.postApplicationVolunteer
 );
 
-// 신청한 봉사활동 정보 확인
+// 신청한 봉사활동 정보 및 완료한 봉사활동 정보 확인
 volunteerApplicationRouter.get(
   '/applications',
   loginRequired,
