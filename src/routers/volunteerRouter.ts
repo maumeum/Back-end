@@ -24,7 +24,7 @@ volunteerRouter.get(
 
 //사용자가 등록한 봉사활동 조회
 volunteerRouter.get(
-  '/volunteers/registeration',
+  '/volunteers/registerations',
   loginRequired,
   volunteerController.getRegisterationVolunteer
 );
@@ -43,6 +43,13 @@ volunteerRouter.patch(
   '/volunteers/:volunteerId',
   loginRequired,
   volunteerController.patchVolunteer
+);
+
+//
+volunteerRouter.patch(
+  '/volunteers/registerations/:volunteerId',
+  loginRequired,
+  volunteerController.patchRegisterationStatusName
 );
 
 export { volunteerRouter };
