@@ -12,6 +12,7 @@ interface UserInfo {
   nickname?: string;
   nanoid?: string;
   introduction?: string;
+  authorization?: boolean;
   image?: string;
   email?: string;
   password?: string;

@@ -9,6 +9,7 @@ import {
   volunteerApplicationRouter,
   communityRouter,
   reviewRouter,
+  teamAuthRouter,
 } from './routers/index.js';
 import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
 import { postCommentRouter } from './routers/postCommentRouter.js';
@@ -46,6 +47,7 @@ app.use('/api', volunteerCommentRouter);
 app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
+app.use('/api', teamAuthRouter);
 
 // app.use(
 //   morgan('common', {

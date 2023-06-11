@@ -6,3 +6,4 @@ export * from './reviewService.js';
 export * from './userService.js';
 export * from './postCommentService.js';
 export * from './volunteerCommentService.js';
+export * from './teamAuthService.js';

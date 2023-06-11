@@ -87,7 +87,6 @@ class ReviewController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
       const { title, content, volunteer_id }: ReviewData = req.body;
-
       const files = (req.files as MyFile[]) || [];
       logger.debug(files);
       const newPath = files.map((file: any) => {
@@ -116,7 +115,7 @@ class ReviewController {
         volunteer_id,
       });
 
-      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, createdReview));
     },
   );
 

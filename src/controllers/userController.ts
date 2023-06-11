@@ -28,7 +28,7 @@ interface updatedUser {
   nickname?: string;
   nanoid?: string;
   introduction?: string;
-  image?: any;
+  image?: string;
   phone?: string;
   role?: 'user' | 'admin' | 'disabled';
 }
