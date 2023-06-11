@@ -1,4 +1,4 @@
-import { prop, modelOptions, mongoose } from '@typegoose/typegoose';
+import { prop, modelOptions } from '@typegoose/typegoose';
 import { nanoid } from 'nanoid';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
@@ -12,7 +12,7 @@ class User {
   @prop({ required: true, default: 'images/default-profile-image.png' })
   public image!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, unique: true })
   public email!: string;
 
   @prop()
@@ -26,6 +26,9 @@ class User {
 
   @prop({ required: true })
   public phone!: string;
+
+  @prop({ default: false })
+  public authorization!: boolean;
 }
 
 export { User };

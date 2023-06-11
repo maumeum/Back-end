@@ -2,18 +2,21 @@ import { modelOptions, prop, Ref, mongoose } from '@typegoose/typegoose';
 import { User } from './userSchema.js';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
-class TeamAuthorization {
-  @prop({ ref: User })
+class TeamAuth {
+  @prop({ ref: User, unique: true })
   public user_id?: Ref<User>;
 
-  @prop({ required: true })
+  @prop()
   public category!: string;
 
-  @prop()
+  @prop({ unique: true })
   public teamName!: string;
 
   @prop()
   public introduction!: string;
+
+  @prop()
+  public briefHistory!: string;
 
   @prop()
   public establishmentDate!: Date;
@@ -24,8 +27,8 @@ class TeamAuthorization {
   @prop()
   public location?: string;
 
-  @prop({ required: true })
+  @prop()
   public image!: string;
 }
 
-export { TeamAuthorization };
+export { TeamAuth };
