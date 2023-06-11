@@ -62,4 +62,11 @@ volunteerRouter.patch(
   volunteerController.patchRegisterationStatusName
 );
 
+// 등록한 봉사활동 신고
+volunteerRouter.patch(
+  '/volunteers/reports/:volunteerId',
+  loginRequired,
+  volunteerController.patchReportVolunteer
+);
+
 export { volunteerRouter };

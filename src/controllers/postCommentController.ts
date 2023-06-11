@@ -78,6 +78,29 @@ class PostCommentController {
     }
   );
 
+  public patchReportComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { postCommentId } = req.params;
+
+      if (!postCommentId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const postCommentData = req.body;
+
+      await this.postCommentService.updateReportComment(
+        postCommentId,
+        postCommentData
+      );
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
   public deleteComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { postCommentId } = req.params;

@@ -12,6 +12,10 @@ interface VolunteerCommentData {
   isReported: boolean;
 }
 
+interface VolunteerReportData {
+  isReported: boolean;
+}
+
 class VolunteerCommentService {
   public async createComment(volunteerComment: VolunteerCommentData) {
     const comment = await VolunteerCommentModel.create(volunteerComment);
@@ -71,9 +75,28 @@ class VolunteerCommentService {
       );
     }
 
-    return updatedComment;
+    return true;
   }
 
+  public async updateReportComment(
+    volunteerComment_id: string,
+    volunteerCommentData: VolunteerReportData
+  ) {
+    const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
+      volunteerComment_id,
+      volunteerCommentData
+    );
+
+    if (!updatedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
+  }
   public async deleteComment(volunteerComment_id: string) {
     const deletedComment = await VolunteerCommentModel.findByIdAndDelete(
       volunteerComment_id

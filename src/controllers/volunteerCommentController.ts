@@ -79,6 +79,29 @@ class VolunteerCommentController {
     }
   );
 
+  public patchReportComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerCommentId } = req.params;
+
+      if (!volunteerCommentId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const volunteerCommentData = req.body;
+
+      await this.volunteerCommentService.updateReportComment(
+        volunteerCommentId,
+        volunteerCommentData
+      );
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
   public deleteComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;

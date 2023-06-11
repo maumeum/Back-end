@@ -56,6 +56,23 @@ class ReviewService {
     return updatedReview;
   }
 
+  public async updateReportReview(review_id: ObjectId, updateInfo: ReviewData) {
+    const updatedReview = await ReviewModel.findByIdAndUpdate(
+      review_id,
+      updateInfo
+    );
+
+    if (!updatedReview) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
+  }
+
   public async deleteReview(review_id: ObjectId) {
     const createReview = await ReviewModel.deleteOne({ _id: review_id });
     if (createReview.deletedCount === 0) {

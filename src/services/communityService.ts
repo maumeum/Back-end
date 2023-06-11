@@ -1,5 +1,12 @@
 import { Ref } from '@typegoose/typegoose';
 import { PostCommentModel, PostModel, UserModel } from '../db/index.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+
+interface communityReportData {
+  isReported: boolean;
+}
 
 export class CommunityService {
   public async createPost({
@@ -60,6 +67,26 @@ export class CommunityService {
       post,
     };
     return total;
+  }
+
+  public async updateReportPost(
+    communityId: string,
+    communityData: communityReportData
+  ) {
+    const community = await PostModel.findByIdAndUpdate(
+      communityId,
+      communityData
+    );
+
+    if (!community) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
   }
   public async delete(id: string) {
     await PostModel.deleteOne({ _id: id });

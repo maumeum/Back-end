@@ -159,14 +159,35 @@ class VolunteerController {
         );
       }
 
-      const { statusName } = req.body;
+      const volunteerData = req.body;
 
       await this.volunteerService.updateRegisterationVolunteer(
         volunteerId,
-        statusName
+        volunteerData
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  public patchReportVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const { isReported } = req.body;
+
+      await this.volunteerService.updateReportVolunteer(
+        volunteerId,
+        isReported
+      );
     }
   );
 }

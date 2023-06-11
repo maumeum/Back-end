@@ -137,7 +137,7 @@ class ReviewController {
       const newPath = files.map((file: any) => {
         return file.path.replace('public/', '');
       });
-      const { title, content }: ReviewData = req.body;
+      const { title, content, isReported }: ReviewData = req.body;
       const updateInfo: ReviewData = {};
       if (title) {
         updateInfo.title = title;
@@ -149,11 +149,35 @@ class ReviewController {
         updateInfo.images = newPath;
       }
 
+      if (newPath) {
+        updateInfo.isReported = isReported;
+      }
+
       const updatedReview = await this.reviewService.updateReview(
         review_id,
         updateInfo
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedReview));
+    }
+  );
+
+  public patchReportReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { review_id }: ReviewData = req.params;
+
+      if (!review_id) {
+        throw new AppError(
+          commonErrors.argumentError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const updateInfo = req.body;
+
+      await this.reviewService.updateReportReview(review_id, updateInfo);
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 

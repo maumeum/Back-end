@@ -43,6 +43,12 @@ volunteerCommentRouter.patch(
   volunteerCommentController.patchComment
 );
 
+volunteerCommentRouter.patch(
+  '/volunteerComments/reports/:volunteerCommentId',
+  loginRequired,
+  volunteerCommentController.patchReportComment
+);
+
 //봉사 모집하기 특정 게시글의 댓글 삭제
 volunteerCommentRouter.delete(
   '/volunteerComments/:volunteerCommentId',

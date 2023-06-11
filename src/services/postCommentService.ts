@@ -12,6 +12,10 @@ interface PostCommentData {
   postData: boolean;
 }
 
+interface PostReportData {
+  isReported: boolean;
+}
+
 class PostCommentService {
   public async createComment(postCommentData: PostCommentData) {
     const postComment = await PostCommentModel.create(postCommentData);
@@ -60,7 +64,27 @@ class PostCommentService {
       );
     }
 
-    return newPostComment;
+    return true;
+  }
+
+  public async updateReportComment(
+    postCommentId: string,
+    postCommentData: PostReportData
+  ) {
+    const newReportComment = await PostCommentModel.findByIdAndUpdate(
+      postCommentId,
+      postCommentData
+    );
+
+    if (!newReportComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
   }
 
   public async deleteComment(postCommentId: string) {

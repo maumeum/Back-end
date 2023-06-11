@@ -134,6 +134,23 @@ export class CommunityController {
     }
   );
 
+  public patchReportPost = asyncHandler(async (req: Request, res: Response) => {
+    const { communityId } = req.params;
+
+    if (!communityId) {
+      throw new AppError(
+        commonErrors.argumentError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    const communityData = req.body;
+
+    await this.communityService.updateReportPost(communityId, communityData);
+
+    res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+  });
   //게시물 삭제
   public deletePost = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
