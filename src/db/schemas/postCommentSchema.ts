@@ -22,7 +22,7 @@ class PostComment {
   @prop({ required: true })
   public content!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, default: false })
   public isReported!: boolean;
 }
 

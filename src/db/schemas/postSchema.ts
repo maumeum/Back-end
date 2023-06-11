@@ -18,7 +18,7 @@ class Post {
   @prop({ required: false })
   public postType!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, default: false })
   public isReported!: boolean;
 }
 

@@ -46,7 +46,7 @@ class Volunteer {
   @prop({ ref: () => User, type: () => mongoose.Types.ObjectId })
   public register_user_id?: Ref<User>;
 
-  @prop({ required: true })
+  @prop({ required: true, default: false })
   public isReported!: boolean;
 }
 
