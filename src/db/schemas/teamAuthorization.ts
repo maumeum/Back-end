@@ -15,6 +15,15 @@ class TeamAuthorization {
   @prop()
   public introduction!: string;
 
+  @prop()
+  public establishmentDate!: Date;
+
+  @prop()
+  public phone!: string;
+
+  @prop()
+  public location?: string;
+
   @prop({ required: true })
   public image!: string;
 }
