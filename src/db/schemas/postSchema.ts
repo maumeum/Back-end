@@ -17,6 +17,9 @@ class Post {
 
   @prop({ required: false })
   public postType!: string;
+
+  @prop({ required: true })
+  public isReported!: boolean;
 }
 
 export { Post };

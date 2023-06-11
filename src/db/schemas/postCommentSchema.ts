@@ -21,6 +21,9 @@ class PostComment {
 
   @prop({ required: true })
   public content!: string;
+
+  @prop({ required: true })
+  public isReported!: boolean;
 }
 
 export { PostComment };
