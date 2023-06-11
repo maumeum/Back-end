@@ -17,7 +17,7 @@ export class CommunityController {
 
   public createPost = asyncHandler(async (req: Request, res: Response) => {
     const user_id = req.id;
-    const { title, content, postType } = req.body;
+    const { title, content, postType, isReported } = req.body;
     if (req.files) {
       const files = (req as MulterRequest).files;
       console.log(files);
@@ -31,6 +31,7 @@ export class CommunityController {
         postType,
         images: newPath,
         user_id,
+        isReported,
       });
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, { newPost }));
@@ -41,6 +42,7 @@ export class CommunityController {
         postType,
         images: [],
         user_id,
+        isReported,
       });
       res.status(STATUS_CODE.OK).json(buildResponse(null, newPost));
     }
@@ -124,12 +126,12 @@ export class CommunityController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       const categoryPost = await this.communityService.getPostByCat(category);
       res.status(STATUS_CODE.OK).json(buildResponse(null, categoryPost));
-    },
+    }
   );
 
   //게시물 삭제
@@ -139,7 +141,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     await this.communityService.delete(id);
@@ -154,7 +156,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.requestValidationError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 

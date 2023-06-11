@@ -9,6 +9,7 @@ interface PostCommentData {
   user_id: ObjectId;
   post_id: ObjectId;
   content: string;
+  postData: boolean;
 }
 
 class PostCommentService {

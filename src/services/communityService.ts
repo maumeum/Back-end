@@ -1,5 +1,5 @@
-import { Ref } from "@typegoose/typegoose";
-import { PostCommentModel, PostModel, UserModel } from "../db/index.js";
+import { Ref } from '@typegoose/typegoose';
+import { PostCommentModel, PostModel, UserModel } from '../db/index.js';
 
 export class CommunityService {
   public async createPost({
@@ -8,12 +8,14 @@ export class CommunityService {
     postType,
     images,
     user_id,
+    isReported,
   }: {
     title: string;
     content: string;
     postType: string;
     images: any;
     user_id: any;
+    isReported: boolean;
   }) {
     const newPost = await PostModel.create({
       title,
@@ -21,6 +23,7 @@ export class CommunityService {
       postType,
       images,
       user_id,
+      isReported,
     });
 
     return newPost;

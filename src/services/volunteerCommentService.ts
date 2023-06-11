@@ -9,6 +9,7 @@ interface VolunteerCommentData {
   volunteer_id: ObjectId;
   user_id: ObjectId;
   content: string;
+  isReported: boolean;
 }
 
 class VolunteerCommentService {

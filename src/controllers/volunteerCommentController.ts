@@ -15,13 +15,14 @@ class VolunteerCommentController {
   public postComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const { volunteer_id, content } = req.body;
+      const volunteerBodyData = req.body;
 
-      await this.volunteerCommentService.createComment({
-        volunteer_id,
-        content,
+      const volunteerData = {
+        ...volunteerBodyData,
         user_id,
-      });
+      };
+
+      await this.volunteerCommentService.createComment(volunteerData);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }

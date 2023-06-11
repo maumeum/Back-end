@@ -13,14 +13,14 @@ class PostCommentController {
 
   public postComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { post_id, content } = req.body;
+      const postBodyData = req.body;
       const user_id = req.id;
 
-      await this.postCommentService.createComment({
-        post_id,
-        content,
+      const postData = {
+        ...postBodyData,
         user_id,
-      });
+      };
+      await this.postCommentService.createComment(postData);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
