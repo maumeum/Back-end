@@ -7,6 +7,8 @@ import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { logger } from '../utils/logger.js';
+import { makeInstance } from '../utils/makeInstance.js';
+import { UserService } from '../services/userService.js';
 
 interface MulterRequest extends Request {
   files: any;
@@ -14,6 +16,7 @@ interface MulterRequest extends Request {
 
 export class CommunityController {
   public communityService = new CommunityService();
+  private userService = makeInstance<UserService>(UserService);
 
   public createPost = asyncHandler(async (req: Request, res: Response) => {
     const user_id = req.id;
@@ -137,6 +140,7 @@ export class CommunityController {
     }
   );
 
+  // 특정 게시물 신고
   public patchReportPost = asyncHandler(async (req: Request, res: Response) => {
     const { communityId } = req.params;
 
@@ -148,9 +152,9 @@ export class CommunityController {
       );
     }
 
-    const communityData = req.body;
-
-    await this.communityService.updateReportPost(communityId, communityData);
+    await this.communityService.updateReportPost(communityId, {
+      isReported: true,
+    });
 
     res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
   });
@@ -183,4 +187,67 @@ export class CommunityController {
     const userPosts = await this.communityService.getUserPosts(user_id);
     res.status(STATUS_CODE.OK).json(buildResponse(null, userPosts));
   });
+
+  // ===== 관리자 기능 =====
+
+  // 신고된 내역 전체 조회
+  public getReportedCommunity = asyncHandler(
+    async (req: Request, res: Response) => {
+      const reportedCommunity =
+        await this.communityService.readReportedCommunity();
+
+      res.status(STATUS_CODE.OK).json(buildResponse(null, reportedCommunity));
+    }
+  );
+
+  public patchReportedCommunity = asyncHandler(
+    async (req: Request, res: Response) => {
+      const { communityId } = req.params;
+
+      if (!communityId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      await this.communityService.updateReportPost(communityId, {
+        isReported: false,
+      });
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  public deleteReportedCommunity = asyncHandler(
+    async (req: Request, res: Response) => {
+      const { communityId } = req.params;
+
+      if (!communityId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const deleteCommunity =
+        await this.communityService.deleteReportedCommunity(communityId);
+
+      const reportUser = deleteCommunity.user_id;
+
+      const reportUserData = await this.userService.getUserReportedTimes(
+        reportUser
+      );
+
+      const reportedTimes = reportUserData!.reportedTimes + 1;
+
+      await this.userService.updateReportedTimes(reportUser!, {
+        reportedTimes,
+      });
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
 }
