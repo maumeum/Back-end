@@ -71,16 +71,24 @@ volunteerRouter.patch(
 );
 
 // ====== 관리자 기능 =======
+
+//adminOnly 추가 예정(테스트 때문에 잠시 빼둠)
+
+// 신고받은 게시글 전체 조회
+volunteerRouter.get(
+  '/volunteers/admins/reports',
+  volunteerController.getReportedVolunteer
+);
+
 // 신고받은 게시글 승인
-//adminOnly 추가 예정
 volunteerRouter.delete(
-  '/volunteers/reports/application/:volunteerId',
+  '/volunteers/admins/reports/application/:volunteerId',
   volunteerController.deleteReportedVolunteer
 );
 
-// 신고받은 게시글 취소
+// 신고받은 게시글 취소(반려)
 volunteerRouter.patch(
-  '/volunteers/reports/cancellation/:volunteerId',
+  '/volunteers/admins/reports/cancellation/:volunteerId',
   volunteerController.patchReportedVolunteer
 );
 

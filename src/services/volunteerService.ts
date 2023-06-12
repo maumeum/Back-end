@@ -6,6 +6,7 @@ import { STATUS_CODE } from '../utils/statusCode.js';
 import { logger } from '../utils/logger.js';
 import { Ref } from '@typegoose/typegoose';
 import { User } from '../db/schemas/userSchema.js';
+import { report } from 'process';
 
 interface VolunteerData {
   title: string;
@@ -153,9 +154,10 @@ class VolunteerService {
     volunteerId: string,
     isReported: VolunteerReportData
   ) {
-    const volunteer = await VolunteerModel.findByIdAndUpdate(volunteerId, {
-      isReported,
-    });
+    const volunteer = await VolunteerModel.findByIdAndUpdate(
+      volunteerId,
+      isReported
+    );
 
     if (!volunteer) {
       throw new AppError(
@@ -166,6 +168,13 @@ class VolunteerService {
     }
 
     return true;
+  }
+
+  // ===== 관리자 기능 =====
+
+  public async readReportedVolunteer() {
+    const reportedVolunteer = await VolunteerModel.find({ isReported: true });
+    return reportedVolunteer;
   }
 
   public async deleteReportedVolunteer(volunteer_id: string) {

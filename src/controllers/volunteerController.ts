@@ -187,18 +187,28 @@ class VolunteerController {
         );
       }
 
-      const { isReported } = req.body;
-
-      await this.volunteerService.updateReportVolunteer(
-        volunteerId,
-        isReported
-      );
+      await this.volunteerService.updateReportVolunteer(volunteerId, {
+        isReported: true,
+      });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 
   // ===== 관리자 기능 =====
+
+  // 신고된 내역 전체 확인
+  public getReportedVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const reportedVolunteer =
+        await this.volunteerService.readReportedVolunteer();
+
+      res
+        .status(STATUS_CODE.CREATED)
+        .json(buildResponse(null, reportedVolunteer));
+    }
+  );
+  // 신고된 내역 승인
   public deleteReportedVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
@@ -232,9 +242,24 @@ class VolunteerController {
     }
   );
 
+  // 신고된 내역 반려
   public patchReportedVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      await this.volunteerService.updateReportVolunteer(volunteerId, {
+        isReported: false,
+      });
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 }
