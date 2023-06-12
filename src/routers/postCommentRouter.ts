@@ -61,13 +61,13 @@ postCommentRouter.get(
 
 // 신고받은 게시글 취소(반려)
 postCommentRouter.patch(
-  '/volunteerComments/admins/reports/cancellations/:postCommentId',
+  '/postComments/admins/reports/cancellations/:postCommentId',
   postCommentController.patchReportedPostComment
 );
 
 // 신고받은 게시글 승인
 postCommentRouter.delete(
-  '/volunteerComments/admins/reports/applications/:postCommentId',
+  '/postComments/admins/reports/applications/:postCommentId',
   postCommentController.deleteReportedPostComment
 );
 

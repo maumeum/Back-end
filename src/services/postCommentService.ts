@@ -73,7 +73,7 @@ class PostCommentService {
   ) {
     const newReportComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
-      { isReported }
+      isReported
     );
 
     if (!newReportComment) {
@@ -113,7 +113,7 @@ class PostCommentService {
   }
 
   public async deleteReportedPostComment(postComment_id: string) {
-    const postComment = await PostCommentModel.findByIdAndUpdate(
+    const postComment = await PostCommentModel.findByIdAndDelete(
       postComment_id
     ).populate('user_id', 'reportedTimes');
 
