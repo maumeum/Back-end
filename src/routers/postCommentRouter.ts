@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { PostCommentController } from '../controllers/index.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
 import { makeInstance } from '../utils/makeInstance.js';
+import { adminOnly } from '../middlewares/adminOnly.js';
 const postCommentRouter = Router();
 
 const postCommentController = makeInstance<PostCommentController>(
@@ -56,18 +57,21 @@ postCommentRouter.delete(
 // 신고받은 게시글 전체 조회
 postCommentRouter.get(
   '/postComments/admins/reports',
+  adminOnly,
   postCommentController.getReportedPostComment
 );
 
 // 신고받은 게시글 취소(반려)
 postCommentRouter.patch(
   '/postComments/admins/reports/cancellations/:postCommentId',
+  adminOnly,
   postCommentController.patchReportedPostComment
 );
 
 // 신고받은 게시글 승인
 postCommentRouter.delete(
   '/postComments/admins/reports/applications/:postCommentId',
+  adminOnly,
   postCommentController.deleteReportedPostComment
 );
 

@@ -2,6 +2,7 @@ import express, { NextFunction } from 'express';
 import { ReviewController } from '../controllers/reviewController.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
 import { imagesUploader } from '../utils/multer.js';
+import { adminOnly } from '../middlewares/adminOnly.js';
 
 const reviewRouter = express.Router();
 const reviewController = new ReviewController();
@@ -69,17 +70,23 @@ reviewRouter.get('/review/search', reviewController.getSearchReviews);
 // ===== 관리자 기능 =====
 //adminOnly 추가 예정(테스트 때문에 잠시 빼둠)
 // 신고받은 게시글 전체 조회
-reviewRouter.get('/review/admins/reports', reviewController.getReportedReview);
+reviewRouter.get(
+  '/review/admins/reports',
+  adminOnly,
+  reviewController.getReportedReview
+);
 
 // 신고받은 게시글 취소(반려)
 reviewRouter.patch(
   '/review/admins/reports/cancellations/:review_id',
+  adminOnly,
   reviewController.patchReportedReview
 );
 
 // 신고받은 게시글 승인
 reviewRouter.delete(
   '/review/admins/reports/applications/:review_id',
+  adminOnly,
   reviewController.deleteReportedReview
 );
 

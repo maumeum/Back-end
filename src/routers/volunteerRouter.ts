@@ -77,18 +77,21 @@ volunteerRouter.patch(
 // 신고받은 게시글 전체 조회
 volunteerRouter.get(
   '/volunteers/admins/reports',
+  adminOnly,
   volunteerController.getReportedVolunteer
 );
 
 // 신고받은 게시글 취소(반려)
 volunteerRouter.patch(
   '/volunteers/admins/reports/cancellations/:volunteerId',
+  adminOnly,
   volunteerController.patchReportedVolunteer
 );
 
 // 신고받은 게시글 승인
 volunteerRouter.delete(
   '/volunteers/admins/reports/applications/:volunteerId',
+  adminOnly,
   volunteerController.deleteReportedVolunteer
 );
 

@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import { AppError } from '../misc/AppError.js';
 import { ObjectId } from 'mongodb';
 import { STATUS_CODE } from '../utils/statusCode.js';
+import { buildResponse } from '../utils/builderResponse.js';
+import { commonErrors } from '../misc/commonErrors.js';
 
 interface JwtPayload {
   user_id: ObjectId;
@@ -15,19 +17,26 @@ function adminOnly(req: Request, res: Response, next: NextFunction) {
 
   if (!userToken || userToken === null) {
     logger.info('Authorization 토큰 없음');
-    res.status(403).json({
-      result: 'forbidden-approach',
-      reason: '로그인한 유저만 사용할 수 있는 서비스입니다.',
-    });
+    res
+      .status(STATUS_CODE.FORBIDDEN)
+      .json(
+        buildResponse(
+          'forbidden-approach',
+          '로그인한 유저만 사용할 수 있는 서비스입니다.'
+        )
+      );
 
     return;
   }
 
   try {
     const secretKey = process.env.JWT_SECRET_KEY || 'secret-key';
+
     const jwtDecoded = jwt.verify(userToken, secretKey) as JwtPayload;
 
     const { user_id, role } = jwtDecoded;
+
+    logger.debug('user_id: ' + user_id + ' role: ' + role);
 
     if (role !== 'admin') {
       throw new AppError(
@@ -42,7 +51,14 @@ function adminOnly(req: Request, res: Response, next: NextFunction) {
 
     next();
   } catch (error) {
-    next(error);
+    res
+      .status(STATUS_CODE.FORBIDDEN)
+      .json(
+        buildResponse(
+          commonErrors.authorizationError,
+          '관리자만 사용할 수 있는 서비스입니다.'
+        )
+      );
   }
 }
 

@@ -3,6 +3,7 @@ import multer from 'multer';
 import { CommunityController } from '../controllers/communityController.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
 import { imageUploader, imagesUploader } from '../utils/multer.js';
+import { adminOnly } from '../middlewares/adminOnly.js';
 
 // const storage = multer.diskStorage({
 //   //파일 저장 위치를 결정
@@ -84,17 +85,20 @@ communityRouter.get('/community', communityController.getAllPosts);
 // 신고받은 게시글 전체 조회
 communityRouter.get(
   '/community/admins/reports',
+  adminOnly,
   communityController.getReportedCommunity
 );
 
 // 신고받은 게시글 취소(반려)
 communityRouter.patch(
   '/community/admins/reports/cancellations/:communityId',
+  adminOnly,
   communityController.patchReportedCommunity
 );
 
 // 신고받은 게시글 승인
 communityRouter.delete(
   '/community/admins/reports/applications/:communityId',
+  adminOnly,
   communityController.deleteReportedCommunity
 );
