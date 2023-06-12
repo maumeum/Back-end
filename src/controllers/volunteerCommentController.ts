@@ -93,11 +93,9 @@ class VolunteerCommentController {
         );
       }
 
-      const { isReported } = req.body;
-
       await this.volunteerCommentService.updateReportComment(
         volunteerCommentId,
-        isReported
+        { isReported: true }
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
@@ -154,6 +152,7 @@ class VolunteerCommentController {
           isReported: false,
         }
       );
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 

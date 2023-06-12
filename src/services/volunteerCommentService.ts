@@ -84,7 +84,7 @@ class VolunteerCommentService {
   ) {
     const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
       volunteerComment_id,
-      { isReported }
+      isReported
     );
 
     if (!updatedComment) {
