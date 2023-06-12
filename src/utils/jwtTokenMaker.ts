@@ -3,8 +3,7 @@ import 'dotenv/config';
 
 type Token = {
   token: string;
-  user_id: string;
-  role: string;
+  uuid: string;
 };
 
 function makeJwtToken(user: any) {
@@ -12,6 +11,7 @@ function makeJwtToken(user: any) {
   const token = jwt.sign({ user_id: user._id, role: user.role }, secretKey);
   const userInfoWithUserToken = <Token>{};
   userInfoWithUserToken.token = token;
+  userInfoWithUserToken.uuid = user.uuid;
   return userInfoWithUserToken;
 }
 

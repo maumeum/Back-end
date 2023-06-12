@@ -1,5 +1,6 @@
 import { prop, modelOptions } from '@typegoose/typegoose';
 import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class User {
@@ -8,6 +9,9 @@ class User {
 
   @prop({ required: true, default: () => nanoid(4) })
   public nanoid!: string;
+
+  @prop({ default: uuidv4 })
+  public uuid!: string;
 
   @prop({ required: true, default: 'images/default-profile-image.png' })
   public image!: string;

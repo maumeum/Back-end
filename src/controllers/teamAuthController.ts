@@ -51,7 +51,8 @@ class TeamAuthController {
 
   // public updateAuthStatus = asyncHandler(
   //   async (req: Request, res: Response, next: NextFunction) => {
-  //     const updatedAuthStatus = await this.userService.updateUser()
+  //     const {user_id} = req.body;
+  //     const updatedAuthStatus = await this.userService.updateUser(user_id, )
 
   //   },
   // );

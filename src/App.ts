@@ -64,6 +64,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     stack: error.stack,
   });
   res.json({
+    res: res,
     name: error.name,
     httpMessage: error.message,
     data: null,
