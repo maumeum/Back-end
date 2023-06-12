@@ -113,14 +113,29 @@ class VolunteerCommentService {
     return deletedComment;
   }
 
-  //봉사활동 ID에 해당하는 댓글 리스트
-  // public async checkUser(volunteer_id: string) {
-  //   const volunteerList = await VolunteerCommentModel.find({
-  //     volunteer_id,
-  //   });
+  // ===== 관리자 기능 =====
+  public async readReportedVolunteerComment() {
+    const reportedVolunteerComment = await VolunteerCommentModel.find({
+      isReported: true,
+    }).select('title content');
+    return reportedVolunteerComment;
+  }
 
-  //   return volunteerList;
-  // }
+  public async deleteReportedVolunteerComment(volunteerComment_id: string) {
+    const volunteerComment = await VolunteerCommentModel.findByIdAndDelete(
+      volunteerComment_id
+    ).populate('user_id', 'reportedTimes');
+
+    if (!volunteerComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return volunteerComment;
+  }
 }
 
 export { VolunteerCommentService };

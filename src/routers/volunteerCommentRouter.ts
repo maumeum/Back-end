@@ -24,11 +24,11 @@ volunteerCommentRouter.get(
 );
 
 //본인이 작성한 리뷰가 맞는지 확인하는 API(아직 미구현);
-volunteerCommentRouter.get(
-  '/volunteerComments/check/:volunteerId',
-  loginRequired,
-  volunteerCommentController.getCheckUser
-);
+// volunteerCommentRouter.get(
+//   '/volunteerComments/check/:volunteerId',
+//   loginRequired,
+//   volunteerCommentController.getCheckUser
+// );
 
 //봉사 모집하기 특정 게시글의 댓글 조회
 volunteerCommentRouter.get(
@@ -54,6 +54,28 @@ volunteerCommentRouter.delete(
   '/volunteerComments/:volunteerCommentId',
   loginRequired,
   volunteerCommentController.deleteComment
+);
+
+// ====== 관리자 기능 =======
+
+//adminOnly 추가 예정(테스트 때문에 잠시 빼둠)
+
+// 신고받은 게시글 전체 조회
+volunteerCommentRouter.get(
+  '/volunteerComments/admins/reports',
+  volunteerCommentController.getReportedVolunteerComment
+);
+
+// 신고받은 게시글 취소(반려)
+volunteerCommentRouter.patch(
+  '/volunteerComments/admins/reports/cancellations/:volunteerCommentId',
+  volunteerCommentController.patchReportedVolunteerComment
+);
+
+// 신고받은 게시글 승인
+volunteerCommentRouter.delete(
+  '/volunteers/admins/reports/applications/:volunteerCommentId',
+  volunteerCommentController.deleteReportedVolunteerComment
 );
 
 export { volunteerCommentRouter };

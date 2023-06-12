@@ -4,9 +4,6 @@ import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { logger } from '../utils/logger.js';
-import { Ref } from '@typegoose/typegoose';
-import { User } from '../db/schemas/userSchema.js';
-import { report } from 'process';
 
 interface VolunteerData {
   title: string;
