@@ -9,6 +9,11 @@ interface PostCommentData {
   user_id: ObjectId;
   post_id: ObjectId;
   content: string;
+  postData: boolean;
+}
+
+interface PostReportData {
+  isReported: boolean;
 }
 
 class PostCommentService {
@@ -59,7 +64,27 @@ class PostCommentService {
       );
     }
 
-    return newPostComment;
+    return true;
+  }
+
+  public async updateReportComment(
+    postCommentId: string,
+    isReported: PostReportData
+  ) {
+    const newReportComment = await PostCommentModel.findByIdAndUpdate(
+      postCommentId,
+      { isReported }
+    );
+
+    if (!newReportComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
   }
 
   public async deleteComment(postCommentId: string) {

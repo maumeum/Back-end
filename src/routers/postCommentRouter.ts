@@ -35,6 +35,12 @@ postCommentRouter.patch(
   postCommentController.patchComment
 );
 
+postCommentRouter.patch(
+  '/postComments/reports/:postCommentId',
+  loginRequired,
+  postCommentController.patchReportComment
+);
+
 //작성한 커뮤니티 댓글 삭제
 postCommentRouter.delete(
   '/postComments/:postCommentId',

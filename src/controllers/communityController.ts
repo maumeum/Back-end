@@ -17,7 +17,7 @@ export class CommunityController {
 
   public createPost = asyncHandler(async (req: Request, res: Response) => {
     const user_id = req.id;
-    const { title, content, postType } = req.body;
+    const { title, content, postType, isReported } = req.body;
     if (req.files) {
       const files = (req as MulterRequest).files;
       console.log(files);
@@ -31,6 +31,7 @@ export class CommunityController {
         postType,
         images: newPath,
         user_id,
+        isReported,
       });
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, { newPost }));
@@ -41,6 +42,7 @@ export class CommunityController {
         postType,
         images: [],
         user_id,
+        isReported,
       });
       res.status(STATUS_CODE.OK).json(buildResponse(null, newPost));
     }
@@ -67,9 +69,12 @@ export class CommunityController {
 
   //keyword 로 게시물 조회
   public searchPost = asyncHandler(async (req: Request, res: Response) => {
-    const { keyword } = req.query;
+    const { keyword, posttype } = req.query;
 
-    const posts = await this.communityService.searchPost(keyword as string);
+    const posts = await this.communityService.searchPost(
+      keyword as string,
+      posttype as string
+    );
     res.status(STATUS_CODE.OK).json(buildResponse(null, posts));
   });
 
@@ -124,14 +129,31 @@ export class CommunityController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       const categoryPost = await this.communityService.getPostByCat(category);
       res.status(STATUS_CODE.OK).json(buildResponse(null, categoryPost));
-    },
+    }
   );
 
+  public patchReportPost = asyncHandler(async (req: Request, res: Response) => {
+    const { communityId } = req.params;
+
+    if (!communityId) {
+      throw new AppError(
+        commonErrors.argumentError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    const communityData = req.body;
+
+    await this.communityService.updateReportPost(communityId, communityData);
+
+    res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+  });
   //게시물 삭제
   public deletePost = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -139,7 +161,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     await this.communityService.delete(id);
@@ -154,7 +176,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.requestValidationError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 

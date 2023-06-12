@@ -1,8 +1,8 @@
-import express from "express";
-import multer from "multer";
-import { CommunityController } from "../controllers/communityController.js";
-import { loginRequired } from "../middlewares/loginRequired.js";
-import { imageUploader, imagesUploader } from "../utils/multer.js";
+import express from 'express';
+import multer from 'multer';
+import { CommunityController } from '../controllers/communityController.js';
+import { loginRequired } from '../middlewares/loginRequired.js';
+import { imageUploader, imagesUploader } from '../utils/multer.js';
 
 // const storage = multer.diskStorage({
 //   //파일 저장 위치를 결정
@@ -20,52 +20,58 @@ export const communityRouter = express.Router();
 const communityController = new CommunityController();
 //카테고리별 조회 //완료
 communityRouter.get(
-  "/community/category/:category",
+  '/community/category/:category',
   communityController.getPostByCategory
 );
 
 //유저 게시물 검색 //완료
-communityRouter.get("/community/search", communityController.searchPost);
+communityRouter.get('/community/search', communityController.searchPost);
 
 //유저 게시물 조회 //완료
 communityRouter.get(
-  "/community/user",
+  '/community/user',
   loginRequired,
   communityController.getUserPosts
 );
 
 //특정 게시물 조회 // 완료
-communityRouter.get("/community/:id", communityController.getPost);
+communityRouter.get('/community/:id', communityController.getPost);
 
 //특정 게시물 수정
 communityRouter.patch(
-  "/community/:id",
+  '/community/:id',
   imageUploader,
   imagesUploader,
   communityController.patchPost
 );
 
+communityRouter.patch(
+  '/community/reports/:communityId',
+  loginRequired,
+  communityController.patchReportPost
+);
+
 //게시물 맞는지 확인
 communityRouter.get(
-  "/community/check/:postid",
+  '/community/check/:postid',
   loginRequired,
   communityController.checkUser
 );
 
 //특정 게시물 삭제 //완료
 communityRouter.delete(
-  "/community/:id",
+  '/community/:id',
   loginRequired,
   communityController.deletePost
 );
 
 //게시물 작성
 communityRouter.post(
-  "/community/create",
+  '/community/create',
   loginRequired,
   imagesUploader,
   communityController.createPost
 );
 
 //게시글 조회 //완료
-communityRouter.get("/community", communityController.getAllPosts);
+communityRouter.get('/community', communityController.getAllPosts);

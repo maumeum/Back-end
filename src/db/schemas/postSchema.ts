@@ -1,5 +1,5 @@
-import { modelOptions, prop, Ref } from '@typegoose/typegoose';
-import { User } from './userSchema.js';
+import { modelOptions, prop, Ref } from "@typegoose/typegoose";
+import { User } from "./userSchema.js";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Post {
@@ -17,6 +17,9 @@ class Post {
 
   @prop({ required: false })
   public postType!: string;
+
+  @prop({ required: true, default: false })
+  public isReported!: boolean;
 }
 
 export { Post };

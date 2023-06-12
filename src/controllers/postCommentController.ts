@@ -13,14 +13,14 @@ class PostCommentController {
 
   public postComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { post_id, content } = req.body;
+      const postBodyData = req.body;
       const user_id = req.id;
 
-      await this.postCommentService.createComment({
-        post_id,
-        content,
+      const postData = {
+        ...postBodyData,
         user_id,
-      });
+      };
+      await this.postCommentService.createComment(postData);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
@@ -72,6 +72,29 @@ class PostCommentController {
       await this.postCommentService.updateComment(
         postCommentId,
         postCommentData
+      );
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  public patchReportComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { postCommentId } = req.params;
+
+      if (!postCommentId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const { isReported } = req.body;
+
+      await this.postCommentService.updateReportComment(
+        postCommentId,
+        isReported
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
