@@ -20,8 +20,13 @@ class TeamAuthService {
     return createReview;
   }
 
-  public async readTeamAuth(info: teamAuth) {
-    const teamAuth = await TeamAuthModel.find();
+  public async readTeamAuth(teamAuth_id: ObjectId) {
+    const teamAuth = await TeamAuthModel.findById(teamAuth_id);
+    return teamAuth;
+  }
+
+  public async readTeamAuthByUid(user_id: ObjectId) {
+    const teamAuth = await TeamAuthModel.findOne({ user_id: user_id });
     return teamAuth;
   }
 }

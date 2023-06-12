@@ -89,7 +89,7 @@ class ReviewService {
     const reviews = await ReviewModel.find()
       .populate({
         path: 'user_id',
-        select: 'nickname nanoid',
+        select: 'nickname nanoid uuid',
       })
       .skip(skip)
       .limit(limit)
@@ -101,6 +101,23 @@ class ReviewService {
   public async totalReviewsCount() {
     const counts = await ReviewModel.countDocuments();
     return counts;
+  }
+
+  //검색기능
+  public async readSearchReviews(keyword: string) {
+    const options = [
+      { title: { $regex: `${keyword}` } },
+      { content: { $regex: `${keyword}` } },
+    ];
+    const ReviewList = await ReviewModel.find({
+      $or: options,
+    });
+
+    if (ReviewList.length === 0) {
+      return [];
+    }
+
+    return ReviewList;
   }
 
   // endDate 이후 && 7일 지나기 전, 사용자 본인이 상태를 직접 false => true로 변경하는 코드

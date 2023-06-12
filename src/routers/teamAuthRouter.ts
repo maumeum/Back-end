@@ -13,6 +13,8 @@ teamAuthRouter.post(
   teamAuthController.postTeamAuth,
 );
 
+teamAuthRouter.get('/team/auth', loginRequired, teamAuthController.getTeamAuth);
+
 // teamAuthRouter.post('/team/auth/admin/true', loginRequired);
 // teamAuthRouter.post('/team/auth/admin/false', loginRequired);
 
