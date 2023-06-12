@@ -91,11 +91,11 @@ class VolunteerCommentController {
         );
       }
 
-      const volunteerCommentData = req.body;
+      const { isReported } = req.body;
 
       await this.volunteerCommentService.updateReportComment(
         volunteerCommentId,
-        volunteerCommentData
+        isReported
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));

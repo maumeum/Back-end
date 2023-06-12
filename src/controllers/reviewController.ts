@@ -173,9 +173,9 @@ class ReviewController {
         );
       }
 
-      const updateInfo = req.body;
+      const { isReported } = req.body;
 
-      await this.reviewService.updateReportReview(review_id, updateInfo);
+      await this.reviewService.updateReportReview(review_id, isReported);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }

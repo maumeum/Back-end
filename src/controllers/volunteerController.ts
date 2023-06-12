@@ -188,6 +188,8 @@ class VolunteerController {
         volunteerId,
         isReported
       );
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 }

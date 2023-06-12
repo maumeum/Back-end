@@ -69,11 +69,11 @@ class PostCommentService {
 
   public async updateReportComment(
     postCommentId: string,
-    postCommentData: PostReportData
+    isReported: PostReportData
   ) {
     const newReportComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
-      postCommentData
+      { isReported }
     );
 
     if (!newReportComment) {

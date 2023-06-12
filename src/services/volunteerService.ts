@@ -26,7 +26,7 @@ interface VolunteerStatus {
   statusName: string;
 }
 
-interface VolunteerReported {
+interface VolunteerReportData {
   isReported: boolean;
 }
 
@@ -149,12 +149,11 @@ class VolunteerService {
 
   public async updateReportVolunteer(
     volunteerId: string,
-    volunteerData: VolunteerReported
+    isReported: VolunteerReportData
   ) {
-    const volunteer = await VolunteerModel.findByIdAndUpdate(
-      volunteerId,
-      volunteerData
-    );
+    const volunteer = await VolunteerModel.findByIdAndUpdate(volunteerId, {
+      isReported,
+    });
 
     if (!volunteer) {
       throw new AppError(

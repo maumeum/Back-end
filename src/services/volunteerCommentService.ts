@@ -80,11 +80,11 @@ class VolunteerCommentService {
 
   public async updateReportComment(
     volunteerComment_id: string,
-    volunteerCommentData: VolunteerReportData
+    isReported: VolunteerReportData
   ) {
     const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
       volunteerComment_id,
-      volunteerCommentData
+      { isReported }
     );
 
     if (!updatedComment) {
