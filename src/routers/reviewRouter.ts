@@ -11,28 +11,28 @@ reviewRouter.get('/review', reviewController.readReview);
 
 reviewRouter.get(
   '/review/detail/:review_id',
-  reviewController.readReviewDetail
+  reviewController.readReviewDetail,
 );
 
 //본인이 작성한 리뷰가 맞는지 확인하는 API
 reviewRouter.get(
   '/review/check/:review_id',
   loginRequired,
-  reviewController.checkUser
+  reviewController.checkUser,
 );
 
 //유저 리뷰 조회 (마이페이지)
 reviewRouter.get(
   '/reviews/users',
   loginRequired,
-  reviewController.readMyReview
+  reviewController.readMyReview,
 );
 //리뷰 생성
 reviewRouter.post(
   '/review',
   loginRequired,
   imagesUploader,
-  reviewController.postReview
+  reviewController.postReview,
 );
 
 //리뷰 수정
@@ -40,27 +40,29 @@ reviewRouter.patch(
   '/review/users/:review_id',
   loginRequired,
   imagesUploader,
-  reviewController.updateReview
+  reviewController.updateReview,
 );
 
 reviewRouter.patch(
   '/review/users/reports/:review_id',
   loginRequired,
-  reviewController.patchReportReview
+  reviewController.patchReportReview,
 );
 
 //리뷰 삭제
 reviewRouter.delete(
   '/review/users/:review_id',
   loginRequired,
-  reviewController.deleteReview
+  reviewController.deleteReview,
 );
 
 //isParticipate 상태 변경
 reviewRouter.post(
   '/review/users/participation/:volunteer_id',
   loginRequired,
-  reviewController.changeParticipationStatus
+  reviewController.changeParticipationStatus,
 );
+
+reviewRouter.get('/review/search', reviewController.getSearchReviews);
 
 export { reviewRouter };
