@@ -192,6 +192,15 @@ class VolunteerController {
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
-}
+  
+  // ===== 관리자 기능 =====
+  public deleteReportedVolunteer = asyncHandler(
+    async(req : Request, res : Response , next : NextFunction) => {
+      const { volunteer_id } = req.params;
+      
+      // 넘겨야되는 데이터 : 각각의 id
+      
+    }
+  )
 
 export { VolunteerController };
