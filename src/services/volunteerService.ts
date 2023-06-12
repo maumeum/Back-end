@@ -173,7 +173,9 @@ class VolunteerService {
   // ===== 관리자 기능 =====
 
   public async readReportedVolunteer() {
-    const reportedVolunteer = await VolunteerModel.find({ isReported: true });
+    const reportedVolunteer = await VolunteerModel.find({
+      isReported: true,
+    }).select('title content');
     return reportedVolunteer;
   }
 

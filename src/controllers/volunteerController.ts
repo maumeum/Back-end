@@ -96,16 +96,11 @@ class VolunteerController {
     async (req: Request, res: Response, next: NextFunction) => {
       const { keyword } = req.query;
 
-      logger.debug(typeof keyword);
+      const searchVolunteers = await this.volunteerService.readSearchVolunteer(
+        keyword as string
+      );
 
-      if (keyword) {
-        const searchVolunteers =
-          await this.volunteerService.readSearchVolunteer(keyword as string);
-
-        res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
-      } else {
-        res.status(STATUS_CODE.OK).json(buildResponse(null, []));
-      }
+      res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
     }
   );
 
