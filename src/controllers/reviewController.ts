@@ -118,7 +118,7 @@ class ReviewController {
         volunteer_id,
       });
 
-      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, createdReview));
     }
   );
 

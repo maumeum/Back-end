@@ -6,3 +6,4 @@ export * from './reviewRouter.js';
 export * from './userRouter.js';
 export * from './postCommentRouter.js';
 export * from './volunteerCommentRouter.js';
+export * from './teamAuthRouter.js';

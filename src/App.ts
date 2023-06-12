@@ -9,6 +9,7 @@ import {
   volunteerApplicationRouter,
   communityRouter,
   reviewRouter,
+  teamAuthRouter,
 } from './routers/index.js';
 import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
 import { postCommentRouter } from './routers/postCommentRouter.js';
@@ -46,6 +47,7 @@ app.use('/api', volunteerCommentRouter);
 app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
+app.use('/api', teamAuthRouter);
 
 // app.use(
 //   morgan('common', {
@@ -62,6 +64,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     stack: error.stack,
   });
   res.json({
+    res: res,
     name: error.name,
     httpMessage: error.message,
     data: null,
