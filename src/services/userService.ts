@@ -24,6 +24,7 @@ interface UserInfo {
 
 interface ReportedTimeData {
   reportedTimes: number;
+  role: string;
 }
 class UserService {
   // 유저 생성
@@ -72,7 +73,15 @@ class UserService {
   // ===== 관리자 기능 =====
   // 사용자의 reportedTimes 가져오기
   public async getUserReportedTimes(user_id: Ref<User>) {
-    const user = await UserModel.findById(user_id).select('reportedTimes');
+    const user = await UserModel.findById(user_id).select('reportedTimes role');
+
+    if (!user) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
 
     return user;
   }
@@ -85,6 +94,8 @@ class UserService {
     const user = await UserModel.findByIdAndUpdate(user_id, reportedTimes);
     return user;
   }
+
+  public async updateUserDisable(user_id: Ref<User>) {}
 }
 
 export { UserService };

@@ -8,6 +8,7 @@ import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { logger } from '../utils/logger.js';
 import { ObjectId } from 'mongodb';
+import { countReportedTimes } from '../utils/reportedTimesData.js';
 
 interface MyFile extends Express.Multer.File {
   // 추가적인 사용자 정의 속성을 선언할 수도 있습니다
@@ -246,10 +247,16 @@ class VolunteerController {
       const reportUserData = await this.userService.getUserReportedTimes(
         reportUser!
       );
-      const reportedTimes = reportUserData!.reportedTimes + 1;
-      await this.userService.updateReportedTimes(reportUser!, {
-        reportedTimes,
-      });
+
+      let isDisabledUser;
+
+      if (reportUserData) {
+        isDisabledUser = countReportedTimes(reportUserData);
+      }
+
+      if (isDisabledUser) {
+        await this.userService.updateReportedTimes(reportUser!, isDisabledUser);
+      }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }

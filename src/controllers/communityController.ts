@@ -9,6 +9,7 @@ import { commonErrors } from '../misc/commonErrors.js';
 import { logger } from '../utils/logger.js';
 import { makeInstance } from '../utils/makeInstance.js';
 import { UserService } from '../services/userService.js';
+import { countReportedTimes } from '../utils/reportedTimesData.js';
 
 interface MulterRequest extends Request {
   files: any;
@@ -235,17 +236,22 @@ export class CommunityController {
       const deleteCommunity =
         await this.communityService.deleteReportedCommunity(communityId);
 
+      //글 작성한 유저정보 가져오기
       const reportUser = deleteCommunity.user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
-        reportUser
+        reportUser!
       );
 
-      const reportedTimes = reportUserData!.reportedTimes + 1;
+      let isDisabledUser;
 
-      await this.userService.updateReportedTimes(reportUser!, {
-        reportedTimes,
-      });
+      if (reportUserData) {
+        isDisabledUser = countReportedTimes(reportUserData);
+      }
+
+      if (isDisabledUser) {
+        await this.userService.updateReportedTimes(reportUser!, isDisabledUser);
+      }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
