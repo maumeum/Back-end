@@ -31,6 +31,9 @@ class User {
   @prop({ required: true })
   public phone!: string;
 
+  @prop({ required: true, default: 0 })
+  public reportedTimes!: number;
+
   @prop({ default: false })
   public authorization!: boolean;
 }

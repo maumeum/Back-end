@@ -24,6 +24,7 @@ interface ReviewData {
   title?: string;
   content?: string;
   images?: string[];
+  isReported?: boolean;
   volunteer_id?: any; // 나중에 고쳐야함.
 }
 class ReviewController {
@@ -36,7 +37,7 @@ class ReviewController {
       const user_id = req.id;
       const reviews = await this.reviewService.getReviewsByUserId(user_id);
       res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
-    },
+    }
   );
 
   public readReviewDetail = asyncHandler(
@@ -46,7 +47,7 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       const review = await this.reviewService.getReviewById(review_id);
@@ -54,11 +55,11 @@ class ReviewController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       res.status(STATUS_CODE.OK).json(buildResponse(null, review));
-    },
+    }
   );
 
   public readReview = asyncHandler(
@@ -67,7 +68,7 @@ class ReviewController {
 
       const reviews = await this.reviewService.getReviews(
         Number(skip),
-        Number(limit),
+        Number(limit)
       );
       const totalReviewsCount = await this.reviewService.totalReviewsCount();
       logger.debug(`totalReviewsCount : ${totalReviewsCount}`);
@@ -80,13 +81,14 @@ class ReviewController {
       res
         .status(STATUS_CODE.OK)
         .json(buildResponse(null, { reviews, hasMore }));
-    },
+    }
   );
 
   public postReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const { title, content, volunteer_id }: ReviewData = req.body;
+      const { title, content, volunteer_id, isReported }: ReviewData = req.body;
+
       const files = (req.files as MyFile[]) || [];
       logger.debug(files);
       const newPath = files.map((file: any) => {
@@ -95,7 +97,7 @@ class ReviewController {
 
       const volunteer =
         await this.volunteerApplicationService.readApplicationVolunteerByVId(
-          volunteer_id,
+          volunteer_id
         );
       logger.debug(`volunteer : ${volunteer}`);
 
@@ -103,7 +105,7 @@ class ReviewController {
         throw new AppError(
           `${commonErrors.requestValidationError} : 참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.`,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
 
@@ -112,11 +114,12 @@ class ReviewController {
         title,
         content,
         images: newPath,
+        isReported,
         volunteer_id,
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, createdReview));
-    },
+    }
   );
 
   public updateReview = asyncHandler(
@@ -126,7 +129,7 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       const files = (req.files as MyFile[]) || [];
@@ -134,7 +137,7 @@ class ReviewController {
       const newPath = files.map((file: any) => {
         return file.path.replace('public/', '');
       });
-      const { title, content }: ReviewData = req.body;
+      const { title, content, isReported }: ReviewData = req.body;
       const updateInfo: ReviewData = {};
       if (title) {
         updateInfo.title = title;
@@ -146,12 +149,36 @@ class ReviewController {
         updateInfo.images = newPath;
       }
 
+      if (newPath) {
+        updateInfo.isReported = isReported;
+      }
+
       const updatedReview = await this.reviewService.updateReview(
         review_id,
-        updateInfo,
+        updateInfo
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedReview));
-    },
+    }
+  );
+
+  public patchReportReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { review_id }: ReviewData = req.params;
+
+      if (!review_id) {
+        throw new AppError(
+          commonErrors.argumentError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const { isReported } = req.body;
+
+      await this.reviewService.updateReportReview(review_id, isReported);
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
   );
 
   public checkUser = asyncHandler(async (req: Request, res: Response) => {
@@ -161,7 +188,7 @@ class ReviewController {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     const review = await this.reviewService.getReviewById(review_id);
@@ -182,12 +209,12 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       await this.reviewService.deleteReview(review_id);
       res.status(STATUS_CODE.OK).json(buildResponse(null, null));
-    },
+    }
   );
 
   public changeParticipationStatus = asyncHandler(
@@ -199,15 +226,15 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       const changed = await this.reviewService.changeParticipateStatus(
         volunteer_id,
-        user_id,
+        user_id
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, changed));
-    },
+    }
   );
 }
 export { ReviewController };

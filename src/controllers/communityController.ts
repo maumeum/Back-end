@@ -1,12 +1,12 @@
-import { Request, Response } from "express";
-import { CommunityService } from "../services/communityService.js";
-import fs from "fs";
-import { asyncHandler } from "../middlewares/asyncHandler.js";
-import { STATUS_CODE } from "../utils/statusCode.js";
-import { buildResponse } from "../utils/builderResponse.js";
-import { AppError } from "../misc/AppError.js";
-import { commonErrors } from "../misc/commonErrors.js";
-import { logger } from "../utils/logger.js";
+import { Request, Response } from 'express';
+import { CommunityService } from '../services/communityService.js';
+import fs from 'fs';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { buildResponse } from '../utils/builderResponse.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { logger } from '../utils/logger.js';
 
 interface MulterRequest extends Request {
   files: any;
@@ -17,12 +17,12 @@ export class CommunityController {
 
   public createPost = asyncHandler(async (req: Request, res: Response) => {
     const user_id = req.id;
-    const { title, content, postType } = req.body;
+    const { title, content, postType, isReported } = req.body;
     if (req.files) {
       const files = (req as MulterRequest).files;
       console.log(files);
       const newPath = files.map((v: any) => {
-        return v.path.replace("public/", "");
+        return v.path.replace('public/', '');
       });
 
       const newPost = await this.communityService.createPost({
@@ -31,6 +31,7 @@ export class CommunityController {
         postType,
         images: newPath,
         user_id,
+        isReported,
       });
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, { newPost }));
@@ -41,6 +42,7 @@ export class CommunityController {
         postType,
         images: [],
         user_id,
+        isReported,
       });
       res.status(STATUS_CODE.OK).json(buildResponse(null, newPost));
     }
@@ -95,7 +97,7 @@ export class CommunityController {
         const files = (req as MulterRequest).files;
         console.log(files);
         const newPath = files.map((v: any) => {
-          return v.path.replace("public/", "");
+          return v.path.replace('public/', '');
         });
 
         const patchPosts = await this.communityService.findOneAndUpdate(id, {
@@ -114,7 +116,7 @@ export class CommunityController {
         res.send(Posts);
       }
     } catch {
-      res.status(400).send({ message: "오류 발생" });
+      res.status(400).send({ message: '오류 발생' });
     }
   };
   //카테고리
@@ -127,7 +129,7 @@ export class CommunityController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          "BAD_REQUEST"
+          'BAD_REQUEST'
         );
       }
       const categoryPost = await this.communityService.getPostByCat(category);
@@ -135,6 +137,23 @@ export class CommunityController {
     }
   );
 
+  public patchReportPost = asyncHandler(async (req: Request, res: Response) => {
+    const { communityId } = req.params;
+
+    if (!communityId) {
+      throw new AppError(
+        commonErrors.argumentError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    const communityData = req.body;
+
+    await this.communityService.updateReportPost(communityId, communityData);
+
+    res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+  });
   //게시물 삭제
   public deletePost = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -142,7 +161,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST'
       );
     }
     await this.communityService.delete(id);
@@ -157,7 +176,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.requestValidationError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST'
       );
     }
 
