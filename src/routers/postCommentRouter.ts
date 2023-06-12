@@ -35,6 +35,7 @@ postCommentRouter.patch(
   postCommentController.patchComment
 );
 
+// 작성한 커뮤니티 댓글 신고
 postCommentRouter.patch(
   '/postComments/reports/:postCommentId',
   loginRequired,
@@ -46,6 +47,28 @@ postCommentRouter.delete(
   '/postComments/:postCommentId',
   loginRequired,
   postCommentController.deleteComment
+);
+
+// ===== 관리자 기능 ======
+
+//adminOnly 추가 예정(테스트 때문에 잠시 빼둠)
+
+// 신고받은 게시글 전체 조회
+postCommentRouter.get(
+  '/postComments/admins/reports',
+  postCommentController.getReportedPostComment
+);
+
+// 신고받은 게시글 취소(반려)
+postCommentRouter.patch(
+  '/volunteerComments/admins/reports/cancellations/:postCommentId',
+  postCommentController.patchReportedPostComment
+);
+
+// 신고받은 게시글 승인
+postCommentRouter.delete(
+  '/volunteerComments/admins/reports/applications/:postCommentId',
+  postCommentController.deleteReportedPostComment
 );
 
 export { postCommentRouter };
