@@ -49,10 +49,12 @@ export class CommunityService {
     return await PostModel.find({ postType: category });
   }
 
-  public async searchPost(keyword: string) {
+  public async searchPost(keyword: string, posttype: string) {
     const options = [{ title: { $regex: `${keyword}` } }];
 
-    const posts = await PostModel.find({ $or: options });
+    const posts = await PostModel.find({ $or: options }).find({
+      postType: posttype,
+    });
     return posts;
   }
 
