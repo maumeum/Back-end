@@ -43,7 +43,7 @@ class PostCommentService {
   public async readComment(post_id: string) {
     const postCommentList = await PostCommentModel.find({
       post_id: post_id,
-    }).populate('user_id', 'nickname');
+    }).populate('user_id', ['nickname', 'uuid']);
     return postCommentList;
   }
 
