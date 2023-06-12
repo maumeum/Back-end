@@ -7,6 +7,7 @@ import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { logger } from '../utils/logger.js';
+import { ObjectId } from 'mongodb';
 
 interface MyFile extends Express.Multer.File {
   // 추가적인 사용자 정의 속성을 선언할 수도 있습니다
@@ -112,6 +113,9 @@ class VolunteerController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
 
+      console.log(user_id);
+      console.log(typeof user_id);
+
       const registerationVolunteers =
         await this.volunteerService.readRegistrationVolunteer(user_id);
 
@@ -211,12 +215,20 @@ class VolunteerController {
       const deleteVolunteer =
         await this.volunteerService.deleteReportedVolunteer(volunteerId);
 
-      console.log(deleteVolunteer);
+      //글 작성한 유저정보 가져오기
+      const reportUser = deleteVolunteer.register_user_id;
 
-      // 글 작성한 유저정보 가져오기
-      //await this.volunteerService.readRegistrationVolunteer
+      if (reportUser) {
+        const reportUserData = await this.userService.getUserReportedTimes(
+          reportUser!
+        );
+        const reportedTimes = reportUserData!.reportedTimes + 1;
+        await this.userService.updateReportedTimes(reportUser, {
+          reportedTimes,
+        });
+      }
 
-      //await this.userService.getUserReportedTimes()
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 

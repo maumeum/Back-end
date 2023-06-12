@@ -72,17 +72,15 @@ volunteerRouter.patch(
 
 // ====== 관리자 기능 =======
 // 신고받은 게시글 승인
-//adminOnly
+//adminOnly 추가 예정
 volunteerRouter.delete(
   '/volunteers/reports/application/:volunteerId',
-  adminOnly,
   volunteerController.deleteReportedVolunteer
 );
 
 // 신고받은 게시글 취소
 volunteerRouter.patch(
   '/volunteers/reports/cancellation/:volunteerId',
-  adminOnly,
   volunteerController.patchReportedVolunteer
 );
 
