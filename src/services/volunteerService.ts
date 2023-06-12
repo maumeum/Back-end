@@ -165,6 +165,20 @@ class VolunteerService {
 
     return true;
   }
+
+  public async deleteReportedVolunteer(volunteer_id: string) {
+    const volunteer = await VolunteerModel.findByIdAndDelete(volunteer_id);
+
+    if (!volunteer) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return volunteer;
+  }
 }
 
 export { VolunteerService };

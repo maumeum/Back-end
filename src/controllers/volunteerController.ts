@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { VolunteerService } from '../services/index.js';
+import { UserService, VolunteerService } from '../services/index.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { makeInstance } from '../utils/makeInstance.js';
@@ -16,6 +16,7 @@ interface MyFile extends Express.Multer.File {
 
 class VolunteerController {
   private volunteerService = makeInstance<VolunteerService>(VolunteerService);
+  private userService = makeInstance<UserService>(UserService);
 
   public postVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -192,15 +193,37 @@ class VolunteerController {
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
-  
+
   // ===== 관리자 기능 =====
   public deleteReportedVolunteer = asyncHandler(
-    async(req : Request, res : Response , next : NextFunction) => {
-      const { volunteer_id } = req.params;
-      
-      // 넘겨야되는 데이터 : 각각의 id
-      
-    }
-  )
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
 
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      // 데이터 삭제
+      const deleteVolunteer =
+        await this.volunteerService.deleteReportedVolunteer(volunteerId);
+
+      console.log(deleteVolunteer);
+
+      // 글 작성한 유저정보 가져오기
+      //await this.volunteerService.readRegistrationVolunteer
+
+      //await this.userService.getUserReportedTimes()
+    }
+  );
+
+  public patchReportedVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+    }
+  );
+}
 export { VolunteerController };

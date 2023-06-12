@@ -27,7 +27,7 @@ class UserService {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     const hashedPassword = await bcrypt.hash(password, CONSTANTS.HASHING_TIMES);
@@ -48,7 +48,7 @@ class UserService {
   //object_id로 유저 찾기 (이메일, 닉네임, 폰)
   public async getUserById(_id: ObjectId) {
     const user = await UserModel.findById({ _id }).select(
-      'email role nickname phone introduction image',
+      'email role nickname phone introduction image'
     );
     return user;
   }
