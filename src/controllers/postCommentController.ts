@@ -6,6 +6,7 @@ import { makeInstance } from '../utils/makeInstance.js';
 import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
+import { countReportedTimes } from '../utils/reportedTimesData.js';
 
 class PostCommentController {
   private postCommentService =
@@ -163,15 +164,22 @@ class PostCommentController {
       const deletePostComment =
         await this.postCommentService.deleteReportedPostComment(postCommentId);
 
+      //글 작성한 유저정보 가져오기
       const reportUser = deletePostComment.user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
         reportUser!
       );
-      const reportedTimes = reportUserData!.reportedTimes + 1;
-      await this.userService.updateReportedTimes(reportUser!, {
-        reportedTimes,
-      });
+
+      let isDisabledUser;
+
+      if (reportUserData) {
+        isDisabledUser = countReportedTimes(reportUserData);
+      }
+
+      if (isDisabledUser) {
+        await this.userService.updateReportedTimes(reportUser!, isDisabledUser);
+      }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
