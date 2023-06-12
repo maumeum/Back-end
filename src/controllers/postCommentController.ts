@@ -91,12 +91,9 @@ class PostCommentController {
         );
       }
 
-      const { isReported } = req.body;
-
-      await this.postCommentService.updateReportComment(
-        postCommentId,
-        isReported
-      );
+      await this.postCommentService.updateReportComment(postCommentId, {
+        isReported: true,
+      });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
