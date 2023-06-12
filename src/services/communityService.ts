@@ -122,4 +122,30 @@ export class CommunityService {
   public async getUserPosts(id: string) {
     return await PostModel.find({ user_id: id });
   }
+
+  // ===== 관리자 기능 =====
+
+  public async readReportedCommunity() {
+    const reportedCommunity = await PostModel.find({
+      isReported: true,
+    }).select('title content');
+
+    return reportedCommunity;
+  }
+  public async deleteReportedCommunity(community_id: string) {
+    const community = await PostModel.findByIdAndDelete(community_id).populate(
+      'user_id',
+      'reportedTimes'
+    );
+
+    if (!community) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return community;
+  }
 }

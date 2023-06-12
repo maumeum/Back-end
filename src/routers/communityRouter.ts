@@ -45,6 +45,7 @@ communityRouter.patch(
   communityController.patchPost
 );
 
+//특정 게시물 신고
 communityRouter.patch(
   '/community/reports/:communityId',
   loginRequired,
@@ -75,3 +76,25 @@ communityRouter.post(
 
 //게시글 조회 //완료
 communityRouter.get('/community', communityController.getAllPosts);
+
+// ====== 관리자 기능 =======
+
+//adminOnly 추가 예정(테스트 때문에 잠시 빼둠)
+
+// 신고받은 게시글 전체 조회
+communityRouter.get(
+  '/community/admins/reports',
+  communityController.getReportedCommunity
+);
+
+// 신고받은 게시글 취소(반려)
+communityRouter.patch(
+  '/community/admins/reports/cancellations/:communityId',
+  communityController.patchReportedCommunity
+);
+
+// 신고받은 게시글 승인
+communityRouter.delete(
+  '/community/admins/reports/applications/:communityId',
+  communityController.deleteReportedCommunity
+);

@@ -194,20 +194,6 @@ class VolunteerService {
 
     return volunteer;
   }
-
-  public async getReportedUser(user_id: string) {
-    const reportedUser = await VolunteerModel.findById(user_id);
-
-    if (reportedUser) {
-      throw new AppError(
-        commonErrors.resourceNotFoundError,
-        STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
-      );
-    }
-
-    return reportedUser;
-  }
 }
 
 export { VolunteerService };
