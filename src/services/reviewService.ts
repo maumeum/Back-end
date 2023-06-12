@@ -213,5 +213,31 @@ class ReviewService {
       }
     }
   }
+
+  // ===== 관리자 기능 =====
+  public async readReportedReview() {
+    const reportedReview = await ReviewModel.find({
+      isReported: true,
+    }).select('title content');
+
+    return reportedReview;
+  }
+
+  public async deleteReportedReview(review_id: ObjectId) {
+    const review = await ReviewModel.findByIdAndDelete(review_id).populate(
+      'user_id',
+      'reportedTimes'
+    );
+
+    if (!review) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return review;
+  }
 }
 export { ReviewService };

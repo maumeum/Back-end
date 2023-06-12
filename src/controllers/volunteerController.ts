@@ -192,17 +192,37 @@ class VolunteerController {
 
   // ===== 관리자 기능 =====
 
-  // 신고된 내역 전체 확인
+  // 신고된 내역 전체 조회
   public getReportedVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const reportedVolunteer =
         await this.volunteerService.readReportedVolunteer();
 
-      res
-        .status(STATUS_CODE.CREATED)
-        .json(buildResponse(null, reportedVolunteer));
+      res.status(STATUS_CODE.OK).json(buildResponse(null, reportedVolunteer));
     }
   );
+
+  // 신고된 내역 반려
+  public patchReportedVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      await this.volunteerService.updateReportVolunteer(volunteerId, {
+        isReported: false,
+      });
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
   // 신고된 내역 승인
   public deleteReportedVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -223,35 +243,12 @@ class VolunteerController {
       //글 작성한 유저정보 가져오기
       const reportUser = deleteVolunteer.register_user_id;
 
-      if (reportUser) {
-        const reportUserData = await this.userService.getUserReportedTimes(
-          reportUser!
-        );
-        const reportedTimes = reportUserData!.reportedTimes + 1;
-        await this.userService.updateReportedTimes(reportUser, {
-          reportedTimes,
-        });
-      }
-
-      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
-  );
-
-  // 신고된 내역 반려
-  public patchReportedVolunteer = asyncHandler(
-    async (req: Request, res: Response, next: NextFunction) => {
-      const { volunteerId } = req.params;
-
-      if (!volunteerId) {
-        throw new AppError(
-          commonErrors.resourceNotFoundError,
-          STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
-        );
-      }
-
-      await this.volunteerService.updateReportVolunteer(volunteerId, {
-        isReported: false,
+      const reportUserData = await this.userService.getUserReportedTimes(
+        reportUser!
+      );
+      const reportedTimes = reportUserData!.reportedTimes + 1;
+      await this.userService.updateReportedTimes(reportUser!, {
+        reportedTimes,
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));

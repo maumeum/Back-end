@@ -82,13 +82,13 @@ volunteerRouter.get(
 
 // 신고받은 게시글 승인
 volunteerRouter.delete(
-  '/volunteers/admins/reports/application/:volunteerId',
+  '/volunteers/admins/reports/applications/:volunteerId',
   volunteerController.deleteReportedVolunteer
 );
 
 // 신고받은 게시글 취소(반려)
 volunteerRouter.patch(
-  '/volunteers/admins/reports/cancellation/:volunteerId',
+  '/volunteers/admins/reports/cancellations/:volunteerId',
   volunteerController.patchReportedVolunteer
 );
 

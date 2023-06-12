@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import {
   ReviewService,
+  UserService,
   VolunteerApplicationService,
 } from '../services/index.js';
 import { ObjectId } from 'mongodb';
@@ -31,6 +32,7 @@ class ReviewController {
   private reviewService = makeInstance<ReviewService>(ReviewService);
   private volunteerApplicationService =
     makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
+  private userService = makeInstance<UserService>(UserService);
 
   public readMyReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -161,6 +163,7 @@ class ReviewController {
     }
   );
 
+  //리뷰 신고
   public patchReportReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { review_id }: ReviewData = req.params;
@@ -173,9 +176,9 @@ class ReviewController {
         );
       }
 
-      const { isReported } = req.body;
-
-      await this.reviewService.updateReportReview(review_id, isReported);
+      await this.reviewService.updateReportReview(review_id, {
+        isReported: true,
+      });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
@@ -189,14 +192,14 @@ class ReviewController {
 
       if (keyword) {
         const searchReviews = await this.reviewService.readSearchReviews(
-          keyword as string,
+          keyword as string
         );
 
         res.status(STATUS_CODE.OK).json(buildResponse(null, searchReviews));
       } else {
         res.status(STATUS_CODE.OK).json(buildResponse(null, []));
       }
-    },
+    }
   );
 
   public checkUser = asyncHandler(async (req: Request, res: Response) => {
@@ -252,6 +255,70 @@ class ReviewController {
         user_id
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, changed));
+    }
+  );
+
+  // ===== 관리자 기능 =====
+  // 신고된 내역 전체 조회
+  public getReportedReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const reportedReview = await this.reviewService.readReportedReview();
+
+      res.status(STATUS_CODE.OK).json(buildResponse(null, reportedReview));
+    }
+  );
+
+  // 신고된 내역 취소(반려)
+  public patchReportedReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { review_id }: ReviewData = req.params;
+
+      if (!review_id) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      await this.reviewService.updateReportReview(review_id, {
+        isReported: false,
+      });
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  // 신고된 내역 승인
+  public deleteReportedReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { review_id }: ReviewData = req.params;
+
+      if (!review_id) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const deleteReview = await this.reviewService.deleteReportedReview(
+        review_id
+      );
+
+      const reportUser = deleteReview.user_id;
+
+      const reportUserData = await this.userService.getUserReportedTimes(
+        reportUser!
+      );
+
+      const reportedTimes = reportUserData!.reportedTimes + 1;
+
+      await this.userService.updateReportedTimes(reportUser!, {
+        reportedTimes,
+      });
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 }
