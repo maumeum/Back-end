@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { TeamAuthModel } from '../db/index.js';
+import { logger } from '../utils/logger.js';
 
 interface teamAuth {
   _id?: ObjectId;
@@ -12,6 +13,7 @@ interface teamAuth {
   phone?: string;
   location?: string;
   image?: string;
+  isSubmit?: boolean;
 }
 
 class TeamAuthService {
@@ -27,6 +29,14 @@ class TeamAuthService {
 
   public async readTeamAuthByUid(user_id: ObjectId) {
     const teamAuth = await TeamAuthModel.findOne({ user_id: user_id });
+    return teamAuth;
+  }
+
+  public async updateTeamAuth(teamAuth_id: ObjectId, updateInfo: teamAuth) {
+    const teamAuth = await TeamAuthModel.findOneAndUpdate(
+      { _id: teamAuth_id },
+      updateInfo,
+    );
     return teamAuth;
   }
 }
