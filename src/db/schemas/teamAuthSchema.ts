@@ -29,6 +29,9 @@ class TeamAuth {
 
   @prop()
   public image!: string;
+
+  @prop({ default: true })
+  public isSubmit!: boolean;
 }
 
 export { TeamAuth };
