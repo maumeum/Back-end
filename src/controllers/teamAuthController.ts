@@ -49,12 +49,30 @@ class TeamAuthController {
     },
   );
 
+  public getTeamAuth = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const user_id = req.id;
+      const teamAuth = await this.teamAuthService.readTeamAuthByUid(user_id);
+      res.status(STATUS_CODE.OK).json(buildResponse(null, teamAuth));
+    },
+  );
+
   // public updateAuthStatus = asyncHandler(
   //   async (req: Request, res: Response, next: NextFunction) => {
-  //     const {user_id} = req.body;
-  //     const updatedAuthStatus = await this.userService.updateUser(user_id, )
-
-  //   },
+  //     const {teamAuth_id} = req.body;
+  //     const teamAuth = await this.teamAuthService.readTeamAuth(teamAuth_id)
+  //     if(!teamAuth || teamAuth === null){
+  //       throw new AppError(
+  //         `${commonErrors.resourceNotFoundError} : teamAuth_id가 잘못되었거나, 일치하는 정보가 없습니다.`,
+  //         STATUS_CODE.BAD_REQUEST,
+  //         'BAD_REQUEST',
+  //       );
+  //     }
+  //     const user_id = teamAuth?.user_id;
+  //     const updatedAuthStatus = await this.userService.updateUser(user_id, {authorization : true})
+  //     res
+  //     .status(STATUS_CODE.CREATED)
+  //     .json(buildResponse(null, updatedAuthStatus));
   // );
 }
 

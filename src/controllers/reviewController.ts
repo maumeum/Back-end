@@ -181,6 +181,24 @@ class ReviewController {
     }
   );
 
+  public getSearchReviews = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { keyword } = req.query;
+
+      logger.debug(typeof keyword);
+
+      if (keyword) {
+        const searchReviews = await this.reviewService.readSearchReviews(
+          keyword as string,
+        );
+
+        res.status(STATUS_CODE.OK).json(buildResponse(null, searchReviews));
+      } else {
+        res.status(STATUS_CODE.OK).json(buildResponse(null, []));
+      }
+    },
+  );
+
   public checkUser = asyncHandler(async (req: Request, res: Response) => {
     const { review_id }: ReviewData = req.params;
     const user_id = req.id;
