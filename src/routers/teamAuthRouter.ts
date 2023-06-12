@@ -9,12 +9,12 @@ const teamAuthController = new TeamAuthController();
 
 teamAuthRouter.post(
   '/team/auth',
-  adminOnly,
+  loginRequired,
   imageUploader,
   teamAuthController.postTeamAuth,
 );
 
-teamAuthRouter.get('/team/auth', adminOnly, teamAuthController.getTeamAuth);
+teamAuthRouter.get('/team/auth', loginRequired, teamAuthController.getTeamAuth);
 
 teamAuthRouter.post(
   '/team/auth/admin',
