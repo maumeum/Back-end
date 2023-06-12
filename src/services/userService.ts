@@ -5,6 +5,8 @@ import { CONSTANTS } from '../utils/Constants.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { AppError } from '../misc/AppError.js';
+import { Ref } from '@typegoose/typegoose';
+import { User } from '../db/schemas/userSchema.js';
 
 //인터페이스 분리해서 작성
 interface UserInfo {
@@ -20,6 +22,9 @@ interface UserInfo {
   role?: 'user' | 'admin' | 'disabled';
 }
 
+interface ReportedTimeData {
+  reportedTimes: number;
+}
 class UserService {
   // 유저 생성
   public async createUser({ nickname, email, password, phone }: UserInfo) {
@@ -62,6 +67,23 @@ class UserService {
   public async updateUser(user_id: ObjectId, updateInfo: UserInfo) {
     const updatedUser = await UserModel.findByIdAndUpdate(user_id, updateInfo);
     return updatedUser;
+  }
+
+  // ===== 관리자 기능 =====
+  // 사용자의 reportedTimes 가져오기
+  public async getUserReportedTimes(user_id: Ref<User>) {
+    const user = await UserModel.findById(user_id).select('reportedTimes');
+
+    return user;
+  }
+
+  // 사용자의 reportedTimes 업데이트하기
+  public async updateReportedTimes(
+    user_id: Ref<User>,
+    reportedTimes: ReportedTimeData
+  ) {
+    const user = await UserModel.findByIdAndUpdate(user_id, reportedTimes);
+    return user;
   }
 }
 
