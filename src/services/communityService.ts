@@ -41,9 +41,14 @@ export class CommunityService {
     return user;
   }
 
-  public async findAllPost() {
-    return await PostModel.find();
+  public async findAllPost(skip: number, limit: number) {
+    console.log(skip, limit);
+    return await PostModel.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
   }
+  //수정한곳
   public async getPostByCat(category: string) {
     console.log(category);
     return await PostModel.find({ postType: category });
@@ -92,6 +97,9 @@ export class CommunityService {
   }
   public async delete(id: string) {
     await PostModel.deleteOne({ _id: id });
+  }
+  public async totalReviewsCount() {
+    return await PostModel.countDocuments();
   }
 
   public async findOneAndUpdate(
