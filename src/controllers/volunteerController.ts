@@ -47,10 +47,19 @@ class VolunteerController {
 
   public getVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const volunteerList = await this.volunteerService.readVolunteer();
+      const { skip, limit } = req.query;
 
-      console.log(volunteerList);
-      res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerList));
+      const volunteerList = await this.volunteerService.readVolunteer(
+        Number(skip),
+        Number(limit)
+      );
+
+      const totalVolunteersCount =
+        await this.volunteerService.totalVolunteerCount();
+      const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { volunteerList, hasMore }));
     }
   );
 
@@ -196,10 +205,21 @@ class VolunteerController {
   // 신고된 내역 전체 조회
   public getReportedVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
       const reportedVolunteer =
-        await this.volunteerService.readReportedVolunteer();
+        await this.volunteerService.readReportedVolunteer(
+          Number(skip),
+          Number(limit)
+        );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, reportedVolunteer));
+      const totalVolunteersCount =
+        await this.volunteerService.totalReportedVolunteerCount();
+
+      const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { reportedVolunteer, hasMore }));
     }
   );
 
