@@ -2,6 +2,7 @@ import express from 'express';
 import { UserController } from '../controllers/userController.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
 import { imageUploader } from '../utils/multer.js';
+import { adminOnly } from '../middlewares/adminOnly.js';
 const userRouter = express.Router();
 
 const userController = new UserController();
@@ -47,5 +48,12 @@ userRouter.patch(
 
 //사용자 회원 탈퇴
 userRouter.delete('/users', loginRequired, userController.deleteUser);
+
+//관리자가 disabled된 유저 조회
+userRouter.get(
+  '/users/admin/disabled',
+  adminOnly,
+  userController.getDisabledUser,
+);
 
 export { userRouter };

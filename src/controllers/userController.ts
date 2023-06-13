@@ -54,11 +54,11 @@ class UserController {
         throw new AppError(
           commonErrors.resourceDuplicationError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       res.status(STATUS_CODE.OK).json(buildResponse(null, null));
-    }
+    },
   );
 
   //유저 생성
@@ -70,7 +70,7 @@ class UserController {
         throw new AppError(
           commonErrors.resourceDuplicationError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -81,7 +81,7 @@ class UserController {
         phone,
       });
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, createdUser));
-    }
+    },
   );
 
   //유저 정보 조회
@@ -90,7 +90,7 @@ class UserController {
       const user_id = req.id;
       const user = await this.userService.getUserById(user_id);
       res.status(STATUS_CODE.OK).json(buildResponse(null, user));
-    }
+    },
   );
 
   //유저 로그인
@@ -102,7 +102,7 @@ class UserController {
         throw new AppError(
           `${commonErrors.authenticationError} : 가입내역 없음`,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -110,7 +110,7 @@ class UserController {
         throw new AppError(
           `${commonErrors.authorizationError} : 탈퇴`,
           STATUS_CODE.FORBIDDEN,
-          'FORBIDDEN'
+          'FORBIDDEN',
         );
       }
       const validPassword = await bcrypt.compare(password, user.password);
@@ -118,12 +118,12 @@ class UserController {
         throw new AppError(
           `${commonErrors.authorizationError} : 비밀번호 불일치`,
           STATUS_CODE.FORBIDDEN,
-          'FORBIDDEN'
+          'FORBIDDEN',
         );
       }
       const madeToken = makeJwtToken(user);
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, madeToken));
-    }
+    },
   );
 
   public userAuthorization = asyncHandler(
@@ -135,24 +135,24 @@ class UserController {
         throw new AppError(
           commonErrors.authorizationError,
           STATUS_CODE.FORBIDDEN,
-          'FORBIDDEN'
+          'FORBIDDEN',
         );
       }
 
       const correctPasswordHash = user.password;
       const isPasswordCorrect = await bcrypt.compare(
         password,
-        correctPasswordHash
+        correctPasswordHash,
       );
       if (!isPasswordCorrect) {
         throw new AppError(
           `${commonErrors.authorizationError} : 비밀번호 불일치`,
           STATUS_CODE.FORBIDDEN,
-          'FORBIDDEN'
+          'FORBIDDEN',
         );
       }
       res.status(STATUS_CODE.OK).json(buildResponse(null, null));
-    }
+    },
   );
 
   //유저 정보 수정(닉네임, 휴대전화번호 , 비밀번호)
@@ -176,17 +176,17 @@ class UserController {
       if (password) {
         const hashedPassword = await bcrypt.hash(
           password,
-          CONSTANTS.HASHING_TIMES
+          CONSTANTS.HASHING_TIMES,
         );
         updateInfo.password = hashedPassword;
       }
 
       const updatedUser = await this.userService.updateUser(
         user_id,
-        updateInfo
+        updateInfo,
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedUser));
-    }
+    },
   );
 
   public updateIntroduction = asyncHandler(
@@ -203,10 +203,10 @@ class UserController {
 
       const updatedUser = await this.userService.updateUser(
         user_id,
-        updateInfo
+        updateInfo,
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedUser));
-    }
+    },
   );
 
   public updateImage = asyncHandler(
@@ -226,10 +226,10 @@ class UserController {
 
       const updatedUser = await this.userService.updateUser(
         user_id,
-        updateInfo
+        updateInfo,
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public toDefaultImage = asyncHandler(
@@ -247,10 +247,10 @@ class UserController {
 
       const updatedUser = await this.userService.updateUser(
         user_id,
-        updateInfo
+        updateInfo,
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public deleteUser = asyncHandler(
@@ -262,7 +262,7 @@ class UserController {
         throw new AppError(
           `${commonErrors.authenticationError} : 가입내역 없음`,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -270,7 +270,7 @@ class UserController {
         throw new AppError(
           `${commonErrors.authorizationError} : 탈퇴`,
           STATUS_CODE.FORBIDDEN,
-          'FORBIDDEN'
+          'FORBIDDEN',
         );
       }
       const validPassword = await bcrypt.compare(password, user.password);
@@ -278,7 +278,7 @@ class UserController {
         throw new AppError(
           `${commonErrors.authorizationError} : 비밀번호 불일치`,
           STATUS_CODE.FORBIDDEN,
-          'FORBIDDEN'
+          'FORBIDDEN',
         );
       }
 
@@ -287,10 +287,20 @@ class UserController {
 
       const updatedUser = await this.userService.updateUser(
         user_id,
-        updateInfo
+        updateInfo,
       );
       res.status(STATUS_CODE.OK).json(buildResponse(null, null));
-    }
+    },
+  );
+
+  //disabled된 유저 전체 조회
+  public getDisabledUser = asyncHandler(
+    async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
+      const disabledUser = await this.userService.getUserByCondition({
+        role: 'disabled',
+      });
+      res.status(STATUS_CODE.OK).json(buildResponse(null, disabledUser));
+    },
   );
 }
 

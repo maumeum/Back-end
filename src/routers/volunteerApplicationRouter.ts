@@ -21,4 +21,11 @@ volunteerApplicationRouter.get(
   loginRequired,
   volunteerApplicationController.getApplicationVolunter
 );
+
+// 봉사활동 신청 취소
+volunteerApplicationRouter.delete(
+  '/applications/:volunteerApplicationId',
+  loginRequired,
+  volunteerApplicationController.deleteApplicationVolunteer
+);
 export { volunteerApplicationRouter };
