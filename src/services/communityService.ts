@@ -87,22 +87,18 @@ export class CommunityService {
 
   public async updateReportPost(
     communityId: string,
-    communityData: communityReportData
+    communityData: communityReportData,
   ) {
     const community = await PostModel.findByIdAndUpdate(
       communityId,
-      communityData
+      communityData,
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-<<<<<<< HEAD
         'BAD_REQUEST',
-=======
-        'BAD_REQUEST'
->>>>>>> 9a6defc56b4211e28506df23e0fe496b7015f65d
       );
     }
 
@@ -127,7 +123,7 @@ export class CommunityService {
       content: string;
       images?: string;
       postType: string;
-    }
+    },
   ) {
     return await PostModel.findOneAndUpdate(
       { _id: id },
@@ -137,7 +133,7 @@ export class CommunityService {
         images,
         postType,
       },
-      { new: true }
+      { new: true },
     );
   }
   public async getUserPosts(id: string) {
@@ -160,22 +156,14 @@ export class CommunityService {
   public async deleteReportedCommunity(community_id: string) {
     const community = await PostModel.findByIdAndDelete(community_id).populate(
       'user_id',
-<<<<<<< HEAD
       'reportedTimes',
-=======
-      'reportedTimes'
->>>>>>> 9a6defc56b4211e28506df23e0fe496b7015f65d
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-<<<<<<< HEAD
         'BAD_REQUEST',
-=======
-        'BAD_REQUEST'
->>>>>>> 9a6defc56b4211e28506df23e0fe496b7015f65d
       );
     }
 
