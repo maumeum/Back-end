@@ -33,7 +33,9 @@ class TeamAuthService {
   }
 
   public async readTeamAuthByCondition(condition: {}) {
-    const teamAuth = await TeamAuthModel.find(condition);
+    const teamAuth = await TeamAuthModel.find(condition).populate('user_id', [
+      'nickname',
+    ]);
     return teamAuth;
   }
 
