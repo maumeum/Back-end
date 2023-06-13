@@ -58,6 +58,17 @@ class TeamAuthController {
       res.status(STATUS_CODE.OK).json(buildResponse(null, teamAuth));
     },
   );
+
+  //관리자가 제출된 팀 인증 다큐먼트들을 확인
+  public getSubmittedTeamAuth = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const teamAuth = await this.teamAuthService.readTeamAuthByCondition({
+        isSubmit: true,
+      });
+      res.status(STATUS_CODE.OK).json(buildResponse(null, teamAuth));
+    },
+  );
+
   public updateAuthStatus = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { teamAuth_id } = req.body;
