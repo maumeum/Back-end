@@ -1,4 +1,5 @@
 import {
+  UserService,
   VolunteerApplicationService,
   VolunteerService,
 } from '../services/index.js';
@@ -10,6 +11,7 @@ import { buildResponse } from '../utils/builderResponse.js';
 import { logger } from '../utils/logger.js';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
 import { AppError } from '../misc/AppError.js';
+import { ObjectId } from 'mongodb';
 class VolunteerApplicationController {
   private volunteerApplicationService =
     makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
@@ -76,14 +78,6 @@ class VolunteerApplicationController {
         await this.volunteerApplicationService.readApplicationVolunteer(
           user_id
         );
-
-      console.log(applicationVolunteerList);
-
-      const registerUserId = applicationVolunteerList.map(
-        (applicationVolunteer) => {
-          const volunteerId = applicationVolunteer.volunteer_id;
-        }
-      );
 
       if (status === 'true') {
         volunteerStatus = applicationVolunteerList.filter(
