@@ -293,8 +293,15 @@ class UserController {
     },
   );
 
-  //  //유저 전체 조회
-  //  public getDisabledUser =
+  //disabled된 유저 전체 조회
+  public getDisabledUser = asyncHandler(
+    async (req: UpdateUserInfoRequest, res: Response, next: NextFunction) => {
+      const disabledUser = await this.userService.getUserByCondition({
+        role: 'disabled',
+      });
+      res.status(STATUS_CODE.OK).json(buildResponse(null, disabledUser));
+    },
+  );
 }
 
 export { UserController };
