@@ -32,20 +32,29 @@ class VolunteerApplicationService {
     return true;
   }
 
-  // 등록한 유저
+  // 등록한 유저 필요
   public async readApplicationVolunteer(userId: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
-    }).populate('volunteer_id', [
-      'title',
-      'centName',
-      'deadline',
-      'endDate',
-      'startDate',
-      'statusName',
-      'images',
-      'register_user_id',
-    ]);
+    })
+      .populate({
+        path: 'volunteer_id',
+        select: [
+          'title',
+          'centName',
+          'deadline',
+          'endDate',
+          'startDate',
+          'statusName',
+          'images',
+          'register_user_id',
+        ],
+        populate: {
+          path: 'register_user_id',
+          select: ['nickname', 'image'],
+        },
+      })
+      .exec();
 
     return applicationVolunteerList;
   }
