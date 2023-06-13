@@ -25,7 +25,7 @@ volunteerRouter.get(
   volunteerController.getSearchVolunteer
 );
 
-//사용자가 등록한 봉사활동 조회
+//사용자가 등록한 봉사활동 전체 조회
 volunteerRouter.get(
   '/volunteers/registerations',
   loginRequired,

@@ -21,8 +21,7 @@ class VolunteerApplicationService {
     volunteer_id,
     isParticipate,
   }: ApplicationVolunteerData) {
-    //신청 가능여부 체크
-
+    //신청 중복여부 체크
     const result = await this.doubleCheckApplicationVolunteer({
       user_id,
       volunteer_id,
@@ -70,12 +69,14 @@ class VolunteerApplicationService {
       throw new AppError(
         '이미 신청이 완료된 봉사활동입니다.',
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
     return true;
   }
+
+  // public async getStockCheck()
 
   public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({

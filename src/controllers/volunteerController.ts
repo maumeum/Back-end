@@ -104,29 +104,45 @@ class VolunteerController {
 
   public getSearchVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { keyword } = req.query;
+      const { keyword, skip, limit } = req.query;
 
       const searchVolunteers = await this.volunteerService.readSearchVolunteer(
-        keyword as string
+        keyword as string,
+        Number(skip),
+        Number(limit)
       );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
+      const totalVolunteerCount =
+        await this.volunteerService.totalVolunteerCount();
+
+      const hasMore = Number(skip) + Number(limit) < totalVolunteerCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { searchVolunteers, hasMore }));
     }
   );
 
   public getRegisterationVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
       const user_id = req.id;
-
-      console.log(user_id);
-      console.log(typeof user_id);
-
       const registerationVolunteers =
-        await this.volunteerService.readRegistrationVolunteer(user_id);
+        await this.volunteerService.readRegistrationVolunteer(
+          user_id,
+          Number(skip),
+          Number(limit)
+        );
+
+      const totalRegisterationVolunnter =
+        await this.volunteerService.totalReportedVolunteerCount();
+
+      const hasMore =
+        Number(skip) + Number(limit) < totalRegisterationVolunnter;
 
       res
         .status(STATUS_CODE.OK)
-        .json(buildResponse(null, registerationVolunteers));
+        .json(buildResponse(null, { registerationVolunteers, hasMore }));
     }
   );
 
