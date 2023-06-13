@@ -31,9 +31,9 @@ class ReviewService {
     const review = await ReviewModel.findById(review_id).populate('user_id', [
       'nickname',
       'uuid',
-      'role',
       'nanoid',
       'reportedTimes',
+      'authorization',
     ]);
     return review;
   }
@@ -92,7 +92,7 @@ class ReviewService {
     const reviews = await ReviewModel.find()
       .populate({
         path: 'user_id',
-        select: 'nickname nanoid uuid',
+        select: 'nickname nanoid uuid authorization',
       })
       .skip(skip)
       .limit(limit)

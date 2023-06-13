@@ -25,7 +25,7 @@ class PostCommentService {
   public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
-      ['title', 'content', 'postType', 'createdAt'],
+      ['title', 'content', 'postType', 'createdAt', 'authorization'],
     );
 
     if (userComments.length === 0) {
@@ -44,7 +44,7 @@ class PostCommentService {
     const postCommentList = await PostCommentModel.find({
       post_id: post_id,
     })
-      .populate('user_id', ['nickname', 'uuid'])
+      .populate('user_id', ['nickname', 'uuid', 'authorization'])
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
