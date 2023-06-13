@@ -97,8 +97,11 @@ export class CommunityController {
 
     const comment = await this.communityService.findByPostIdComment(id);
     const post = await this.communityService.indByPostIdPost(id);
+    const user = await this.communityService.findUserByPostId(id);
 
-    res.status(STATUS_CODE.OK).json(buildResponse(null, { post, comment }));
+    res
+      .status(STATUS_CODE.OK)
+      .json(buildResponse(null, { post, comment, userRole: user!.role }));
   });
 
   public patchPost = async (req: Request, res: Response) => {
@@ -138,7 +141,6 @@ export class CommunityController {
     async (req: Request, res: Response) => {
       const { category } = req.params;
       const { skip, limit } = req.query;
-      console.log(category);
 
       if (!category) {
         throw new AppError(

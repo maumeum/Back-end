@@ -9,6 +9,12 @@ interface communityReportData {
 }
 
 export class CommunityService {
+  public async findUserByPostId(id: string) {
+    const post = await PostModel.findOne({ _id: id });
+    const user = await UserModel.findOne({ _id: post!.user_id });
+    return user;
+  }
+
   public async createPost({
     title,
     content,
