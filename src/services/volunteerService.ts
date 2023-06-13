@@ -69,8 +69,9 @@ class VolunteerService {
   public async readVolunteer(skip: number, limit: number) {
     const volunteerList = await VolunteerModel.find({})
       .select(
-        'title centName deadline statusName applyCount registerCount images register_user_id'
+        'title centName deadline statusName applyCount registerCount images'
       )
+      .populate('register_user_id', ['image', 'nickname'])
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
@@ -78,11 +79,13 @@ class VolunteerService {
     return volunteerList;
   }
 
+  //전체 토탈
   public async totalVolunteerCount() {
     const counts = await VolunteerModel.countDocuments();
     return counts;
   }
 
+  //관리자 토탈
   public async totalReportedVolunteerCount() {
     const counts = await VolunteerModel.countDocuments({ isReported: true });
     return counts;
@@ -104,26 +107,37 @@ class VolunteerService {
     return volunteer;
   }
 
-  public async readSearchVolunteer(keyword: string) {
+  public async readSearchVolunteer(
+    keyword: string,
+    skip: number,
+    limit: number
+  ) {
     const options = [
       { title: { $regex: `${keyword}` } },
       { content: { $regex: `${keyword}` } },
     ];
     const volunteerList = await VolunteerModel.find({
       $or: options,
-    });
-
-    if (volunteerList.length === 0) {
-      return [];
-    }
+    })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
   }
 
-  public async readRegistrationVolunteer(user_id: ObjectId) {
+  public async readRegistrationVolunteer(
+    user_id: ObjectId,
+    skip: number,
+    limit: number
+  ) {
     const volunteerList = await VolunteerModel.find({
       register_user_id: user_id,
-    }).populate('register_user_id');
+    })
+      .populate('register_user_id')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
   }

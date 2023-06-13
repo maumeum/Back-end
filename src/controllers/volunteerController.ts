@@ -42,25 +42,40 @@ class VolunteerController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    },
+    }
   );
 
   public getVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { skip, limit } = req.query;
+      const { skip, limit, status } = req.query;
 
       const volunteerList = await this.volunteerService.readVolunteer(
         Number(skip),
-        Number(limit),
+        Number(limit)
       );
+
+      let volunteerStatus;
+
+      if (status === 'true') {
+        volunteerStatus = volunteerList.filter((volunteer) => {
+          return volunteer.statusName === '모집중';
+        });
+      } else if (status === 'false') {
+        volunteerStatus = volunteerList.filter((volunteer) => {
+          return (
+            volunteer.statusName === '모집완료' ||
+            volunteer.statusName === '모집중단'
+          );
+        });
+      }
 
       const totalVolunteersCount =
         await this.volunteerService.totalVolunteerCount();
       const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
       res
         .status(STATUS_CODE.OK)
-        .json(buildResponse(null, { volunteerList, hasMore }));
-    },
+        .json(buildResponse(null, { volunteerStatus, hasMore }));
+    }
   );
 
   public getCheckUser = asyncHandler(
@@ -69,7 +84,7 @@ class VolunteerController {
       const user_id = req.id;
 
       const volunteer = await this.volunteerService.readVolunteerById(
-        volunteerId,
+        volunteerId
       );
 
       logger.debug(String(user_id));
@@ -80,7 +95,7 @@ class VolunteerController {
       } else {
         res.status(STATUS_CODE.OK).json(buildResponse(null, false));
       }
-    },
+    }
   );
 
   public getVolunteerById = asyncHandler(
@@ -91,43 +106,59 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       const volunteer = await this.volunteerService.readVolunteerById(
-        volunteerId,
+        volunteerId
       );
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, volunteer));
-    },
+    }
   );
 
   public getSearchVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { keyword } = req.query;
+      const { keyword, skip, limit } = req.query;
 
       const searchVolunteers = await this.volunteerService.readSearchVolunteer(
         keyword as string,
+        Number(skip),
+        Number(limit)
       );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
-    },
+      const totalVolunteerCount =
+        await this.volunteerService.totalVolunteerCount();
+
+      const hasMore = Number(skip) + Number(limit) < totalVolunteerCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { searchVolunteers, hasMore }));
+    }
   );
 
   public getRegisterationVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
       const user_id = req.id;
-
-      console.log(user_id);
-      console.log(typeof user_id);
-
       const registerationVolunteers =
-        await this.volunteerService.readRegistrationVolunteer(user_id);
+        await this.volunteerService.readRegistrationVolunteer(
+          user_id,
+          Number(skip),
+          Number(limit)
+        );
+
+      const totalRegisterationVolunnter =
+        await this.volunteerService.totalReportedVolunteerCount();
+
+      const hasMore =
+        Number(skip) + Number(limit) < totalRegisterationVolunnter;
 
       res
         .status(STATUS_CODE.OK)
-        .json(buildResponse(null, registerationVolunteers));
-    },
+        .json(buildResponse(null, { registerationVolunteers, hasMore }));
+    }
   );
 
   public patchVolunteer = asyncHandler(
@@ -139,7 +170,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
 
@@ -154,7 +185,7 @@ class VolunteerController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    },
+    }
   );
 
   public patchRegisterationStatusName = asyncHandler(
@@ -165,7 +196,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
 
@@ -173,11 +204,11 @@ class VolunteerController {
 
       await this.volunteerService.updateRegisterationVolunteer(
         volunteerId,
-        volunteerData,
+        volunteerData
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    },
+    }
   );
 
   public patchReportVolunteer = asyncHandler(
@@ -188,7 +219,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
 
@@ -197,7 +228,7 @@ class VolunteerController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    },
+    }
   );
 
   // ===== 관리자 기능 =====
@@ -209,7 +240,7 @@ class VolunteerController {
       const reportedVolunteer =
         await this.volunteerService.readReportedVolunteer(
           Number(skip),
-          Number(limit),
+          Number(limit)
         );
 
       const totalVolunteersCount =
@@ -220,7 +251,7 @@ class VolunteerController {
       res
         .status(STATUS_CODE.OK)
         .json(buildResponse(null, { reportedVolunteer, hasMore }));
-    },
+    }
   );
 
   // 신고된 내역 반려
@@ -232,7 +263,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
 
@@ -241,7 +272,7 @@ class VolunteerController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    },
+    }
   );
 
   // 신고된 내역 승인
@@ -253,7 +284,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
 
@@ -265,7 +296,7 @@ class VolunteerController {
       const reportUser = deleteVolunteer.register_user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
-        reportUser!,
+        reportUser!
       );
 
       let isDisabledUser;
@@ -279,7 +310,7 @@ class VolunteerController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    },
+    }
   );
 }
 export { VolunteerController };
