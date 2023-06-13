@@ -1,8 +1,8 @@
-import { Ref } from "@typegoose/typegoose";
-import { PostCommentModel, PostModel, UserModel } from "../db/index.js";
-import { AppError } from "../misc/AppError.js";
-import { commonErrors } from "../misc/commonErrors.js";
-import { STATUS_CODE } from "../utils/statusCode.js";
+import { Ref } from '@typegoose/typegoose';
+import { PostCommentModel, PostModel, UserModel } from '../db/index.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface communityReportData {
   isReported: boolean;
@@ -87,22 +87,18 @@ export class CommunityService {
 
   public async updateReportPost(
     communityId: string,
-    communityData: communityReportData,
+    communityData: communityReportData
   ) {
     const community = await PostModel.findByIdAndUpdate(
       communityId,
-      communityData,
+      communityData
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-<<<<<<< HEAD
-        'BAD_REQUEST',
-=======
-        "BAD_REQUEST"
->>>>>>> 15772cdbaba159d63e6fef53bb82a949f66ef9e4
+        'BAD_REQUEST'
       );
     }
 
@@ -127,7 +123,7 @@ export class CommunityService {
       content: string;
       images?: string;
       postType: string;
-    },
+    }
   ) {
     return await PostModel.findOneAndUpdate(
       { _id: id },
@@ -137,7 +133,7 @@ export class CommunityService {
         images,
         postType,
       },
-      { new: true },
+      { new: true }
     );
   }
   public async getUserPosts(id: string) {
@@ -153,30 +149,21 @@ export class CommunityService {
   public async readReportedCommunity() {
     const reportedCommunity = await PostModel.find({
       isReported: true,
-    }).select("title content");
+    }).select('title content');
 
     return reportedCommunity;
   }
   public async deleteReportedCommunity(community_id: string) {
     const community = await PostModel.findByIdAndDelete(community_id).populate(
-<<<<<<< HEAD
       'user_id',
-      'reportedTimes',
-=======
-      "user_id",
-      "reportedTimes"
->>>>>>> 15772cdbaba159d63e6fef53bb82a949f66ef9e4
+      'reportedTimes'
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-<<<<<<< HEAD
-        'BAD_REQUEST',
-=======
-        "BAD_REQUEST"
->>>>>>> 15772cdbaba159d63e6fef53bb82a949f66ef9e4
+        'BAD_REQUEST'
       );
     }
 
