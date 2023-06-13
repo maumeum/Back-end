@@ -9,6 +9,11 @@ interface VolunteerCommentData {
   volunteer_id: ObjectId;
   user_id: ObjectId;
   content: string;
+  isReported: boolean;
+}
+
+interface VolunteerReportData {
+  isReported: boolean;
 }
 
 class VolunteerCommentService {
@@ -48,7 +53,7 @@ class VolunteerCommentService {
   public async readPostComment(volunteer_id: string) {
     const postCommentList = await VolunteerCommentModel.find({
       volunteer_id: volunteer_id,
-    }).populate('user_id', 'nickname');
+    }).populate('user_id', ['nickname', 'uuid']);
 
     return postCommentList;
   }
@@ -70,9 +75,28 @@ class VolunteerCommentService {
       );
     }
 
-    return updatedComment;
+    return true;
   }
 
+  public async updateReportComment(
+    volunteerComment_id: string,
+    isReported: VolunteerReportData
+  ) {
+    const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
+      volunteerComment_id,
+      isReported
+    );
+
+    if (!updatedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
+  }
   public async deleteComment(volunteerComment_id: string) {
     const deletedComment = await VolunteerCommentModel.findByIdAndDelete(
       volunteerComment_id
@@ -89,14 +113,29 @@ class VolunteerCommentService {
     return deletedComment;
   }
 
-  //봉사활동 ID에 해당하는 댓글 리스트
-  // public async checkUser(volunteer_id: string) {
-  //   const volunteerList = await VolunteerCommentModel.find({
-  //     volunteer_id,
-  //   });
+  // ===== 관리자 기능 =====
+  public async readReportedVolunteerComment() {
+    const reportedVolunteerComment = await VolunteerCommentModel.find({
+      isReported: true,
+    }).select('title content');
+    return reportedVolunteerComment;
+  }
 
-  //   return volunteerList;
-  // }
+  public async deleteReportedVolunteerComment(volunteerComment_id: string) {
+    const volunteerComment = await VolunteerCommentModel.findByIdAndDelete(
+      volunteerComment_id
+    ).populate('user_id', 'reportedTimes');
+
+    if (!volunteerComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return volunteerComment;
+  }
 }
 
 export { VolunteerCommentService };

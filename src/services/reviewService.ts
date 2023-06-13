@@ -17,6 +17,7 @@ interface ReviewData {
   title?: string;
   content?: string;
   images?: string[];
+  isReported?: boolean;
   volunteer_id?: ObjectId;
 }
 
@@ -29,7 +30,7 @@ class ReviewService {
   public async getReviewById(review_id: ObjectId) {
     const review = await ReviewModel.findById(review_id).populate(
       'user_id',
-      'nickname',
+      'nickname'
     );
     return review;
   }
@@ -43,16 +44,33 @@ class ReviewService {
     const updatedReview = await ReviewModel.findOneAndUpdate(
       { _id: review_id },
       updateInfo,
-      { new: true },
+      { new: true }
     );
     if (!updatedReview) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     return updatedReview;
+  }
+
+  public async updateReportReview(review_id: ObjectId, updateInfo: ReviewData) {
+    const updatedReview = await ReviewModel.findByIdAndUpdate(
+      review_id,
+      updateInfo
+    );
+
+    if (!updatedReview) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
   }
 
   public async deleteReview(review_id: ObjectId) {
@@ -61,7 +79,7 @@ class ReviewService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     return createReview;
@@ -71,7 +89,7 @@ class ReviewService {
     const reviews = await ReviewModel.find()
       .populate({
         path: 'user_id',
-        select: 'nickname nanoid',
+        select: 'nickname nanoid uuid',
       })
       .skip(skip)
       .limit(limit)
@@ -85,10 +103,27 @@ class ReviewService {
     return counts;
   }
 
+  //검색기능
+  public async readSearchReviews(keyword: string) {
+    const options = [
+      { title: { $regex: `${keyword}` } },
+      { content: { $regex: `${keyword}` } },
+    ];
+    const ReviewList = await ReviewModel.find({
+      $or: options,
+    });
+
+    if (ReviewList.length === 0) {
+      return [];
+    }
+
+    return ReviewList;
+  }
+
   // endDate 이후 && 7일 지나기 전, 사용자 본인이 상태를 직접 false => true로 변경하는 코드
   public async changeParticipateStatus(
     volunteer_id: ObjectId,
-    user_id: ObjectId,
+    user_id: ObjectId
   ) {
     const matchedApplyVolunteer = await VolunteerApplicationModel.findOne({
       volunteer_id,
@@ -99,14 +134,14 @@ class ReviewService {
       throw new AppError(
         `${commonErrors.resourceNotFoundError} : 일치하는 데이터 없음.`,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     if (matchedApplyVolunteer.isParticipate) {
       throw new AppError(
         "isParticipate is already in status 'true'",
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     logger.debug(`matchedApplyVolunteer : ${matchedApplyVolunteer}`);
@@ -139,14 +174,14 @@ class ReviewService {
         throw new AppError(
           '조건에 만족하는 요청이 아닙니다. No changes were made',
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
     } else {
       throw new AppError(
         '조건에 만족하는 요청이 아닙니다. No changes were made',
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
   }
@@ -160,7 +195,7 @@ class ReviewService {
 
     for (const apply of applyVolunteer) {
       const volunteer = await VolunteerModel.findById(
-        apply.volunteer_id,
+        apply.volunteer_id
       ).select('endDate statusName');
       logger.debug(`volunteer : ${volunteer}`);
       if (
@@ -177,6 +212,32 @@ class ReviewService {
         logger.debug(`apply : ${apply}`);
       }
     }
+  }
+
+  // ===== 관리자 기능 =====
+  public async readReportedReview() {
+    const reportedReview = await ReviewModel.find({
+      isReported: true,
+    }).select('title content');
+
+    return reportedReview;
+  }
+
+  public async deleteReportedReview(review_id: ObjectId) {
+    const review = await ReviewModel.findByIdAndDelete(review_id).populate(
+      'user_id',
+      'reportedTimes'
+    );
+
+    if (!review) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return review;
   }
 }
 export { ReviewService };

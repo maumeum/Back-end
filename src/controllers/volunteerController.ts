@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { VolunteerService } from '../services/index.js';
+import { UserService, VolunteerService } from '../services/index.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { makeInstance } from '../utils/makeInstance.js';
@@ -7,6 +7,8 @@ import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { logger } from '../utils/logger.js';
+import { ObjectId } from 'mongodb';
+import { countReportedTimes } from '../utils/reportedTimesData.js';
 
 interface MyFile extends Express.Multer.File {
   // 추가적인 사용자 정의 속성을 선언할 수도 있습니다
@@ -16,6 +18,7 @@ interface MyFile extends Express.Multer.File {
 
 class VolunteerController {
   private volunteerService = makeInstance<VolunteerService>(VolunteerService);
+  private userService = makeInstance<UserService>(UserService);
 
   public postVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -94,22 +97,20 @@ class VolunteerController {
     async (req: Request, res: Response, next: NextFunction) => {
       const { keyword } = req.query;
 
-      logger.debug(typeof keyword);
+      const searchVolunteers = await this.volunteerService.readSearchVolunteer(
+        keyword as string
+      );
 
-      if (keyword) {
-        const searchVolunteers =
-          await this.volunteerService.readSearchVolunteer(keyword as string);
-
-        res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
-      } else {
-        res.status(STATUS_CODE.OK).json(buildResponse(null, []));
-      }
+      res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
     }
   );
 
   public getRegisterationVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
+
+      console.log(user_id);
+      console.log(typeof user_id);
 
       const registerationVolunteers =
         await this.volunteerService.readRegistrationVolunteer(user_id);
@@ -159,16 +160,106 @@ class VolunteerController {
         );
       }
 
-      const { statusName } = req.body;
+      const volunteerData = req.body;
 
       await this.volunteerService.updateRegisterationVolunteer(
         volunteerId,
-        statusName
+        volunteerData
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
-}
 
+  public patchReportVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      await this.volunteerService.updateReportVolunteer(volunteerId, {
+        isReported: true,
+      });
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  // ===== 관리자 기능 =====
+
+  // 신고된 내역 전체 조회
+  public getReportedVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const reportedVolunteer =
+        await this.volunteerService.readReportedVolunteer();
+
+      res.status(STATUS_CODE.OK).json(buildResponse(null, reportedVolunteer));
+    }
+  );
+
+  // 신고된 내역 반려
+  public patchReportedVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      await this.volunteerService.updateReportVolunteer(volunteerId, {
+        isReported: false,
+      });
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  // 신고된 내역 승인
+  public deleteReportedVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerId } = req.params;
+
+      if (!volunteerId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      // 데이터 삭제
+      const deleteVolunteer =
+        await this.volunteerService.deleteReportedVolunteer(volunteerId);
+
+      //글 작성한 유저정보 가져오기
+      const reportUser = deleteVolunteer.register_user_id;
+
+      const reportUserData = await this.userService.getUserReportedTimes(
+        reportUser!
+      );
+
+      let isDisabledUser;
+
+      if (reportUserData) {
+        isDisabledUser = countReportedTimes(reportUserData);
+      }
+
+      if (isDisabledUser) {
+        await this.userService.updateReportedTimes(reportUser!, isDisabledUser);
+      }
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+}
 export { VolunteerController };

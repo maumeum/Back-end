@@ -2,6 +2,7 @@ import express from 'express';
 import { TeamAuthController } from '../controllers/index.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
 import { imageUploader } from '../utils/multer.js';
+import { adminOnly } from '../middlewares/adminOnly.js';
 
 const teamAuthRouter = express.Router();
 const teamAuthController = new TeamAuthController();
@@ -13,7 +14,12 @@ teamAuthRouter.post(
   teamAuthController.postTeamAuth,
 );
 
-// teamAuthRouter.post('/team/auth/admin/true', loginRequired);
-// teamAuthRouter.post('/team/auth/admin/false', loginRequired);
+teamAuthRouter.get('/team/auth', loginRequired, teamAuthController.getTeamAuth);
+
+teamAuthRouter.post(
+  '/team/auth/admin',
+  adminOnly,
+  teamAuthController.updateAuthStatus,
+);
 
 export { teamAuthRouter };

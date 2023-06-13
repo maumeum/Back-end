@@ -9,6 +9,11 @@ interface PostCommentData {
   user_id: ObjectId;
   post_id: ObjectId;
   content: string;
+  postData: boolean;
+}
+
+interface PostReportData {
+  isReported: boolean;
 }
 
 class PostCommentService {
@@ -38,7 +43,7 @@ class PostCommentService {
   public async readComment(post_id: string) {
     const postCommentList = await PostCommentModel.find({
       post_id: post_id,
-    }).populate('user_id', 'nickname');
+    }).populate('user_id', ['nickname', 'uuid']);
     return postCommentList;
   }
 
@@ -59,7 +64,27 @@ class PostCommentService {
       );
     }
 
-    return newPostComment;
+    return true;
+  }
+
+  public async updateReportComment(
+    postCommentId: string,
+    isReported: PostReportData
+  ) {
+    const newReportComment = await PostCommentModel.findByIdAndUpdate(
+      postCommentId,
+      isReported
+    );
+
+    if (!newReportComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
   }
 
   public async deleteComment(postCommentId: string) {
@@ -76,6 +101,31 @@ class PostCommentService {
     }
 
     return deletePostComment;
+  }
+
+  // ===== 관리자 기능 =====
+  public async readReportedPostComment() {
+    const reportedPostComment = await PostCommentModel.find({
+      isReported: true,
+    }).select('title content');
+
+    return reportedPostComment;
+  }
+
+  public async deleteReportedPostComment(postComment_id: string) {
+    const postComment = await PostCommentModel.findByIdAndDelete(
+      postComment_id
+    ).populate('user_id', 'reportedTimes');
+
+    if (!postComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return postComment;
   }
 }
 

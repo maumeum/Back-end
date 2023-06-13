@@ -3,6 +3,7 @@ import { VolunteerController } from '../controllers/index.js';
 import { loginRequired } from '../middlewares/loginRequired.js';
 import { makeInstance } from '../utils/makeInstance.js';
 import { imagesUploader } from '../utils/multer.js';
+import { adminOnly } from '../middlewares/adminOnly.js';
 
 const volunteerRouter = Router();
 
@@ -60,6 +61,38 @@ volunteerRouter.patch(
   '/volunteers/registerations/:volunteerId',
   loginRequired,
   volunteerController.patchRegisterationStatusName
+);
+
+// 등록한 봉사활동 신고
+volunteerRouter.patch(
+  '/volunteers/reports/:volunteerId',
+  loginRequired,
+  volunteerController.patchReportVolunteer
+);
+
+// ====== 관리자 기능 =======
+
+//adminOnly 추가 예정(테스트 때문에 잠시 빼둠)
+
+// 신고받은 게시글 전체 조회
+volunteerRouter.get(
+  '/volunteers/admins/reports',
+  adminOnly,
+  volunteerController.getReportedVolunteer
+);
+
+// 신고받은 게시글 취소(반려)
+volunteerRouter.patch(
+  '/volunteers/admins/reports/cancellations/:volunteerId',
+  adminOnly,
+  volunteerController.patchReportedVolunteer
+);
+
+// 신고받은 게시글 승인
+volunteerRouter.delete(
+  '/volunteers/admins/reports/applications/:volunteerId',
+  adminOnly,
+  volunteerController.deleteReportedVolunteer
 );
 
 export { volunteerRouter };

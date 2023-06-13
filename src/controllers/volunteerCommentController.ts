@@ -1,4 +1,4 @@
-import { VolunteerCommentService } from '../services/index.js';
+import { UserService, VolunteerCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
@@ -6,22 +6,26 @@ import { makeInstance } from '../utils/makeInstance.js';
 import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
+import { countReportedTimes } from '../utils/reportedTimesData.js';
 
 class VolunteerCommentController {
   private volunteerCommentService = makeInstance<VolunteerCommentService>(
     VolunteerCommentService
   );
 
+  private userService = makeInstance<UserService>(UserService);
+
   public postComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const { volunteer_id, content } = req.body;
+      const volunteerBodyData = req.body;
 
-      await this.volunteerCommentService.createComment({
-        volunteer_id,
-        content,
+      const volunteerData = {
+        ...volunteerBodyData,
         user_id,
-      });
+      };
+
+      await this.volunteerCommentService.createComment(volunteerData);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
@@ -78,6 +82,27 @@ class VolunteerCommentController {
     }
   );
 
+  public patchReportComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerCommentId } = req.params;
+
+      if (!volunteerCommentId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      await this.volunteerCommentService.updateReportComment(
+        volunteerCommentId,
+        { isReported: true }
+      );
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
   public deleteComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
@@ -95,12 +120,26 @@ class VolunteerCommentController {
     }
   );
 
-  public getCheckUser = asyncHandler(
-    async (req: Request, res: Response, next: NextFunction) => {
-      const { volunteerId } = req.params;
-      const user_id = req.id;
+  // ===== 관리자 기능 =====
 
-      if (!volunteerId) {
+  // 신고된 내역 전체 조회
+  public getReportedVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const reportedVolunteerComment =
+        await this.volunteerCommentService.readReportedVolunteerComment();
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, reportedVolunteerComment));
+    }
+  );
+
+  // 신고된 내역 반려
+  public patchReportedVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerCommentId } = req.params;
+
+      if (!volunteerCommentId) {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
@@ -108,19 +147,51 @@ class VolunteerCommentController {
         );
       }
 
-      const volunteerList = await this.volunteerCommentService.readPostComment(
-        volunteerId
+      await this.volunteerCommentService.updateReportComment(
+        volunteerCommentId,
+        {
+          isReported: false,
+        }
+      );
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  public deleteReportedVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerCommentId } = req.params;
+
+      if (!volunteerCommentId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const deleteVolunteerComment =
+        await this.volunteerCommentService.deleteReportedVolunteerComment(
+          volunteerCommentId
+        );
+
+      //글 작성한 유저정보 가져오기
+      const reportUser = deleteVolunteerComment.user_id;
+
+      const reportUserData = await this.userService.getUserReportedTimes(
+        reportUser!
       );
 
-      //const userList = await this.
-      //const userList =
-      // const isUpdateComments = volunteerList.map((volunteer) => {
-      //   if (volunteer.user_id === user_id) {
-      //     res.status(STATUS_CODE.OK).json(buildResponse(null, true));
-      //   } else {
-      //     res.status(STATUS_CODE.OK).json(buildResponse(null, false));
-      //   }
-      // });
+      let isDisabledUser;
+
+      if (reportUserData) {
+        isDisabledUser = countReportedTimes(reportUserData);
+      }
+
+      if (isDisabledUser) {
+        await this.userService.updateReportedTimes(reportUser!, isDisabledUser);
+      }
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 }
