@@ -120,20 +120,16 @@ class VolunteerApplicationController {
 
       const { volunteer_id } = req.body;
 
-      //신청한 봉사정보 가져오고
       const volunteerData = await this.volunteerService.readVolunteerById(
         volunteer_id
       );
 
       const applyCount = volunteerData.applyCount;
 
-      // applyCount 업데이트하고
-
       await this.volunteerService.updateVolunteerApplyCount(volunteer_id, {
         applyCount: applyCount - 1,
       });
 
-      //신청한 봉사 삭제하고
       await this.volunteerApplicationService.deleteApplicationVolunteer(
         volunteerApplicationId
       );
