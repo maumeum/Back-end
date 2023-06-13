@@ -12,6 +12,7 @@ import { logger } from '../utils/logger.js';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
 import { AppError } from '../misc/AppError.js';
 import { ObjectId } from 'mongodb';
+import { commonErrors } from '../misc/commonErrors.js';
 class VolunteerApplicationController {
   private volunteerApplicationService =
     makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
@@ -102,6 +103,42 @@ class VolunteerApplicationController {
       }
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerStatus));
+    }
+  );
+
+  public deleteApplicationVolunteer = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerApplicationId } = req.params;
+
+      if (!volunteerApplicationId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const { volunteer_id } = req.body;
+
+      //신청한 봉사정보 가져오고
+      const volunteerData = await this.volunteerService.readVolunteerById(
+        volunteer_id
+      );
+
+      const applyCount = volunteerData.applyCount;
+
+      // applyCount 업데이트하고
+
+      await this.volunteerService.updateVolunteerApplyCount(volunteer_id, {
+        applyCount: applyCount - 1,
+      });
+
+      //신청한 봉사 삭제하고
+      await this.volunteerApplicationService.deleteApplicationVolunteer(
+        volunteerApplicationId
+      );
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
   );
 }

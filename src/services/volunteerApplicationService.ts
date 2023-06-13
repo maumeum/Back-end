@@ -32,7 +32,6 @@ class VolunteerApplicationService {
     return true;
   }
 
-  // 등록한 유저 필요
   public async readApplicationVolunteer(userId: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
@@ -80,6 +79,12 @@ class VolunteerApplicationService {
       volunteer_id: volunteer_id,
     }).select('isParticipate');
     return applicationVolunteerList;
+  }
+
+  public async deleteApplicationVolunteer(volunteerApplicationId: string) {
+    await VolunteerApplicationModel.findByIdAndDelete(volunteerApplicationId);
+
+    return true;
   }
 }
 
