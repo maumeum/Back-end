@@ -33,7 +33,7 @@ class UserService {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     const hashedPassword = await bcrypt.hash(password, CONSTANTS.HASHING_TIMES);
@@ -54,7 +54,7 @@ class UserService {
   //object_id로 유저 찾기 (이메일, 닉네임, 폰)
   public async getUserById(_id: ObjectId) {
     const user = await UserModel.findById({ _id }).select(
-      'email role nickname phone introduction image'
+      'email role nickname phone introduction image authorization',
     );
     return user;
   }
@@ -79,7 +79,7 @@ class UserService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -89,7 +89,7 @@ class UserService {
   // 사용자의 reportedTimes 업데이트하기
   public async updateReportedTimes(
     user_id: Ref<User>,
-    reportedTimes: ReportedTimeData
+    reportedTimes: ReportedTimeData,
   ) {
     const user = await UserModel.findByIdAndUpdate(user_id, reportedTimes);
     return user;
