@@ -28,10 +28,13 @@ class ReviewService {
   }
 
   public async getReviewById(review_id: ObjectId) {
-    const review = await ReviewModel.findById(review_id).populate(
-      'user_id',
-      'nickname'
-    );
+    const review = await ReviewModel.findById(review_id).populate('user_id', [
+      'nickname',
+      'uuid',
+      'role',
+      'nanoid',
+      'reportedTimes',
+    ]);
     return review;
   }
 
@@ -44,13 +47,13 @@ class ReviewService {
     const updatedReview = await ReviewModel.findOneAndUpdate(
       { _id: review_id },
       updateInfo,
-      { new: true }
+      { new: true },
     );
     if (!updatedReview) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     return updatedReview;
@@ -59,14 +62,14 @@ class ReviewService {
   public async updateReportReview(review_id: ObjectId, updateInfo: ReviewData) {
     const updatedReview = await ReviewModel.findByIdAndUpdate(
       review_id,
-      updateInfo
+      updateInfo,
     );
 
     if (!updatedReview) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -79,7 +82,7 @@ class ReviewService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     return createReview;
@@ -123,7 +126,7 @@ class ReviewService {
   // endDate 이후 && 7일 지나기 전, 사용자 본인이 상태를 직접 false => true로 변경하는 코드
   public async changeParticipateStatus(
     volunteer_id: ObjectId,
-    user_id: ObjectId
+    user_id: ObjectId,
   ) {
     const matchedApplyVolunteer = await VolunteerApplicationModel.findOne({
       volunteer_id,
@@ -134,14 +137,14 @@ class ReviewService {
       throw new AppError(
         `${commonErrors.resourceNotFoundError} : 일치하는 데이터 없음.`,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     if (matchedApplyVolunteer.isParticipate) {
       throw new AppError(
         "isParticipate is already in status 'true'",
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     logger.debug(`matchedApplyVolunteer : ${matchedApplyVolunteer}`);
@@ -174,14 +177,14 @@ class ReviewService {
         throw new AppError(
           '조건에 만족하는 요청이 아닙니다. No changes were made',
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
     } else {
       throw new AppError(
         '조건에 만족하는 요청이 아닙니다. No changes were made',
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
   }
@@ -195,7 +198,7 @@ class ReviewService {
 
     for (const apply of applyVolunteer) {
       const volunteer = await VolunteerModel.findById(
-        apply.volunteer_id
+        apply.volunteer_id,
       ).select('endDate statusName');
       logger.debug(`volunteer : ${volunteer}`);
       if (
@@ -226,14 +229,14 @@ class ReviewService {
   public async deleteReportedReview(review_id: ObjectId) {
     const review = await ReviewModel.findByIdAndDelete(review_id).populate(
       'user_id',
-      'reportedTimes'
+      'reportedTimes',
     );
 
     if (!review) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
