@@ -47,7 +47,7 @@ class PostCommentService {
       .populate('user_id', ['nickname', 'uuid', 'authorization'])
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: 1 });
     return postCommentList;
   }
 

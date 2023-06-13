@@ -50,12 +50,27 @@ class VolunteerCommentService {
     return volunteerList;
   }
 
-  public async readPostComment(volunteer_id: string) {
-    const postCommentList = await VolunteerCommentModel.find({
+  public async readVolunteerComment(
+    volunteer_id: string,
+    skip: number,
+    limit: number,
+  ) {
+    const volunteerCommentList = await VolunteerCommentModel.find({
       volunteer_id: volunteer_id,
-    }).populate('user_id', ['nickname', 'uuid', 'authorization']);
+    })
+      .populate('user_id', ['nickname', 'uuid', 'authorization'])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: 1 });
 
-    return postCommentList;
+    return volunteerCommentList;
+  }
+
+  public async totalVolunteerCount(volunteer_id: string) {
+    const counts = await VolunteerCommentModel.countDocuments({
+      volunteer_id: volunteer_id,
+    });
+    return counts;
   }
 
   public async updateComment(
