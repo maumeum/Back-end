@@ -75,7 +75,7 @@ class VolunteerApplicationController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id; //봉사를 신청한 사람
       const { status } = req.query;
-      let volunteerStatus;
+      let volunteerStatus = null;
 
       const applicationVolunteerList =
         await this.volunteerApplicationService.readApplicationVolunteer(
@@ -83,6 +83,8 @@ class VolunteerApplicationController {
         );
 
       //const volunteerStatus :  = statusCondition(status!.toString(), applicationVolunteerList);
+
+      console.log(applicationVolunteerList);
 
       if (status === 'true') {
         volunteerStatus = applicationVolunteerList.filter(

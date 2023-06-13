@@ -49,7 +49,7 @@ class VolunteerApplicationService {
         ],
         populate: {
           path: 'register_user_id',
-          select: ['nickname', 'image'],
+          select: ['nickname', 'image', 'authorization'],
         },
       })
       .exec();
