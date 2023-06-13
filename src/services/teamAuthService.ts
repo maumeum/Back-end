@@ -32,6 +32,11 @@ class TeamAuthService {
     return teamAuth;
   }
 
+  public async readTeamAuthByCondition(condition: {}) {
+    const teamAuth = await TeamAuthModel.find(condition);
+    return teamAuth;
+  }
+
   public async updateTeamAuth(teamAuth_id: ObjectId, updateInfo: teamAuth) {
     const teamAuth = await TeamAuthModel.findOneAndUpdate(
       { _id: teamAuth_id },
