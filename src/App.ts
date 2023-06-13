@@ -34,10 +34,10 @@ mongoose.connect(DB_URL, { dbName: 'maum' });
 const db = mongoose.connection;
 
 db.on('connected', () =>
-  logger.info('정상적으로 MongoDB 서버에 연결되었습니다.'),
+  logger.info('정상적으로 MongoDB 서버에 연결되었습니다.')
 );
 db.on('error', (error) =>
-  logger.info('\nMongoDB 연결에 실패하였습니다...' + '\n' + error),
+  logger.info('\nMongoDB 연결에 실패하였습니다...' + '\n' + error)
 );
 
 app.use('/api', userRouter);
@@ -64,7 +64,6 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     stack: error.stack,
   });
   res.json({
-    res: res,
     name: error.name,
     httpMessage: error.message,
     data: null,

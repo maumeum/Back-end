@@ -30,6 +30,10 @@ interface VolunteerReportData {
   isReported: boolean;
 }
 
+interface VolunteerApplyCountData {
+  applyCount: number;
+}
+
 class VolunteerService {
   public async createVolunteer(volunteerData: VolunteerData) {
     const { deadline, startDate, endDate, applyCount, registerCount } =
@@ -39,7 +43,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.inputError,
         STATUS_CODE.FORBIDDEN,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -47,7 +51,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.inputError,
         STATUS_CODE.FORBIDDEN,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     const createVolunteer = await VolunteerModel.create(volunteerData);
@@ -56,7 +60,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     return createVolunteer;
@@ -93,7 +97,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -125,38 +129,58 @@ class VolunteerService {
   }
 
   public async updateVolunteer(
-    volunteerId: string,
-    volunteerData: VolunteerData,
+    volunteer_id: string,
+    volunteerData: VolunteerData
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
-      volunteerId,
-      volunteerData,
+      volunteer_id,
+      volunteerData
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     return true;
   }
 
-  public async updateRegisterationVolunteer(
-    volunteerId: string,
-    volunteerData: VolunteerStatus,
+  public async updateVolunteerApplyCount(
+    volunteer_id: string,
+    applyCount: VolunteerApplyCountData
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
-      volunteerId,
-      volunteerData,
+      volunteer_id,
+      applyCount
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
+      );
+    }
+
+    return true;
+  }
+
+  public async updateRegisterationVolunteer(
+    volunteerId: string,
+    volunteerData: VolunteerStatus
+  ) {
+    const volunteer = await VolunteerModel.findByIdAndUpdate(
+      volunteerId,
+      volunteerData
+    );
+
+    if (!volunteer) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
       );
     }
 
@@ -165,18 +189,18 @@ class VolunteerService {
 
   public async updateReportVolunteer(
     volunteerId: string,
-    isReported: VolunteerReportData,
+    isReported: VolunteerReportData
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
-      isReported,
+      isReported
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -194,21 +218,19 @@ class VolunteerService {
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    //logger.debug()
-
     return reportedVolunteer;
   }
 
   public async deleteReportedVolunteer(volunteer_id: string) {
     const volunteer = await VolunteerModel.findByIdAndDelete(
-      volunteer_id,
+      volunteer_id
     ).populate('register_user_id', 'reportedTimes');
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 

@@ -23,36 +23,29 @@ class VolunteerApplicationService {
   }: ApplicationVolunteerData) {
     //신청 가능여부 체크
 
-    const result = await this.doubleCheckApplicationVolunteer({
+    await VolunteerApplicationModel.create({
       user_id,
       volunteer_id,
+      isParticipate,
     });
 
-    if (result) {
-      const applicationVolunteer = await VolunteerApplicationModel.create({
-        user_id,
-        volunteer_id,
-        isParticipate,
-      });
-
-      return applicationVolunteer;
-    }
+    return true;
   }
 
+  // 등록한 유저
   public async readApplicationVolunteer(userId: ObjectId) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
-    })
-      .populate('user_id', 'image')
-      .populate('volunteer_id', [
-        'title',
-        'centName',
-        'deadline',
-        'endDate',
-        'startDate',
-        'statusName',
-        'images',
-      ]);
+    }).populate('volunteer_id', [
+      'title',
+      'centName',
+      'deadline',
+      'endDate',
+      'startDate',
+      'statusName',
+      'images',
+      'register_user_id',
+    ]);
 
     return applicationVolunteerList;
   }
@@ -67,14 +60,10 @@ class VolunteerApplicationService {
     });
 
     if (volunteerApplication.length !== 0) {
-      throw new AppError(
-        '이미 신청이 완료된 봉사활동입니다.',
-        STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
-      );
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
