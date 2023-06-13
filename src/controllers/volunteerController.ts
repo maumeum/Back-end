@@ -29,7 +29,7 @@ class VolunteerController {
         const files = req.files as MyFile[];
         logger.debug(files);
         const newPath = files.map((file) => {
-          return file.path.replace('public/', '');
+          return `images/${file.filename}`;
         });
 
         const volunteerData = {

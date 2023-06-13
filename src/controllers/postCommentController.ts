@@ -46,10 +46,10 @@ class PostCommentController {
         Number(skip),
         Number(limit),
       );
-      const totalReviewsCount = await this.postCommentService.totalCommentCount(
+      const totalCommentCount = await this.postCommentService.totalCommentCount(
         postId,
       );
-      const hasMore = Number(skip) + Number(limit) < totalReviewsCount;
+      const hasMore = Number(skip) + Number(limit) < totalCommentCount;
 
       res
         .status(STATUS_CODE.OK)
