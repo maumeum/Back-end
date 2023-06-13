@@ -60,15 +60,25 @@ export class CommunityController {
 
   // 모든 게시물 조회
   public getAllPosts = asyncHandler(async (req: Request, res: Response) => {
-    const posts = await this.communityService.findAllPost();
-    res.status(STATUS_CODE.OK).json(buildResponse(null, posts));
+    const { skip, limit } = req.query;
+
+    const posts = await this.communityService.findAllPost(
+      Number(skip),
+      Number(limit)
+    );
+    const totalReviewsCount = await this.communityService.totalReviewsCount();
+
+    const hasMore = Number(skip) + Number(limit) < totalReviewsCount;
+    res.status(STATUS_CODE.OK).json(buildResponse(null, { posts, hasMore }));
   });
   ////
 
   //keyword 로 게시물 조회
   public searchPost = asyncHandler(async (req: Request, res: Response) => {
     const { keyword, posttype } = req.query;
+    //community/serach?keyword=${keyword}&posttype=findfreind
 
+    // qna findfreind
     const posts = await this.communityService.searchPost(
       keyword as string,
       posttype as string
