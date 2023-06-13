@@ -47,19 +47,34 @@ class VolunteerController {
 
   public getVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { skip, limit } = req.query;
+      const { skip, limit, status } = req.query;
 
       const volunteerList = await this.volunteerService.readVolunteer(
         Number(skip),
         Number(limit)
       );
 
+      let volunteerStatus;
+
+      if (status === 'true') {
+        volunteerStatus = volunteerList.filter((volunteer) => {
+          return volunteer.statusName === '모집중';
+        });
+      } else if (status === 'false') {
+        volunteerStatus = volunteerList.filter((volunteer) => {
+          return (
+            volunteer.statusName === '모집완료' ||
+            volunteer.statusName === '모집중단'
+          );
+        });
+      }
+
       const totalVolunteersCount =
         await this.volunteerService.totalVolunteerCount();
       const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
       res
         .status(STATUS_CODE.OK)
-        .json(buildResponse(null, { volunteerList, hasMore }));
+        .json(buildResponse(null, { volunteerStatus, hasMore }));
     }
   );
 

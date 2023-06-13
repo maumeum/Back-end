@@ -69,8 +69,9 @@ class VolunteerService {
   public async readVolunteer(skip: number, limit: number) {
     const volunteerList = await VolunteerModel.find({})
       .select(
-        'title centName deadline statusName applyCount registerCount images register_user_id'
+        'title centName deadline statusName applyCount registerCount images'
       )
+      .populate('register_user_id', ['image', 'nickname'])
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });

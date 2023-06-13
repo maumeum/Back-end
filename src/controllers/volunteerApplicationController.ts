@@ -13,6 +13,8 @@ import { Volunteer } from '../db/schemas/volunteerSchema.js';
 import { AppError } from '../misc/AppError.js';
 import { ObjectId } from 'mongodb';
 import { commonErrors } from '../misc/commonErrors.js';
+import { statusCondition } from '../utils/volunteerStatusDivide.js';
+
 class VolunteerApplicationController {
   private volunteerApplicationService =
     makeInstance<VolunteerApplicationService>(VolunteerApplicationService);
@@ -79,6 +81,8 @@ class VolunteerApplicationController {
         await this.volunteerApplicationService.readApplicationVolunteer(
           user_id
         );
+
+      //const volunteerStatus :  = statusCondition(status!.toString(), applicationVolunteerList);
 
       if (status === 'true') {
         volunteerStatus = applicationVolunteerList.filter(
