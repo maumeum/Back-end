@@ -62,10 +62,26 @@ class VolunteerService {
     return createVolunteer;
   }
 
-  public async readVolunteer() {
-    const volunteerList = await VolunteerModel.find({});
+  public async readVolunteer(skip: number, limit: number) {
+    const volunteerList = await VolunteerModel.find({})
+      .select(
+        'title centName deadline statusName applyCount registerCount images register_user_id'
+      )
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
+  }
+
+  public async totalVolunteerCount() {
+    const counts = await VolunteerModel.countDocuments();
+    return counts;
+  }
+
+  public async totalReportedVolunteerCount() {
+    const counts = await VolunteerModel.countDocuments({ isReported: true });
+    return counts;
   }
 
   public async readVolunteerById(volunteerId: string) {
@@ -169,10 +185,17 @@ class VolunteerService {
 
   // ===== 관리자 기능 =====
 
-  public async readReportedVolunteer() {
+  public async readReportedVolunteer(skip: number, limit: number) {
     const reportedVolunteer = await VolunteerModel.find({
       isReported: true,
-    }).select('title content');
+    })
+      .select('title content')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    //logger.debug()
+
     return reportedVolunteer;
   }
 
