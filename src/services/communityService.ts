@@ -87,18 +87,22 @@ export class CommunityService {
 
   public async updateReportPost(
     communityId: string,
-    communityData: communityReportData
+    communityData: communityReportData,
   ) {
     const community = await PostModel.findByIdAndUpdate(
       communityId,
-      communityData
+      communityData,
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
+<<<<<<< HEAD
+        'BAD_REQUEST',
+=======
         "BAD_REQUEST"
+>>>>>>> 15772cdbaba159d63e6fef53bb82a949f66ef9e4
       );
     }
 
@@ -123,7 +127,7 @@ export class CommunityService {
       content: string;
       images?: string;
       postType: string;
-    }
+    },
   ) {
     return await PostModel.findOneAndUpdate(
       { _id: id },
@@ -133,11 +137,15 @@ export class CommunityService {
         images,
         postType,
       },
-      { new: true }
+      { new: true },
     );
   }
   public async getUserPosts(id: string) {
-    return await PostModel.find({ user_id: id });
+    return await PostModel.find({ user_id: id }).populate('user_id', [
+      'nickname',
+      'authorization',
+      'uuid',
+    ]);
   }
 
   // ===== 관리자 기능 =====
@@ -151,15 +159,24 @@ export class CommunityService {
   }
   public async deleteReportedCommunity(community_id: string) {
     const community = await PostModel.findByIdAndDelete(community_id).populate(
+<<<<<<< HEAD
+      'user_id',
+      'reportedTimes',
+=======
       "user_id",
       "reportedTimes"
+>>>>>>> 15772cdbaba159d63e6fef53bb82a949f66ef9e4
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
+<<<<<<< HEAD
+        'BAD_REQUEST',
+=======
         "BAD_REQUEST"
+>>>>>>> 15772cdbaba159d63e6fef53bb82a949f66ef9e4
       );
     }
 
