@@ -28,9 +28,24 @@ class ReviewService {
   }
 
   public async getRandomReviews() {
-    const randomReviews = await ReviewModel.aggregate([
-      { $sample: { size: CONSTANTS.RANDOM_REVIEWS } },
-    ]);
+    const reviewCount = await ReviewModel.countDocuments();
+    const randomIndexes: number[] = [];
+    while (randomIndexes.length < CONSTANTS.RANDOM_REVIEWS) {
+      const randomIndex = Math.floor(Math.random() * reviewCount);
+      if (!randomIndexes.includes(randomIndex)) {
+        randomIndexes.push(randomIndex);
+      }
+    }
+
+    // 랜덤한 인덱스에 해당하는 리뷰를 조회하고 사용자 정보를 populate
+    const randomReviews = await ReviewModel.find()
+      .skip(randomIndexes[0])
+      .limit(CONSTANTS.RANDOM_REVIEWS)
+      .populate({
+        path: 'user_id',
+        select: 'nickname nanoid uuid authorization image',
+      });
+
     return randomReviews;
   }
 
