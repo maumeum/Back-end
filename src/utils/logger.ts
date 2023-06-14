@@ -32,8 +32,6 @@ if (currentEnvironment === 'production') {
       maxFiles: maxFiles,
     }),
   );
-} else {
-  // 프로덕션 환경이 아닌 경우, 콘솔에 출력하는 transport를 추가합니다
   loggerTransports.push(
     new transports.Console({
       level: 'info',
@@ -50,6 +48,24 @@ if (currentEnvironment === 'production') {
       ),
     }),
   );
+} else {
+  // 프로덕션 환경이 아닌 경우, 콘솔에 출력하는 transport를 추가합니다
+  // loggerTransports.push(
+  //   new transports.Console({
+  //     level: 'info',
+  //     format: format.combine(
+  //       format.label({ label: '[maum-eum]' }),
+  //       format.timestamp({
+  //         format: 'YYYY-MM-DD HH:mm:ss',
+  //       }),
+  //       format.colorize(),
+  //       format.printf(
+  //         (info: TransformableInfo) =>
+  //           `${info.timestamp} - ${info.level}: ${info.label} ${info.message}`,
+  //       ),
+  //     ),
+  //   }),
+  // );
 
   loggerTransports.push(
     new transports.Console({
