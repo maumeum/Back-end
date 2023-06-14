@@ -55,7 +55,6 @@ export class CommunityService {
       .limit(limit)
       .sort({ createdAt: -1 })
       .populate("user_id", ["nickname", "uuid"]);
-
     return posts;
   }
   //수정한곳
@@ -64,7 +63,8 @@ export class CommunityService {
     return await PostModel.find({ postType: category })
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("user_id", ["nickname", "uuid"]);
   }
 
   public async searchPost(keyword: string, posttype: string) {
@@ -116,6 +116,9 @@ export class CommunityService {
   }
   public async totalReviewsCount() {
     return await PostModel.countDocuments();
+  }
+  public async totalCategoryReviewsCount(category: string) {
+    return await PostModel.find({ postTyp: category }).countDocuments();
   }
 
   public async findOneAndUpdate(
