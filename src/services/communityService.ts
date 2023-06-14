@@ -83,7 +83,8 @@ export class CommunityService {
     const post = await PostModel.findOne({ _id: id })
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("user_id", ["nickname", "nanoid"]);
     const user = await UserModel.findOne({ _id: post!.user_id });
     const total = {
       user: user!.nickname,
