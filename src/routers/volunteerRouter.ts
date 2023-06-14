@@ -20,12 +20,14 @@ volunteerRouter.post(
 
 // 쿼리스트링 : req.query.keyword 형태로 가져옴
 // keyword가 포함된 봉사활동 글 검색
+// skip, limit
 volunteerRouter.get(
   '/volunteers/search',
   volunteerController.getSearchVolunteer
 );
 
 //사용자가 등록한 봉사활동 전체 조회
+// skip, limit
 volunteerRouter.get(
   '/volunteers/registerations',
   loginRequired,
@@ -46,6 +48,7 @@ volunteerRouter.get(
 );
 
 //전체 봉사활동 정보조회
+// skip, limit
 volunteerRouter.get('/volunteers', volunteerController.getVolunteer);
 
 // 특정 봉사활동 정보수정
@@ -75,6 +78,7 @@ volunteerRouter.patch(
 //adminOnly 추가 예정(테스트 때문에 잠시 빼둠)
 
 // 신고받은 게시글 전체 조회
+// skip, limit
 volunteerRouter.get(
   '/volunteers/admins/reports',
   adminOnly,

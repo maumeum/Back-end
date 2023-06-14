@@ -1,9 +1,10 @@
 import { ObjectId } from 'mongodb';
-import { VolunteerModel } from '../db/index.js';
+import { VolunteerApplicationModel, VolunteerModel } from '../db/index.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { logger } from '../utils/logger.js';
+import { searchOption } from '../utils/searchOptions.js';
 
 interface VolunteerData {
   title: string;
@@ -42,6 +43,13 @@ interface VolunteerApplyCountData {
   applyCount: number;
 }
 
+type VolunteerConditionData = {
+  options?: Array<{ [key: string]: { $regex: string } }>;
+  user_id?: ObjectId;
+  isReported?: boolean;
+  statusName?: string | { $in: string[] };
+};
+
 class VolunteerService {
   public async createVolunteer(volunteerData: VolunteerData) {
     const { deadline, startDate, endDate, applyCount, registerCount } =
@@ -51,7 +59,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.inputError,
         STATUS_CODE.FORBIDDEN,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -59,7 +67,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.inputError,
         STATUS_CODE.FORBIDDEN,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     const createVolunteer = await VolunteerModel.create(volunteerData);
@@ -68,16 +76,20 @@ class VolunteerService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     return createVolunteer;
   }
 
-  public async readVolunteer(skip: number, limit: number) {
-    const volunteerList = await VolunteerModel.find({})
+  public async readVolunteer(
+    skip: number,
+    limit: number,
+    statusName: string | { $in: string[] }
+  ) {
+    const volunteerList = await VolunteerModel.find({ statusName: statusName })
       .select(
-        'title centName deadline statusName applyCount registerCount images',
+        'title centName deadline statusName applyCount registerCount images'
       )
       .populate('register_user_id', ['image', 'nickname'])
       .skip(skip)
@@ -87,6 +99,26 @@ class VolunteerService {
     return volunteerList;
   }
 
+  public async getPostListQueryBuilder(condition: VolunteerConditionData) {
+    let counts = 0;
+    if (condition.options) {
+      counts = await VolunteerModel.countDocuments({ $or: condition.options });
+    } else if (condition.user_id) {
+      counts = await VolunteerModel.countDocuments({
+        register_user_id: condition.user_id,
+      });
+    } else if (condition.isReported) {
+      counts = await VolunteerModel.countDocuments({
+        isReported: condition.isReported,
+      });
+    } else if (condition.statusName) {
+      counts = await VolunteerModel.countDocuments({
+        statusName: condition.statusName,
+      });
+    }
+
+    return counts;
+  }
   //전체 토탈
   public async totalVolunteerCount() {
     const counts = await VolunteerModel.countDocuments();
@@ -108,7 +140,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -118,12 +150,10 @@ class VolunteerService {
   public async readSearchVolunteer(
     keyword: string,
     skip: number,
-    limit: number,
+    limit: number
   ) {
-    const options = [
-      { title: { $regex: `${keyword}` } },
-      { content: { $regex: `${keyword}` } },
-    ];
+    const options = searchOption(keyword);
+
     const volunteerList = await VolunteerModel.find({
       $or: options,
     })
@@ -137,7 +167,7 @@ class VolunteerService {
   public async readRegistrationVolunteer(
     user_id: ObjectId,
     skip: number,
-    limit: number,
+    limit: number
   ) {
     const volunteerList = await VolunteerModel.find({
       register_user_id: user_id,
@@ -152,18 +182,18 @@ class VolunteerService {
 
   public async updateVolunteer(
     volunteer_id: string,
-    volunteerData: VolunteerData,
+    volunteerData: VolunteerData
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteer_id,
-      volunteerData,
+      volunteerData
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
     return true;
@@ -171,18 +201,18 @@ class VolunteerService {
 
   public async updateVolunteerApplyCount(
     volunteer_id: string,
-    applyCount: VolunteerApplyCountData,
+    applyCount: VolunteerApplyCountData
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteer_id,
-      applyCount,
+      applyCount
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -191,18 +221,18 @@ class VolunteerService {
 
   public async updateRegisterationVolunteer(
     volunteerId: string,
-    volunteerData: VolunteerStatus,
+    volunteerData: VolunteerStatus
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
-      volunteerData,
+      volunteerData
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -211,18 +241,18 @@ class VolunteerService {
 
   public async updateReportVolunteer(
     volunteerId: string,
-    isReported: VolunteerReportData,
+    isReported: VolunteerReportData
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
-      isReported,
+      isReported
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -245,14 +275,14 @@ class VolunteerService {
 
   public async deleteReportedVolunteer(volunteer_id: string) {
     const volunteer = await VolunteerModel.findByIdAndDelete(
-      volunteer_id,
+      volunteer_id
     ).populate('register_user_id', 'reportedTimes');
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
