@@ -106,16 +106,21 @@ class ReviewController {
       });
 
       const volunteer =
-        await this.volunteerApplicationService.readApplicationVolunteerByVId(
-          volunteer_id,
+        await this.volunteerApplicationService.readApplicationVolunteerByCondition(
+          { user_id, volunteer_id },
         );
       logger.debug(`volunteer : ${volunteer}`);
 
-      if (!volunteer[0].isParticipate) {
+      const checkedReview = await this.reviewService.getReviewByCondition({
+        user_id: user_id,
+        volunteer_id: volunteer_id,
+      });
+      console.log(volunteer);
+      if (!volunteer || !volunteer.isParticipate) {
         throw new AppError(
           `${commonErrors.requestValidationError} : 참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.`,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST  참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.',
         );
       }
 
@@ -126,6 +131,16 @@ class ReviewController {
         images: newPath,
         volunteer_id,
       });
+
+      const applicationVolunteer =
+        await this.volunteerApplicationService.readApplicationVolunteerByCondition(
+          { user_id, volunteer_id },
+        );
+
+      if (applicationVolunteer) {
+        applicationVolunteer.isReviewed = true;
+        await applicationVolunteer.save();
+      }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, createdReview));
     },
