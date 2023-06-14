@@ -25,6 +25,13 @@ userRouter.get('/users/info', loginRequired, userController.getUser);
 //사용자 정보 수정 (닉네임, 휴대전화번호, 비밀번호)
 userRouter.patch('/users/info', loginRequired, userController.updateUserInfo);
 
+//사용자의 팀 인증여부 확인
+userRouter.get(
+  '/users/teamAuth',
+  loginRequired,
+  userController.checkTeamAuthorization,
+);
+
 //사용자 정보 수정 (자기소개)
 userRouter.patch(
   '/users/introduction',

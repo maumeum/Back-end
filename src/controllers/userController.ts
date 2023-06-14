@@ -84,6 +84,23 @@ class UserController {
     },
   );
 
+  //팀인증된 유저인지 판별하는 함수
+  public checkTeamAuthorization = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const user_id = req.id;
+      const user = await this.userService.getUserById(user_id);
+      if (user?.authorization === false) {
+        throw new AppError(
+          commonErrors.authorizationError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST : 팀 인증된 유저가 아닙니다. 인증을 먼저 받아주세요.',
+        );
+      }
+
+      res.status(STATUS_CODE.OK).json(buildResponse(null, null));
+    },
+  );
+
   //유저 정보 조회
   public getUser = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
