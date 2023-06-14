@@ -159,7 +159,13 @@ export class CommunityController {
         Number(skip),
         Number(limit)
       );
-      res.status(STATUS_CODE.OK).json(buildResponse(null, categoryPost));
+      const totalReviewsCount =
+        await this.communityService.totalCategoryReviewsCount(category);
+
+      const hasMore = Number(skip) + Number(limit) < totalReviewsCount;
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { categoryPost, hasMore }));
     }
   );
 
