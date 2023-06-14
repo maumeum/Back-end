@@ -25,7 +25,7 @@ class PostCommentService {
   public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
-      ['title', 'content', 'postType', 'createdAt', 'authorization'],
+      ['title', 'content', 'postType', 'createdAt', 'authorization']
     );
 
     if (userComments.length === 0) {
@@ -58,18 +58,18 @@ class PostCommentService {
 
   public async updateComment(
     postCommentId: string,
-    postCommentData: PostCommentData,
+    postCommentData: PostCommentData
   ) {
     const newPostComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
-      postCommentData,
+      postCommentData
     );
 
     if (!newPostComment) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -78,18 +78,18 @@ class PostCommentService {
 
   public async updateReportComment(
     postCommentId: string,
-    isReported: PostReportData,
+    isReported: PostReportData
   ) {
     const newReportComment = await PostCommentModel.findByIdAndUpdate(
       postCommentId,
-      isReported,
+      isReported
     );
 
     if (!newReportComment) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -98,14 +98,14 @@ class PostCommentService {
 
   public async deleteComment(postCommentId: string) {
     const deletePostComment = await PostCommentModel.findByIdAndDelete(
-      postCommentId,
+      postCommentId
     );
 
     if (!deletePostComment) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -116,21 +116,21 @@ class PostCommentService {
   public async readReportedPostComment() {
     const reportedPostComment = await PostCommentModel.find({
       isReported: true,
-    }).select('title content');
+    }).select('title content post_id');
 
     return reportedPostComment;
   }
 
   public async deleteReportedPostComment(postComment_id: string) {
     const postComment = await PostCommentModel.findByIdAndDelete(
-      postComment_id,
+      postComment_id
     ).populate('user_id', 'reportedTimes');
 
     if (!postComment) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
