@@ -25,25 +25,36 @@ class PostCommentController {
       await this.postCommentService.createComment(postData);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public getComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { postId } = req.params;
+      const { skip, limit } = req.query;
 
       if (!postId) {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
-      const postCommentList = await this.postCommentService.readComment(postId);
+      const postCommentList = await this.postCommentService.readComment(
+        postId,
+        Number(skip),
+        Number(limit),
+      );
+      const totalCommentCount = await this.postCommentService.totalCommentCount(
+        postId,
+      );
+      const hasMore = Number(skip) + Number(limit) < totalCommentCount;
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, postCommentList));
-    }
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { postCommentList, hasMore }));
+    },
   );
 
   public getPostByComment = asyncHandler(
@@ -51,11 +62,11 @@ class PostCommentController {
       const user_id = req.id;
 
       const postComment = await this.postCommentService.readPostByComment(
-        user_id
+        user_id,
       );
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, postComment));
-    }
+    },
   );
 
   public patchComment = asyncHandler(
@@ -66,18 +77,18 @@ class PostCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       const postCommentData = req.body;
 
       await this.postCommentService.updateComment(
         postCommentId,
-        postCommentData
+        postCommentData,
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public patchReportComment = asyncHandler(
@@ -88,7 +99,7 @@ class PostCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -97,7 +108,7 @@ class PostCommentController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public deleteComment = asyncHandler(
@@ -108,14 +119,14 @@ class PostCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
       await this.postCommentService.deleteComment(postCommentId);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   // ===== 관리자 기능 =====
@@ -127,7 +138,7 @@ class PostCommentController {
         await this.postCommentService.readReportedPostComment();
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, reportedPostComment));
-    }
+    },
   );
 
   public patchReportedPostComment = asyncHandler(
@@ -138,7 +149,7 @@ class PostCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -146,7 +157,7 @@ class PostCommentController {
         isReported: false,
       });
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public deleteReportedPostComment = asyncHandler(
@@ -157,7 +168,7 @@ class PostCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -168,7 +179,7 @@ class PostCommentController {
       const reportUser = deletePostComment.user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
-        reportUser!
+        reportUser!,
       );
 
       let isDisabledUser;
@@ -182,7 +193,7 @@ class PostCommentController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 }
 

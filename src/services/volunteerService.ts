@@ -16,7 +16,15 @@ interface VolunteerData {
   endDate: Date;
   applyCount: number;
   registerCount: number;
-  actType: string;
+  actType:
+    | '노인'
+    | '급식'
+    | '환경'
+    | '동물'
+    | '장애인'
+    | '생활편의지원'
+    | '의료'
+    | '교육';
   teenager: boolean;
   images: string[];
   register_user_id: ObjectId;
@@ -30,6 +38,10 @@ interface VolunteerReportData {
   isReported: boolean;
 }
 
+interface VolunteerApplyCountData {
+  applyCount: number;
+}
+
 class VolunteerService {
   public async createVolunteer(volunteerData: VolunteerData) {
     const { deadline, startDate, endDate, applyCount, registerCount } =
@@ -39,7 +51,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.inputError,
         STATUS_CODE.FORBIDDEN,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -47,7 +59,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.inputError,
         STATUS_CODE.FORBIDDEN,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     const createVolunteer = await VolunteerModel.create(volunteerData);
@@ -56,16 +68,35 @@ class VolunteerService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     return createVolunteer;
   }
 
-  public async readVolunteer() {
-    const volunteerList = await VolunteerModel.find({});
+  public async readVolunteer(skip: number, limit: number) {
+    const volunteerList = await VolunteerModel.find({})
+      .select(
+        'title centName deadline statusName applyCount registerCount images',
+      )
+      .populate('register_user_id', ['image', 'nickname'])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
+  }
+
+  //전체 토탈
+  public async totalVolunteerCount() {
+    const counts = await VolunteerModel.countDocuments();
+    return counts;
+  }
+
+  //관리자 토탈
+  public async totalReportedVolunteerCount() {
+    const counts = await VolunteerModel.countDocuments({ isReported: true });
+    return counts;
   }
 
   public async readVolunteerById(volunteerId: string) {
@@ -77,70 +108,101 @@ class VolunteerService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
     return volunteer;
   }
 
-  public async readSearchVolunteer(keyword: string) {
+  public async readSearchVolunteer(
+    keyword: string,
+    skip: number,
+    limit: number,
+  ) {
     const options = [
       { title: { $regex: `${keyword}` } },
       { content: { $regex: `${keyword}` } },
     ];
     const volunteerList = await VolunteerModel.find({
       $or: options,
-    });
-
-    if (volunteerList.length === 0) {
-      return [];
-    }
+    })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
   }
 
-  public async readRegistrationVolunteer(user_id: ObjectId) {
+  public async readRegistrationVolunteer(
+    user_id: ObjectId,
+    skip: number,
+    limit: number,
+  ) {
     const volunteerList = await VolunteerModel.find({
       register_user_id: user_id,
-    }).populate('register_user_id');
+    })
+      .populate('register_user_id')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
   }
 
   public async updateVolunteer(
-    volunteerId: string,
-    volunteerData: VolunteerData
+    volunteer_id: string,
+    volunteerData: VolunteerData,
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
-      volunteerId,
-      volunteerData
+      volunteer_id,
+      volunteerData,
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     return true;
   }
 
-  public async updateRegisterationVolunteer(
-    volunteerId: string,
-    volunteerData: VolunteerStatus
+  public async updateVolunteerApplyCount(
+    volunteer_id: string,
+    applyCount: VolunteerApplyCountData,
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
-      volunteerId,
-      volunteerData
+      volunteer_id,
+      applyCount,
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
+      );
+    }
+
+    return true;
+  }
+
+  public async updateRegisterationVolunteer(
+    volunteerId: string,
+    volunteerData: VolunteerStatus,
+  ) {
+    const volunteer = await VolunteerModel.findByIdAndUpdate(
+      volunteerId,
+      volunteerData,
+    );
+
+    if (!volunteer) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST',
       );
     }
 
@@ -149,18 +211,18 @@ class VolunteerService {
 
   public async updateReportVolunteer(
     volunteerId: string,
-    isReported: VolunteerReportData
+    isReported: VolunteerReportData,
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
-      isReported
+      isReported,
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -169,23 +231,28 @@ class VolunteerService {
 
   // ===== 관리자 기능 =====
 
-  public async readReportedVolunteer() {
+  public async readReportedVolunteer(skip: number, limit: number) {
     const reportedVolunteer = await VolunteerModel.find({
       isReported: true,
-    }).select('title content');
+    })
+      .select('title content')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
     return reportedVolunteer;
   }
 
   public async deleteReportedVolunteer(volunteer_id: string) {
     const volunteer = await VolunteerModel.findByIdAndDelete(
-      volunteer_id
+      volunteer_id,
     ).populate('register_user_id', 'reportedTimes');
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 

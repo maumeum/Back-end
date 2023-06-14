@@ -25,33 +25,74 @@ class VolunteerController {
       const register_user_id = req.id;
       const volunteerBodyData = req.body;
 
+      const register_user = await this.userService.getUserById(
+        register_user_id,
+      );
+      if (register_user?.authorization === false) {
+        throw new AppError(
+          commonErrors.authenticationError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST: 팀인증을 받지 못한 유저입니다. 팀 인증을 먼저 받아주세요.',
+        );
+      }
+
+      let volunteerData;
       if (req.files) {
         const files = req.files as MyFile[];
         logger.debug(files);
         const newPath = files.map((file) => {
-          return file.path.replace('public/', '');
+          return `images/${file.filename}`;
         });
 
-        const volunteerData = {
+        volunteerData = {
           ...volunteerBodyData,
           images: newPath,
           register_user_id,
         };
-
-        await this.volunteerService.createVolunteer(volunteerData);
+      } else {
+        volunteerData = {
+          ...volunteerBodyData,
+          register_user_id,
+        };
       }
 
+      console.log(volunteerData);
+      await this.volunteerService.createVolunteer(volunteerData);
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public getVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const volunteerList = await this.volunteerService.readVolunteer();
+      const { skip, limit, status } = req.query;
 
-      console.log(volunteerList);
-      res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerList));
-    }
+      const volunteerList = await this.volunteerService.readVolunteer(
+        Number(skip),
+        Number(limit),
+      );
+
+      let volunteerStatus;
+
+      if (status === 'true') {
+        volunteerStatus = volunteerList.filter((volunteer) => {
+          return volunteer.statusName === '모집중';
+        });
+      } else if (status === 'false') {
+        volunteerStatus = volunteerList.filter((volunteer) => {
+          return (
+            volunteer.statusName === '모집완료' ||
+            volunteer.statusName === '모집중단'
+          );
+        });
+      }
+
+      const totalVolunteersCount =
+        await this.volunteerService.totalVolunteerCount();
+      const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { volunteerStatus, hasMore }));
+    },
   );
 
   public getCheckUser = asyncHandler(
@@ -60,7 +101,7 @@ class VolunteerController {
       const user_id = req.id;
 
       const volunteer = await this.volunteerService.readVolunteerById(
-        volunteerId
+        volunteerId,
       );
 
       logger.debug(String(user_id));
@@ -71,7 +112,7 @@ class VolunteerController {
       } else {
         res.status(STATUS_CODE.OK).json(buildResponse(null, false));
       }
-    }
+    },
   );
 
   public getVolunteerById = asyncHandler(
@@ -82,43 +123,59 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       const volunteer = await this.volunteerService.readVolunteerById(
-        volunteerId
+        volunteerId,
       );
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, volunteer));
-    }
+    },
   );
 
   public getSearchVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { keyword } = req.query;
+      const { keyword, skip, limit } = req.query;
 
       const searchVolunteers = await this.volunteerService.readSearchVolunteer(
-        keyword as string
+        keyword as string,
+        Number(skip),
+        Number(limit),
       );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
-    }
+      const totalVolunteerCount =
+        await this.volunteerService.totalVolunteerCount();
+
+      const hasMore = Number(skip) + Number(limit) < totalVolunteerCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { searchVolunteers, hasMore }));
+    },
   );
 
   public getRegisterationVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
       const user_id = req.id;
-
-      console.log(user_id);
-      console.log(typeof user_id);
-
       const registerationVolunteers =
-        await this.volunteerService.readRegistrationVolunteer(user_id);
+        await this.volunteerService.readRegistrationVolunteer(
+          user_id,
+          Number(skip),
+          Number(limit),
+        );
+
+      const totalRegisterationVolunnter =
+        await this.volunteerService.totalReportedVolunteerCount();
+
+      const hasMore =
+        Number(skip) + Number(limit) < totalRegisterationVolunnter;
 
       res
         .status(STATUS_CODE.OK)
-        .json(buildResponse(null, registerationVolunteers));
-    }
+        .json(buildResponse(null, { registerationVolunteers, hasMore }));
+    },
   );
 
   public patchVolunteer = asyncHandler(
@@ -130,7 +187,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -145,7 +202,7 @@ class VolunteerController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public patchRegisterationStatusName = asyncHandler(
@@ -156,7 +213,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -164,11 +221,11 @@ class VolunteerController {
 
       await this.volunteerService.updateRegisterationVolunteer(
         volunteerId,
-        volunteerData
+        volunteerData,
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public patchReportVolunteer = asyncHandler(
@@ -179,7 +236,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -188,7 +245,7 @@ class VolunteerController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   // ===== 관리자 기능 =====
@@ -196,11 +253,22 @@ class VolunteerController {
   // 신고된 내역 전체 조회
   public getReportedVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
       const reportedVolunteer =
-        await this.volunteerService.readReportedVolunteer();
+        await this.volunteerService.readReportedVolunteer(
+          Number(skip),
+          Number(limit),
+        );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, reportedVolunteer));
-    }
+      const totalVolunteersCount =
+        await this.volunteerService.totalReportedVolunteerCount();
+
+      const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { reportedVolunteer, hasMore }));
+    },
   );
 
   // 신고된 내역 반려
@@ -212,7 +280,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -221,7 +289,7 @@ class VolunteerController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   // 신고된 내역 승인
@@ -233,7 +301,7 @@ class VolunteerController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -245,7 +313,7 @@ class VolunteerController {
       const reportUser = deleteVolunteer.register_user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
-        reportUser!
+        reportUser!,
       );
 
       let isDisabledUser;
@@ -259,7 +327,7 @@ class VolunteerController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 }
 export { VolunteerController };

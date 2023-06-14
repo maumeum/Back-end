@@ -10,7 +10,7 @@ import { countReportedTimes } from '../utils/reportedTimesData.js';
 
 class VolunteerCommentController {
   private volunteerCommentService = makeInstance<VolunteerCommentService>(
-    VolunteerCommentService
+    VolunteerCommentService,
   );
 
   private userService = makeInstance<UserService>(UserService);
@@ -28,7 +28,7 @@ class VolunteerCommentController {
       await this.volunteerCommentService.createComment(volunteerData);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public getVolunteerByComment = asyncHandler(
@@ -38,27 +38,37 @@ class VolunteerCommentController {
         await this.volunteerCommentService.readVolunteerByComment(user_id);
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerComment));
-    }
+    },
   );
 
   public getPostComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
+      const { skip, limit } = req.query;
 
       if (!volunteerId) {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
-      const commentList = await this.volunteerCommentService.readPostComment(
-        volunteerId
-      );
+      const volunteerCommentList =
+        await this.volunteerCommentService.readVolunteerComment(
+          volunteerId,
+          Number(skip),
+          Number(limit),
+        );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, commentList));
-    }
+      const totalVolunteerCount =
+        await this.volunteerCommentService.totalVolunteerCount(volunteerId);
+      const hasMore = Number(skip) + Number(limit) < totalVolunteerCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { volunteerCommentList, hasMore }));
+    },
   );
 
   public patchComment = asyncHandler(
@@ -69,17 +79,17 @@ class VolunteerCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       const volunteerCommentData = req.body;
       await this.volunteerCommentService.updateComment(
         volunteerCommentId,
-        volunteerCommentData
+        volunteerCommentData,
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public patchReportComment = asyncHandler(
@@ -90,17 +100,17 @@ class VolunteerCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
       await this.volunteerCommentService.updateReportComment(
         volunteerCommentId,
-        { isReported: true }
+        { isReported: true },
       );
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public deleteComment = asyncHandler(
@@ -111,13 +121,13 @@ class VolunteerCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       await this.volunteerCommentService.deleteComment(volunteerCommentId);
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   // ===== 관리자 기능 =====
@@ -131,7 +141,7 @@ class VolunteerCommentController {
       res
         .status(STATUS_CODE.OK)
         .json(buildResponse(null, reportedVolunteerComment));
-    }
+    },
   );
 
   // 신고된 내역 반려
@@ -143,7 +153,7 @@ class VolunteerCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -151,10 +161,10 @@ class VolunteerCommentController {
         volunteerCommentId,
         {
           isReported: false,
-        }
+        },
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public deleteReportedVolunteerComment = asyncHandler(
@@ -165,20 +175,20 @@ class VolunteerCommentController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
       const deleteVolunteerComment =
         await this.volunteerCommentService.deleteReportedVolunteerComment(
-          volunteerCommentId
+          volunteerCommentId,
         );
 
       //글 작성한 유저정보 가져오기
       const reportUser = deleteVolunteerComment.user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
-        reportUser!
+        reportUser!,
       );
 
       let isDisabledUser;
@@ -192,7 +202,7 @@ class VolunteerCommentController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 }
 

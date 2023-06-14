@@ -25,7 +25,7 @@ class PostCommentService {
   public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id }).populate(
       'post_id',
-      ['title', 'content', 'postType', 'createdAt']
+      ['title', 'content', 'postType', 'createdAt', 'authorization']
     );
 
     if (userComments.length === 0) {
@@ -40,11 +40,26 @@ class PostCommentService {
     return postList;
   }
 
-  public async readComment(post_id: string) {
+  public async readComment(post_id: string, skip: number, limit: number) {
     const postCommentList = await PostCommentModel.find({
       post_id: post_id,
-    }).populate('user_id', ['nickname', 'uuid']);
+    })
+      .populate('user_id', ['nickname', 'uuid', 'authorization', 'nanoid'])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: 1 });
     return postCommentList;
+  }
+
+  public async readCommentByPostId(post_id: string) {
+    const postCommentList = await PostCommentModel.find({ post_id: post_id });
+
+    return postCommentList;
+  }
+
+  public async totalCommentCount(post_id: string) {
+    const counts = await PostCommentModel.countDocuments({ post_id: post_id });
+    return counts;
   }
 
   public async updateComment(
@@ -103,11 +118,17 @@ class PostCommentService {
     return deletePostComment;
   }
 
+  public async deleteComments(postId: string) {
+    await PostCommentModel.deleteMany({
+      postId: postId,
+    });
+  }
+
   // ===== 관리자 기능 =====
   public async readReportedPostComment() {
     const reportedPostComment = await PostCommentModel.find({
       isReported: true,
-    }).select('title content');
+    }).select('title content post_id');
 
     return reportedPostComment;
   }

@@ -10,7 +10,7 @@ interface TransformableInfo {
 const maxFiles = 5;
 
 // 환경 변수를 통해 현재 환경을 가져옵니다 (예: development, production)
-const currentEnvironment = process.env.LOGGER;
+const currentEnvironment = process.env.NODE_ENV;
 const loggerTransports = [];
 
 // 프로덕션 환경인 경우
@@ -32,8 +32,6 @@ if (currentEnvironment === 'production') {
       maxFiles: maxFiles,
     }),
   );
-} else {
-  // 프로덕션 환경이 아닌 경우, 콘솔에 출력하는 transport를 추가합니다
   loggerTransports.push(
     new transports.Console({
       level: 'info',
@@ -50,6 +48,24 @@ if (currentEnvironment === 'production') {
       ),
     }),
   );
+} else {
+  // 프로덕션 환경이 아닌 경우, 콘솔에 출력하는 transport를 추가합니다
+  // loggerTransports.push(
+  //   new transports.Console({
+  //     level: 'info',
+  //     format: format.combine(
+  //       format.label({ label: '[maum-eum]' }),
+  //       format.timestamp({
+  //         format: 'YYYY-MM-DD HH:mm:ss',
+  //       }),
+  //       format.colorize(),
+  //       format.printf(
+  //         (info: TransformableInfo) =>
+  //           `${info.timestamp} - ${info.level}: ${info.label} ${info.message}`,
+  //       ),
+  //     ),
+  //   }),
+  // );
 
   loggerTransports.push(
     new transports.Console({

@@ -1,15 +1,16 @@
-import { Request, Response } from "express";
-import { CommunityService } from "../services/communityService.js";
-import fs from "fs";
-import { asyncHandler } from "../middlewares/asyncHandler.js";
-import { STATUS_CODE } from "../utils/statusCode.js";
-import { buildResponse } from "../utils/builderResponse.js";
-import { AppError } from "../misc/AppError.js";
-import { commonErrors } from "../misc/commonErrors.js";
-import { logger } from "../utils/logger.js";
-import { makeInstance } from "../utils/makeInstance.js";
-import { UserService } from "../services/userService.js";
-import { countReportedTimes } from "../utils/reportedTimesData.js";
+import { Request, Response } from 'express';
+import { CommunityService } from '../services/communityService.js';
+import fs from 'fs';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { buildResponse } from '../utils/builderResponse.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { logger } from '../utils/logger.js';
+import { makeInstance } from '../utils/makeInstance.js';
+import { UserService } from '../services/userService.js';
+import { countReportedTimes } from '../utils/reportedTimesData.js';
+import { PostCommentService } from '../services/postCommentService.js';
 
 interface MulterRequest extends Request {
   files: any;
@@ -18,15 +19,16 @@ interface MulterRequest extends Request {
 export class CommunityController {
   public communityService = new CommunityService();
   private userService = makeInstance<UserService>(UserService);
+  private postCommentService =
+    makeInstance<PostCommentService>(PostCommentService);
 
   public createPost = asyncHandler(async (req: Request, res: Response) => {
     const user_id = req.id;
     const { title, content, postType, isReported } = req.body;
     if (req.files) {
       const files = (req as MulterRequest).files;
-      console.log(files);
-      const newPath = files.map((v: any) => {
-        return v.path.replace("public/", "");
+      const newPath = files.map((file: any) => {
+        return `images/${file.filename}`;
       });
 
       const newPost = await this.communityService.createPost({
@@ -119,7 +121,7 @@ export class CommunityController {
         const files = (req as MulterRequest).files;
         console.log(files);
         const newPath = files.map((v: any) => {
-          return v.path.replace("public/", "");
+          return v.path.replace('public/', '');
         });
 
         const patchPosts = await this.communityService.findOneAndUpdate(id, {
@@ -138,7 +140,7 @@ export class CommunityController {
         res.send(Posts);
       }
     } catch {
-      res.status(400).send({ message: "오류 발생" });
+      res.status(400).send({ message: '오류 발생' });
     }
   };
   //카테고리
@@ -151,7 +153,7 @@ export class CommunityController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          "BAD_REQUEST"
+          'BAD_REQUEST'
         );
       }
       const categoryPost = await this.communityService.getPostByCat(
@@ -177,7 +179,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST'
       );
     }
 
@@ -194,9 +196,12 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST'
       );
     }
+
+    // 게시글의 post id를 가지는 댓글 삭제
+    await this.postCommentService.deleteComments(id);
     await this.communityService.delete(id);
     res.status(STATUS_CODE.OK).json(buildResponse(null, null));
   });
@@ -209,7 +214,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.requestValidationError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST'
       );
     }
 
@@ -237,7 +242,7 @@ export class CommunityController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          "BAD_REQUEST"
+          'BAD_REQUEST'
         );
       }
 
@@ -257,7 +262,7 @@ export class CommunityController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          "BAD_REQUEST"
+          'BAD_REQUEST'
         );
       }
 

@@ -1,8 +1,8 @@
-import { Ref } from "@typegoose/typegoose";
-import { PostCommentModel, PostModel, UserModel } from "../db/index.js";
-import { AppError } from "../misc/AppError.js";
-import { commonErrors } from "../misc/commonErrors.js";
-import { STATUS_CODE } from "../utils/statusCode.js";
+import { Ref } from '@typegoose/typegoose';
+import { PostCommentModel, PostModel, UserModel } from '../db/index.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface communityReportData {
   isReported: boolean;
@@ -95,18 +95,18 @@ export class CommunityService {
 
   public async updateReportPost(
     communityId: string,
-    communityData: communityReportData
+    communityData: communityReportData,
   ) {
     const community = await PostModel.findByIdAndUpdate(
       communityId,
-      communityData
+      communityData,
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST',
       );
     }
 
@@ -134,7 +134,7 @@ export class CommunityService {
       content: string;
       images?: string;
       postType: string;
-    }
+    },
   ) {
     return await PostModel.findOneAndUpdate(
       { _id: id },
@@ -144,11 +144,15 @@ export class CommunityService {
         images,
         postType,
       },
-      { new: true }
+      { new: true },
     );
   }
   public async getUserPosts(id: string) {
-    return await PostModel.find({ user_id: id });
+    return await PostModel.find({ user_id: id }).populate('user_id', [
+      'nickname',
+      'authorization',
+      'uuid',
+    ]);
   }
 
   // ===== 관리자 기능 =====
@@ -156,21 +160,21 @@ export class CommunityService {
   public async readReportedCommunity() {
     const reportedCommunity = await PostModel.find({
       isReported: true,
-    }).select("title content");
+    }).select('title content');
 
     return reportedCommunity;
   }
   public async deleteReportedCommunity(community_id: string) {
     const community = await PostModel.findByIdAndDelete(community_id).populate(
-      "user_id",
-      "reportedTimes"
+      'user_id',
+      'reportedTimes',
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST',
       );
     }
 
