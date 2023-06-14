@@ -14,9 +14,9 @@ const url = process.env.URL;
 changeParticipateStatus();
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('aaaaaaTypescript + Node.js + Express Server');
+  res.send('마음이음 API 서버입니다.');
 });
 
 app.listen(port, () => {
-  logger.info(`[server]:서버가 ${url}:${port}/ 에서 실행되고 있습니다.`);
+  logger.info(`[server]:서버가 실행되고 있습니다.`);
 });
