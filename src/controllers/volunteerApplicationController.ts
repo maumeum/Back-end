@@ -84,26 +84,16 @@ class VolunteerApplicationController {
 
       //const volunteerStatus :  = statusCondition(status!.toString(), applicationVolunteerList);
 
-      console.log(applicationVolunteerList);
-
       if (status === 'true') {
         volunteerStatus = applicationVolunteerList.filter(
           (applicationVolunteer) => {
-            const volunteer_id = applicationVolunteer.volunteer_id as Volunteer;
-
-            return volunteer_id && volunteer_id.statusName === '모집중';
+            return applicationVolunteer.isParticipate === true;
           }
         );
       } else if (status === 'false') {
         volunteerStatus = applicationVolunteerList.filter(
           (applicationVolunteer) => {
-            const volunteer_id = applicationVolunteer.volunteer_id as Volunteer;
-
-            return (
-              volunteer_id &&
-              (volunteer_id.statusName === '모집완료' ||
-                volunteer_id.statusName === '모집중단')
-            );
+            return applicationVolunteer.isParticipate === false;
           }
         );
       }
