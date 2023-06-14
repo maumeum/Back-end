@@ -28,25 +28,16 @@ class ReviewService {
   }
 
   public async getRandomReviews() {
-    const reviewCount = await ReviewModel.countDocuments();
-    const randomIndexes: number[] = [];
-    while (randomIndexes.length < CONSTANTS.RANDOM_REVIEWS) {
-      const randomIndex = Math.floor(Math.random() * reviewCount);
-      if (!randomIndexes.includes(randomIndex)) {
-        randomIndexes.push(randomIndex);
-      }
-    }
-
     // 랜덤한 인덱스에 해당하는 리뷰를 조회하고 사용자 정보를 populate
-    const randomReviews = await ReviewModel.find()
-      .skip(randomIndexes[0])
-      .limit(CONSTANTS.RANDOM_REVIEWS)
-      .populate({
-        path: 'user_id',
-        select: 'nickname nanoid uuid authorization image',
-      });
+    const randomReviews = await ReviewModel.find().populate({
+      path: 'user_id',
+      select: 'nickname nanoid uuid authorization image',
+    });
+    const reviews = randomReviews
+      .sort(() => Math.random() - 0.5)
+      .slice(0, CONSTANTS.RANDOM_REVIEWS);
 
-    return randomReviews;
+    return reviews;
   }
 
   public async getReviewById(review_id: ObjectId) {
@@ -154,8 +145,7 @@ class ReviewService {
       volunteer_id,
       user_id,
     }).populate({ path: 'volunteer_id', select: 'endDate statusName' });
-    const matchedVolunteer = await VolunteerModel.findById(volunteer_id);
-    if (!matchedApplyVolunteer || !matchedVolunteer) {
+    if (!matchedApplyVolunteer) {
       throw new AppError(
         `${commonErrors.resourceNotFoundError} : 일치하는 데이터 없음.`,
         STATUS_CODE.BAD_REQUEST,
@@ -189,11 +179,6 @@ class ReviewService {
     if (now > endDateTime && now < sevenDaysAfterEnd) {
       if (!matchedApplyVolunteer.isParticipate) {
         matchedApplyVolunteer.isParticipate = true;
-        matchedVolunteer.statusName = '모집완료';
-        //@ts-ignore
-        logger.debug(volunteer.statusName);
-        await matchedVolunteer.save();
-        logger.debug(`matchedVolunteer : ${matchedVolunteer}`);
         await matchedApplyVolunteer.save();
       } else {
         throw new AppError(
