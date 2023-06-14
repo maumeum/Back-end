@@ -49,10 +49,14 @@ export class CommunityService {
 
   public async findAllPost(skip: number, limit: number) {
     console.log(skip, limit);
-    return await PostModel.find()
+
+    const posts = await PostModel.find()
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("user_id", ["nickname", "uuid"]);
+
+    return posts;
   }
   //수정한곳
   public async getPostByCat(category: string, skip: number, limit: number) {
@@ -75,8 +79,11 @@ export class CommunityService {
   public async findByPostIdComment(id: string) {
     return await PostCommentModel.find({ post_id: id });
   }
-  public async indByPostIdPost(id: string) {
-    const post = await PostModel.findOne({ _id: id });
+  public async indByPostIdPost(id: string, skip: number, limit: number) {
+    const post = await PostModel.findOne({ _id: id })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
     const user = await UserModel.findOne({ _id: post!.user_id });
     const total = {
       user: user!.nickname,
