@@ -32,6 +32,7 @@ class VolunteerCommentService {
   }
 
   public async readVolunteerByComment(user_id: ObjectId) {
+    //이쪽에 스킵리밋 적용.
     const userComments = await VolunteerCommentModel.find({ user_id }).populate(
       'volunteer_id',
       ['title', 'content', 'createdAt'],

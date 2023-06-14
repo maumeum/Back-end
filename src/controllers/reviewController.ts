@@ -87,6 +87,13 @@ class ReviewController {
     },
   );
 
+  public readRandomReviews = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const reviews = await this.reviewService.getRandomReviews();
+      res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
+    },
+  );
+
   public postReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;

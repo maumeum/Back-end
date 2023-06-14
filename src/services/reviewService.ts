@@ -27,6 +27,13 @@ class ReviewService {
     return reviews;
   }
 
+  public async getRandomReviews() {
+    const randomReviews = await ReviewModel.aggregate([
+      { $sample: { size: CONSTANTS.RANDOM_REVIEWS } },
+    ]);
+    return randomReviews;
+  }
+
   public async getReviewById(review_id: ObjectId) {
     const review = await ReviewModel.findById(review_id).populate('user_id', [
       'nickname',

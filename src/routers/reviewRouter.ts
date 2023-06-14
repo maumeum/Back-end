@@ -7,6 +7,9 @@ import { adminOnly } from '../middlewares/adminOnly.js';
 const reviewRouter = express.Router();
 const reviewController = new ReviewController();
 
+//메인 리뷰 랜덤 조회
+reviewRouter.get('/randomReviews', reviewController.readRandomReviews);
+
 //리뷰 전체 조회 (일반유저)
 reviewRouter.get('/review', reviewController.readReview);
 
