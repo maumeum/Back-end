@@ -154,8 +154,7 @@ class ReviewService {
       volunteer_id,
       user_id,
     }).populate({ path: 'volunteer_id', select: 'endDate statusName' });
-    const matchedVolunteer = await VolunteerModel.findById(volunteer_id);
-    if (!matchedApplyVolunteer || !matchedVolunteer) {
+    if (!matchedApplyVolunteer) {
       throw new AppError(
         `${commonErrors.resourceNotFoundError} : 일치하는 데이터 없음.`,
         STATUS_CODE.BAD_REQUEST,
@@ -189,11 +188,6 @@ class ReviewService {
     if (now > endDateTime && now < sevenDaysAfterEnd) {
       if (!matchedApplyVolunteer.isParticipate) {
         matchedApplyVolunteer.isParticipate = true;
-        matchedVolunteer.statusName = '모집완료';
-        //@ts-ignore
-        logger.debug(volunteer.statusName);
-        await matchedVolunteer.save();
-        logger.debug(`matchedVolunteer : ${matchedVolunteer}`);
         await matchedApplyVolunteer.save();
       } else {
         throw new AppError(

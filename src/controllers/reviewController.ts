@@ -97,7 +97,7 @@ class ReviewController {
   public postReview = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const { title, content, volunteer_id, isReported }: ReviewData = req.body;
+      const { title, content, volunteer_id }: ReviewData = req.body;
 
       const files = (req.files as MyFile[]) || [];
       logger.debug(files);
@@ -124,7 +124,6 @@ class ReviewController {
         title,
         content,
         images: newPath,
-        isReported,
         volunteer_id,
       });
 
@@ -147,7 +146,7 @@ class ReviewController {
       const newPath = files.map((file: any) => {
         return `images/${file.filename}`;
       });
-      const { title, content, isReported }: ReviewData = req.body;
+      const { title, content }: ReviewData = req.body;
       const updateInfo: ReviewData = {};
       if (title) {
         updateInfo.title = title;
@@ -157,10 +156,6 @@ class ReviewController {
       }
       if (newPath) {
         updateInfo.images = newPath;
-      }
-
-      if (newPath) {
-        updateInfo.isReported = isReported;
       }
 
       const updatedReview = await this.reviewService.updateReview(
