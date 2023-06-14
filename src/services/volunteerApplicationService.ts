@@ -32,9 +32,13 @@ class VolunteerApplicationService {
     return true;
   }
 
-  public async readApplicationVolunteer(userId: ObjectId) {
+  public async readApplicationVolunteer(
+    userId: ObjectId,
+    isParticipateStatus: boolean
+  ) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
+      isParticipate: isParticipateStatus,
     })
       .populate({
         path: 'volunteer_id',
@@ -85,7 +89,7 @@ class VolunteerApplicationService {
 
   public async readApplicationVolunteerByCondition(condition: {}) {
     const checkedApplicationVolunteer = await VolunteerApplicationModel.findOne(
-      condition,
+      condition
     );
     return checkedApplicationVolunteer;
   }

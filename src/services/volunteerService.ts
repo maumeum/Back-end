@@ -119,17 +119,6 @@ class VolunteerService {
 
     return counts;
   }
-  //전체 토탈
-  public async totalVolunteerCount() {
-    const counts = await VolunteerModel.countDocuments();
-    return counts;
-  }
-
-  //관리자 토탈
-  public async totalReportedVolunteerCount() {
-    const counts = await VolunteerModel.countDocuments({ isReported: true });
-    return counts;
-  }
 
   public async readVolunteerById(volunteerId: string) {
     const volunteer = await VolunteerModel.findOne({
