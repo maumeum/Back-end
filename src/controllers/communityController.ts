@@ -10,6 +10,7 @@ import { logger } from '../utils/logger.js';
 import { makeInstance } from '../utils/makeInstance.js';
 import { UserService } from '../services/userService.js';
 import { countReportedTimes } from '../utils/reportedTimesData.js';
+import { PostCommentService } from '../services/postCommentService.js';
 
 interface MulterRequest extends Request {
   files: any;
@@ -18,6 +19,8 @@ interface MulterRequest extends Request {
 export class CommunityController {
   public communityService = new CommunityService();
   private userService = makeInstance<UserService>(UserService);
+  private postCommentService =
+    makeInstance<PostCommentService>(PostCommentService);
 
   public createPost = asyncHandler(async (req: Request, res: Response) => {
     const user_id = req.id;
@@ -69,7 +72,7 @@ export class CommunityController {
 
     const posts = await this.communityService.findAllPost(
       Number(skip),
-      Number(limit),
+      Number(limit)
     );
     const totalReviewsCount = await this.communityService.totalReviewsCount();
 
@@ -86,7 +89,7 @@ export class CommunityController {
     // qna findfreind
     const posts = await this.communityService.searchPost(
       keyword as string,
-      posttype as string,
+      posttype as string
     );
     res.status(STATUS_CODE.OK).json(buildResponse(null, posts));
   });
@@ -150,13 +153,13 @@ export class CommunityController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
       const categoryPost = await this.communityService.getPostByCat(
         category,
         Number(skip),
-        Number(limit),
+        Number(limit)
       );
       const totalReviewsCount =
         await this.communityService.totalCategoryReviewsCount(category);
@@ -176,7 +179,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -193,9 +196,12 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
+
+    // 게시글의 post id를 가지는 댓글 삭제
+    await this.postCommentService.deleteComments(id);
     await this.communityService.delete(id);
     res.status(STATUS_CODE.OK).json(buildResponse(null, null));
   });
@@ -208,7 +214,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.requestValidationError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST'
       );
     }
 
@@ -225,7 +231,7 @@ export class CommunityController {
         await this.communityService.readReportedCommunity();
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, reportedCommunity));
-    },
+    }
   );
 
   public patchReportedCommunity = asyncHandler(
@@ -236,7 +242,7 @@ export class CommunityController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
 
@@ -245,7 +251,7 @@ export class CommunityController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    },
+    }
   );
 
   public deleteReportedCommunity = asyncHandler(
@@ -256,7 +262,7 @@ export class CommunityController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST'
         );
       }
 
@@ -267,7 +273,7 @@ export class CommunityController {
       const reportUser = deleteCommunity.user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
-        reportUser!,
+        reportUser!
       );
 
       let isDisabledUser;
@@ -281,6 +287,6 @@ export class CommunityController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    },
+    }
   );
 }

@@ -51,6 +51,12 @@ class PostCommentService {
     return postCommentList;
   }
 
+  public async readCommentByPostId(post_id: string) {
+    const postCommentList = await PostCommentModel.find({ post_id: post_id });
+
+    return postCommentList;
+  }
+
   public async totalCommentCount(post_id: string) {
     const counts = await PostCommentModel.countDocuments({ post_id: post_id });
     return counts;
@@ -110,6 +116,12 @@ class PostCommentService {
     }
 
     return deletePostComment;
+  }
+
+  public async deleteComments(postId: string) {
+    await PostCommentModel.deleteMany({
+      postId: postId,
+    });
   }
 
   // ===== 관리자 기능 =====
