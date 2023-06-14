@@ -76,10 +76,10 @@ class VolunteerApplicationService {
 
   // public async getStockCheck()
 
-  public async readApplicationVolunteerByVId(condition: {}) {
-    const applicationVolunteerList = await VolunteerApplicationModel.find(
-      condition,
-    ).select('isParticipate');
+  public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
+    const applicationVolunteerList = await VolunteerApplicationModel.find({
+      volunteer_id: volunteer_id,
+    }).select('isParticipate');
     return applicationVolunteerList;
   }
 

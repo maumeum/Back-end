@@ -10,17 +10,11 @@ class Volunteer {
   @prop({ required: true })
   public content!: string;
 
-  @prop({ required: true })
-  public centName!: string;
-
-  @prop()
-  public centDescription?: string;
-
   @prop({ required: true, default: '모집중' })
   public statusName!: string;
 
   @prop({ required: true, type: Date })
-  public deadline?: Date;
+  public deadline!: Date;
 
   @prop({ required: true, type: Date })
   public startDate!: Date;
