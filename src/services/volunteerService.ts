@@ -30,6 +30,10 @@ interface VolunteerReportData {
   isReported: boolean;
 }
 
+interface VolunteerApplyCountData {
+  applyCount: number;
+}
+
 class VolunteerService {
   public async createVolunteer(volunteerData: VolunteerData) {
     const { deadline, startDate, endDate, applyCount, registerCount } =
@@ -62,10 +66,29 @@ class VolunteerService {
     return createVolunteer;
   }
 
-  public async readVolunteer() {
-    const volunteerList = await VolunteerModel.find({});
+  public async readVolunteer(skip: number, limit: number) {
+    const volunteerList = await VolunteerModel.find({})
+      .select(
+        'title centName deadline statusName applyCount registerCount images'
+      )
+      .populate('register_user_id', ['image', 'nickname'])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
+  }
+
+  //전체 토탈
+  public async totalVolunteerCount() {
+    const counts = await VolunteerModel.countDocuments();
+    return counts;
+  }
+
+  //관리자 토탈
+  public async totalReportedVolunteerCount() {
+    const counts = await VolunteerModel.countDocuments({ isReported: true });
+    return counts;
   }
 
   public async readVolunteerById(volunteerId: string) {
@@ -84,36 +107,47 @@ class VolunteerService {
     return volunteer;
   }
 
-  public async readSearchVolunteer(keyword: string) {
+  public async readSearchVolunteer(
+    keyword: string,
+    skip: number,
+    limit: number
+  ) {
     const options = [
       { title: { $regex: `${keyword}` } },
       { content: { $regex: `${keyword}` } },
     ];
     const volunteerList = await VolunteerModel.find({
       $or: options,
-    });
-
-    if (volunteerList.length === 0) {
-      return [];
-    }
+    })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
   }
 
-  public async readRegistrationVolunteer(user_id: ObjectId) {
+  public async readRegistrationVolunteer(
+    user_id: ObjectId,
+    skip: number,
+    limit: number
+  ) {
     const volunteerList = await VolunteerModel.find({
       register_user_id: user_id,
-    }).populate('register_user_id');
+    })
+      .populate('register_user_id')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return volunteerList;
   }
 
   public async updateVolunteer(
-    volunteerId: string,
+    volunteer_id: string,
     volunteerData: VolunteerData
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
-      volunteerId,
+      volunteer_id,
       volunteerData
     );
 
@@ -124,6 +158,26 @@ class VolunteerService {
         'BAD_REQUEST'
       );
     }
+    return true;
+  }
+
+  public async updateVolunteerApplyCount(
+    volunteer_id: string,
+    applyCount: VolunteerApplyCountData
+  ) {
+    const volunteer = await VolunteerModel.findByIdAndUpdate(
+      volunteer_id,
+      applyCount
+    );
+
+    if (!volunteer) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
     return true;
   }
 
@@ -169,10 +223,15 @@ class VolunteerService {
 
   // ===== 관리자 기능 =====
 
-  public async readReportedVolunteer() {
+  public async readReportedVolunteer(skip: number, limit: number) {
     const reportedVolunteer = await VolunteerModel.find({
       isReported: true,
-    }).select('title content');
+    })
+      .select('title content')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
     return reportedVolunteer;
   }
 

@@ -7,6 +7,7 @@ import { STATUS_CODE } from '../utils/statusCode.js';
 import { AppError } from '../misc/AppError.js';
 import { Ref } from '@typegoose/typegoose';
 import { User } from '../db/schemas/userSchema.js';
+import { logger } from '../utils/logger.js';
 
 //인터페이스 분리해서 작성
 interface UserInfo {
@@ -33,7 +34,7 @@ class UserService {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     const hashedPassword = await bcrypt.hash(password, CONSTANTS.HASHING_TIMES);
@@ -54,7 +55,7 @@ class UserService {
   //object_id로 유저 찾기 (이메일, 닉네임, 폰)
   public async getUserById(_id: ObjectId) {
     const user = await UserModel.findById({ _id }).select(
-      'email role nickname phone introduction image'
+      'email role nickname phone introduction image authorization uuid',
     );
     return user;
   }
@@ -70,6 +71,23 @@ class UserService {
     return updatedUser;
   }
 
+  public async getUserByCondition(condition: {}) {
+    console.log(condition);
+    const user = await UserModel.find(condition).select([
+      'nickname',
+      'role',
+      'uuid',
+      'authorization',
+      'image',
+      'phone',
+      'reportedTimes',
+      'email',
+      'createdAt',
+      'updatedAt',
+    ]);
+    return user;
+  }
+
   // ===== 관리자 기능 =====
   // 사용자의 reportedTimes 가져오기
   public async getUserReportedTimes(user_id: Ref<User>) {
@@ -79,7 +97,7 @@ class UserService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -89,7 +107,7 @@ class UserService {
   // 사용자의 reportedTimes 업데이트하기
   public async updateReportedTimes(
     user_id: Ref<User>,
-    reportedTimes: ReportedTimeData
+    reportedTimes: ReportedTimeData,
   ) {
     const user = await UserModel.findByIdAndUpdate(user_id, reportedTimes);
     return user;

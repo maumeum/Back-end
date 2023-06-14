@@ -29,7 +29,7 @@ class VolunteerController {
         const files = req.files as MyFile[];
         logger.debug(files);
         const newPath = files.map((file) => {
-          return file.path.replace('public/', '');
+          return `images/${file.filename}`;
         });
 
         const volunteerData = {
@@ -47,10 +47,34 @@ class VolunteerController {
 
   public getVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const volunteerList = await this.volunteerService.readVolunteer();
+      const { skip, limit, status } = req.query;
 
-      console.log(volunteerList);
-      res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerList));
+      const volunteerList = await this.volunteerService.readVolunteer(
+        Number(skip),
+        Number(limit)
+      );
+
+      let volunteerStatus;
+
+      if (status === 'true') {
+        volunteerStatus = volunteerList.filter((volunteer) => {
+          return volunteer.statusName === '모집중';
+        });
+      } else if (status === 'false') {
+        volunteerStatus = volunteerList.filter((volunteer) => {
+          return (
+            volunteer.statusName === '모집완료' ||
+            volunteer.statusName === '모집중단'
+          );
+        });
+      }
+
+      const totalVolunteersCount =
+        await this.volunteerService.totalVolunteerCount();
+      const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { volunteerStatus, hasMore }));
     }
   );
 
@@ -95,29 +119,45 @@ class VolunteerController {
 
   public getSearchVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { keyword } = req.query;
+      const { keyword, skip, limit } = req.query;
 
       const searchVolunteers = await this.volunteerService.readSearchVolunteer(
-        keyword as string
+        keyword as string,
+        Number(skip),
+        Number(limit)
       );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, searchVolunteers));
+      const totalVolunteerCount =
+        await this.volunteerService.totalVolunteerCount();
+
+      const hasMore = Number(skip) + Number(limit) < totalVolunteerCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { searchVolunteers, hasMore }));
     }
   );
 
   public getRegisterationVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
       const user_id = req.id;
-
-      console.log(user_id);
-      console.log(typeof user_id);
-
       const registerationVolunteers =
-        await this.volunteerService.readRegistrationVolunteer(user_id);
+        await this.volunteerService.readRegistrationVolunteer(
+          user_id,
+          Number(skip),
+          Number(limit)
+        );
+
+      const totalRegisterationVolunnter =
+        await this.volunteerService.totalReportedVolunteerCount();
+
+      const hasMore =
+        Number(skip) + Number(limit) < totalRegisterationVolunnter;
 
       res
         .status(STATUS_CODE.OK)
-        .json(buildResponse(null, registerationVolunteers));
+        .json(buildResponse(null, { registerationVolunteers, hasMore }));
     }
   );
 
@@ -196,10 +236,21 @@ class VolunteerController {
   // 신고된 내역 전체 조회
   public getReportedVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
       const reportedVolunteer =
-        await this.volunteerService.readReportedVolunteer();
+        await this.volunteerService.readReportedVolunteer(
+          Number(skip),
+          Number(limit)
+        );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, reportedVolunteer));
+      const totalVolunteersCount =
+        await this.volunteerService.totalReportedVolunteerCount();
+
+      const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { reportedVolunteer, hasMore }));
     }
   );
 
