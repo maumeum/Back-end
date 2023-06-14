@@ -93,9 +93,14 @@ export class CommunityController {
 
   public getPost = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const { skip, limit } = req.query;
 
     const comment = await this.communityService.findByPostIdComment(id);
-    const post = await this.communityService.indByPostIdPost(id);
+    const post = await this.communityService.indByPostIdPost(
+      id,
+      Number(skip),
+      Number(limit)
+    );
     const user = await this.communityService.findUserByPostId(id);
 
     res
