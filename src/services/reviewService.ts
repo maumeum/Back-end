@@ -28,7 +28,6 @@ class ReviewService {
   }
 
   public async getRandomReviews() {
-    // 랜덤한 인덱스에 해당하는 리뷰를 조회하고 사용자 정보를 populate
     const randomReviews = await ReviewModel.find().populate({
       path: 'user_id',
       select: 'nickname nanoid uuid authorization image',
@@ -112,6 +111,14 @@ class ReviewService {
       .sort({ createdAt: -1 });
 
     return reviews;
+  }
+
+  public async getReviewByCondition(condition: {}) {
+    const review = await ReviewModel.findOne(condition);
+    if (review) {
+      return true;
+    }
+    return false;
   }
 
   public async totalReviewsCount() {

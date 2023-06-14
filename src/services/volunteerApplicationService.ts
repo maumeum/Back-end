@@ -76,11 +76,18 @@ class VolunteerApplicationService {
 
   // public async getStockCheck()
 
-  public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
-    const applicationVolunteerList = await VolunteerApplicationModel.find({
-      volunteer_id: volunteer_id,
-    }).select('isParticipate');
+  public async readApplicationVolunteerByVId(condition: {}) {
+    const applicationVolunteerList = await VolunteerApplicationModel.find(
+      condition,
+    ).select('isParticipate');
     return applicationVolunteerList;
+  }
+
+  public async readApplicationVolunteerByCondition(condition: {}) {
+    const checkedApplicationVolunteer = await VolunteerApplicationModel.findOne(
+      condition,
+    );
+    return checkedApplicationVolunteer;
   }
 
   public async deleteApplicationVolunteer(volunteerApplicationId: string) {
