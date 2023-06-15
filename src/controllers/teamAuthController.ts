@@ -8,6 +8,7 @@ import { buildResponse } from '../utils/builderResponse.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { ObjectId } from 'mongodb';
 import { logger } from '../utils/logger.js';
+import { sendMail } from '../middlewares/nodeMailer.js';
 
 class TeamAuthController {
   private teamAuthService = makeInstance<TeamAuthService>(TeamAuthService);
@@ -86,6 +87,7 @@ class TeamAuthController {
       const { teamAuth_id } = req.body;
       const { status } = req.query;
       const teamAuth = await this.teamAuthService.readTeamAuth(teamAuth_id);
+
       if (!teamAuth || teamAuth === null) {
         throw new AppError(
           `${commonErrors.resourceNotFoundError} : teamAuth_id가 잘못되었거나, 일치하는 정보가 없습니다.`,
@@ -105,6 +107,18 @@ class TeamAuthController {
         teamAuth_id,
         updateInfo,
       );
+
+      const userInfo = await this.userService.getUserById(user_id);
+      if (!userInfo) {
+        throw new AppError(
+          `${commonErrors.resourceNotFoundError} : 해당하는 유저 정보가 없습니다.`,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST',
+        );
+      }
+
+      sendMail(userInfo.email, userInfo.nickname, teamAuth.teamName);
+
       res
         .status(STATUS_CODE.CREATED)
         .json(buildResponse(null, updatedAuthStatus));
