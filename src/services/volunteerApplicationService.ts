@@ -7,7 +7,6 @@ import { commonErrors } from '../misc/commonErrors.js';
 interface ApplicationVolunteerData {
   user_id: ObjectId;
   volunteer_id: ObjectId;
-  isParticipate: boolean;
 }
 
 interface doubleCheckApplicationVolunteerData {
@@ -19,14 +18,12 @@ class VolunteerApplicationService {
   public async createApplicationVolunteer({
     user_id,
     volunteer_id,
-    isParticipate,
   }: ApplicationVolunteerData) {
     //신청 가능여부 체크
 
     await VolunteerApplicationModel.create({
       user_id,
       volunteer_id,
-      isParticipate,
     });
 
     return true;

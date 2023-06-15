@@ -23,7 +23,7 @@ class VolunteerApplicationController {
 
   public postApplicationVolunteer = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { volunteer_id, isParticipate } = req.body;
+      const { volunteer_id } = req.body;
 
       const user_id = req.id;
 
@@ -60,7 +60,6 @@ class VolunteerApplicationController {
       await this.volunteerApplicationService.createApplicationVolunteer({
         user_id,
         volunteer_id,
-        isParticipate,
       });
 
       await this.volunteerService.updateVolunteerApplyCount(volunteer_id, {
