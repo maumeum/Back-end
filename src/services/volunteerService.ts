@@ -91,7 +91,7 @@ class VolunteerService {
       .select(
         'title centName deadline statusName applyCount registerCount images createdAt'
       )
-      .populate('register_user_id', ['image', 'nickname'])
+      .populate('register_user_id', ['image', 'nickname', 'uuid'])
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
