@@ -14,7 +14,7 @@ const sendMail = async (email: String, nickname: String, teamName: string) => {
     to: email,
     subject: `[마음이음] ${nickname}님의 요청하신 팀 인증이 완료되었습니다.`,
     html: `
-    <link rel="icon" type="image/svg+xml" href="/mainlogo.svg" />
+    
     <h2>팀 ${teamName}의 인증이 완료되었습니다. 로그인하여 확인해주세요.</h2>
     <a href="http://kdt-sw-4-team01.elicecoding.com/">http://kdt-sw-4-team01.elicecoding.com/</a>
   `,

@@ -1,5 +1,9 @@
 import { ObjectId } from 'mongodb';
-import { VolunteerApplicationModel, VolunteerModel } from '../db/index.js';
+import {
+  TeamAuthModel,
+  VolunteerApplicationModel,
+  VolunteerModel,
+} from '../db/index.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
@@ -59,7 +63,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.inputError,
         STATUS_CODE.FORBIDDEN,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -67,7 +71,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.inputError,
         STATUS_CODE.FORBIDDEN,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     const createVolunteer = await VolunteerModel.create(volunteerData);
@@ -76,7 +80,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     return createVolunteer;
@@ -85,18 +89,33 @@ class VolunteerService {
   public async readVolunteer(
     skip: number,
     limit: number,
-    statusName: string | { $in: string[] }
+    statusName: string | { $in: string[] },
   ) {
     const volunteerList = await VolunteerModel.find({ statusName: statusName })
       .select(
-        'title centName deadline statusName applyCount registerCount images createdAt'
+        'title centName deadline statusName applyCount registerCount images createdAt register_user_id',
       )
       .populate('register_user_id', ['image', 'nickname', 'uuid'])
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    return volunteerList;
+    // 'register_user_id'를 통해 'teamName' 값을 가져오기 위해 추가 작업
+    const updatedVolunteerList = await Promise.all(
+      volunteerList.map(async (volunteer) => {
+        const userId = volunteer.register_user_id;
+        const teamAuth = await TeamAuthModel.findOne({
+          user_id: userId,
+        }).select('teamName');
+        const teamName = teamAuth ? teamAuth.teamName : null;
+        return {
+          ...volunteer.toObject(),
+          teamName,
+        };
+      }),
+    );
+
+    return updatedVolunteerList;
   }
 
   public async getPostListQueryBuilder(condition: VolunteerConditionData) {
@@ -133,7 +152,7 @@ class VolunteerService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -143,7 +162,7 @@ class VolunteerService {
   public async readSearchVolunteer(
     keyword: string,
     skip: number,
-    limit: number
+    limit: number,
   ) {
     const options = searchOption(keyword);
 
@@ -160,7 +179,7 @@ class VolunteerService {
   public async readRegistrationVolunteer(
     user_id: ObjectId,
     skip: number,
-    limit: number
+    limit: number,
   ) {
     const volunteerList = await VolunteerModel.find({
       register_user_id: user_id,
@@ -175,18 +194,18 @@ class VolunteerService {
 
   public async updateVolunteer(
     volunteer_id: string,
-    volunteerData: VolunteerData
+    volunteerData: VolunteerData,
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteer_id,
-      volunteerData
+      volunteerData,
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     return true;
@@ -194,18 +213,18 @@ class VolunteerService {
 
   public async updateVolunteerApplyCount(
     volunteer_id: string,
-    applyCount: VolunteerApplyCountData
+    applyCount: VolunteerApplyCountData,
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteer_id,
-      applyCount
+      applyCount,
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -214,18 +233,18 @@ class VolunteerService {
 
   public async updateRegisterationVolunteer(
     volunteerId: string,
-    volunteerData: VolunteerStatus
+    volunteerData: VolunteerStatus,
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
-      volunteerData
+      volunteerData,
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -234,18 +253,18 @@ class VolunteerService {
 
   public async updateReportVolunteer(
     volunteerId: string,
-    isReported: VolunteerReportData
+    isReported: VolunteerReportData,
   ) {
     const volunteer = await VolunteerModel.findByIdAndUpdate(
       volunteerId,
-      isReported
+      isReported,
     );
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -268,14 +287,14 @@ class VolunteerService {
 
   public async deleteReportedVolunteer(volunteer_id: string) {
     const volunteer = await VolunteerModel.findByIdAndDelete(
-      volunteer_id
+      volunteer_id,
     ).populate('register_user_id', 'reportedTimes');
 
     if (!volunteer) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
