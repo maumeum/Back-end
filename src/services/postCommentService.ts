@@ -140,12 +140,10 @@ class PostCommentService {
     return deletePostComment;
   }
 
-  public async deleteComments(postId: string) {
-    const deleteList = await PostCommentModel.deleteMany({
-      postId: postId,
+  public async deletePostComments(postId: string) {
+    await PostCommentModel.deleteMany({
+      post_id: postId,
     });
-
-    console.log(deleteList);
   }
 
   // ===== 관리자 기능 =====
