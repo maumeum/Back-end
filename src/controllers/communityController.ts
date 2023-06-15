@@ -84,13 +84,15 @@ export class CommunityController {
 
   //keyword 로 게시물 조회
   public searchPost = asyncHandler(async (req: Request, res: Response) => {
-    const { keyword, posttype } = req.query;
+    const { keyword, posttype, limit, skip } = req.query;
     //community/serach?keyword=${keyword}&posttype=findfreind
 
     // qna findfreind
     const posts = await this.communityService.searchPost(
       keyword as string,
-      posttype as string
+      posttype as string,
+      Number(skip),
+      Number(limit)
     );
     res.status(STATUS_CODE.OK).json(buildResponse(null, posts));
   });

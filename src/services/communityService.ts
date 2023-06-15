@@ -67,12 +67,22 @@ export class CommunityService {
       .populate("user_id", ["nickname", "uuid"]);
   }
 
-  public async searchPost(keyword: string, posttype: string) {
+  public async searchPost(
+    keyword: string,
+    posttype: string,
+    skip: number,
+    limit: number
+  ) {
     const options = [{ title: { $regex: `${keyword}` } }];
 
-    const posts = await PostModel.find({ $or: options }).find({
-      postType: posttype,
-    });
+    const posts = await PostModel.find({ $or: options })
+      .find({
+        postType: posttype,
+      })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate("user_id", ["nickname", "uuid"]);
     return posts;
   }
 
