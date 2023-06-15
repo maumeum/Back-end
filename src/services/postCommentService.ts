@@ -151,7 +151,8 @@ class PostCommentService {
     const reportedPostComment = await PostCommentModel.find({
       isReported: true,
     })
-      .select('title content post_id')
+      .populate('user_id', 'nickname')
+      .select('content post_id')
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });

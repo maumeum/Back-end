@@ -154,7 +154,8 @@ class VolunteerCommentService {
     const reportedVolunteerComment = await VolunteerCommentModel.find({
       isReported: true,
     })
-      .select('title content')
+      .populate('user_id', 'nickname')
+      .select('content volunteer_id')
       .skip(skip)
       .limit(limit)
       .sort({ createAt: -1 });
