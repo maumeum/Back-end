@@ -95,7 +95,8 @@ export class CommunityService {
     const posts = await PostModel.find({ $or: options })
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("user_id", ["nickname", "uuid"]);
     return posts;
   }
   public async indByPostIdPost(id: string, skip: number, limit: number) {
