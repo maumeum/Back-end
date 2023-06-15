@@ -94,6 +94,9 @@ export class CommunityController {
       Number(skip),
       Number(limit)
     );
+    const totalReviewsCount = await this.communityService.totalReviewsCount();
+
+    const hasMore = Number(skip) + Number(limit) < totalReviewsCount;
     res.status(STATUS_CODE.OK).json(buildResponse(null, posts));
   });
   public searchtotalPost = asyncHandler(async (req: Request, res: Response) => {
@@ -103,7 +106,11 @@ export class CommunityController {
       Number(skip),
       Number(limit)
     );
-    res.status(STATUS_CODE.OK).json(buildResponse(null, posts));
+    const totalReviewsCount =
+      await this.communityService.totalCategoryReviewsCount1(keyword as string);
+
+    const hasMore = Number(skip) + Number(limit) < totalReviewsCount;
+    res.status(STATUS_CODE.OK).json(buildResponse(null, { posts, hasMore }));
   });
 
   public getPost = asyncHandler(async (req: Request, res: Response) => {

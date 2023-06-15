@@ -141,6 +141,10 @@ export class CommunityService {
   public async totalCategoryReviewsCount(category: string) {
     return await PostModel.find({ postTyp: category }).countDocuments();
   }
+  public async totalCategoryReviewsCount1(keyword: string) {
+    const options = [{ title: { $regex: `${keyword}` } }];
+    return await PostModel.find({ $or: options }).countDocuments();
+  }
 
   public async findOneAndUpdate(
     id: string,
