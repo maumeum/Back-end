@@ -1,39 +1,26 @@
-// import nodemailer from 'nodemailer';
-// import dotenv from 'dotenv';
-// dotenv.config();
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// const EMAIL = process.env.GMAIL;
-// const PASSWORD = process.env.GMAIL_PASSWORD;
+const EMAIL = process.env.GMAIL;
+const PASSWORD = process.env.GMAIL_PASSWORD;
 
-// const mailSender = {
-//   // 메일발송 함수
-//   sendGmail: function (param) {
-//     var transporter = nodemailer.createTransport({
-//       service: 'gmail', // 메일 보내는 곳
-//       prot: 587,
-//       host: 'smtp.gmlail.com',
-//       secure: false,
-//       requireTLS: true,
-//       auth: {
-//         user: EMAIL, // 보내는 메일의 주소
-//         pass: PASSWORD, // 보내는 메일의 비밀번호
-//       },
-//     });
-//     // 메일 옵션
-//     var mailOptions = {
-//       from: EMAIL, // 보내는 메일의 주소
-//       to: param.toEmail, // 수신할 이메일
-//       subject: param.subject, // 메일 제목
-//       text: param.text, // 메일 내용
-//     };
+const sendMail = async (email: String, nickname: String, teamName: string) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: EMAIL, pass: PASSWORD },
+  });
+  const mailOptions: {} = {
+    to: email,
+    subject: `[마음이음] ${nickname}님의 요청하신 팀 인증이 완료되었습니다.`,
+    html: `
+    <link rel="icon" type="image/svg+xml" href="/mainlogo.svg" />
+    <h2>팀 ${teamName}의 인증이 완료되었습니다. 로그인하여 확인해주세요.</h2>
+    <a href="http://kdt-sw-4-team01.elicecoding.com/">http://kdt-sw-4-team01.elicecoding.com/</a>
+  `,
+  };
+  console.log(teamName);
+  await transporter.sendMail(mailOptions);
+};
 
-//     // 메일 발송
-//     transporter.sendMail(mailOptions, function (error, info) {
-//       if (error) {
-//         console.log(error);
-//       } else {
-//         console.log('Email sent: ' + info.response);
-//       }
-//     });
-//   },
-// };
+export { sendMail };

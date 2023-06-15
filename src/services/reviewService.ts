@@ -163,7 +163,7 @@ class ReviewService {
       throw new AppError(
         "isParticipate is already in status 'true'",
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        "BAD_REQUEST isParticipate is already in status 'true'",
       );
     }
     logger.debug(`matchedApplyVolunteer : ${matchedApplyVolunteer}`);
@@ -191,14 +191,14 @@ class ReviewService {
         throw new AppError(
           '조건에 만족하는 요청이 아닙니다. No changes were made',
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST',
+          'BAD_REQUEST 조건에 만족하는 요청이 아닙니다. No changes were made',
         );
       }
     } else {
       throw new AppError(
         '조건에 만족하는 요청이 아닙니다. No changes were made',
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST',
+        'BAD_REQUEST 조건에 만족하는 요청이 아닙니다. No changes were made',
       );
     }
   }
