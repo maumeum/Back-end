@@ -72,7 +72,6 @@ class UserService {
   }
 
   public async getUserByCondition(condition: {}) {
-    console.log(condition);
     const user = await UserModel.find(condition).select([
       'nickname',
       'role',
