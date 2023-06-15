@@ -44,7 +44,13 @@ class PostCommentService {
     const postCommentList = await PostCommentModel.find({
       post_id: post_id,
     })
-      .populate('user_id', ['nickname', 'uuid', 'authorization', 'nanoid'])
+      .populate('user_id', [
+        'nickname',
+        'uuid',
+        'authorization',
+        'nanoid',
+        'image',
+      ])
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 1 });
