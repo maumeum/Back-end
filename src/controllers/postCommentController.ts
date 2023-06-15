@@ -47,8 +47,11 @@ class PostCommentController {
         Number(skip),
         Number(limit)
       );
+
       const totalCommentCount =
-        await this.postCommentService.getPostListQueryBuilder(postId);
+        await this.postCommentService.getPostListQueryBuilder({
+          post_id: postId,
+        });
       const hasMore = Number(skip) + Number(limit) < totalCommentCount;
 
       res
@@ -73,6 +76,7 @@ class PostCommentController {
         return postId;
       });
 
+      console.log(postList);
       const totalVolunteerCount =
         await this.postCommentService.getPostListQueryBuilder({
           user_id: user_id,
@@ -150,10 +154,22 @@ class PostCommentController {
   //신고된 내역 전체 조회
   public getReportedPostComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
       const reportedPostComment =
-        await this.postCommentService.readReportedPostComment();
+        await this.postCommentService.readReportedPostComment(
+          Number(skip),
+          Number(limit)
+        );
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, reportedPostComment));
+      const totalCommentCount =
+        await this.postCommentService.getPostListQueryBuilder({
+          isReported: true,
+        });
+      const hasMore = Number(skip) + Number(limit) < totalCommentCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { reportedPostComment, hasMore }));
     }
   );
 

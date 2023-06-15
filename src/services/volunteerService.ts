@@ -119,7 +119,6 @@ class VolunteerService {
 
     return counts;
   }
-
   public async readVolunteerById(volunteerId: string) {
     const volunteer = await VolunteerModel.findOne({
       _id: volunteerId,

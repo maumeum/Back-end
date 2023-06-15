@@ -68,13 +68,12 @@ class PostCommentService {
   public async getPostListQueryBuilder(condition: any) {
     let counts = 0;
     if (condition.user_id) {
-      console.log('들어왔다!');
       counts = await PostCommentModel.countDocuments({
         user_id: condition.user_id,
       });
-    } else if (condition.volunteer_id) {
+    } else if (condition.post_id) {
       counts = await PostCommentModel.countDocuments({
-        volunteer_id: condition.volunteer_id,
+        post_id: condition.post_id,
       });
     } else if (condition.isReported) {
       counts = await PostCommentModel.countDocuments({
@@ -142,16 +141,22 @@ class PostCommentService {
   }
 
   public async deleteComments(postId: string) {
-    await PostCommentModel.deleteMany({
+    const deleteList = await PostCommentModel.deleteMany({
       postId: postId,
     });
+
+    console.log(deleteList);
   }
 
   // ===== 관리자 기능 =====
-  public async readReportedPostComment() {
+  public async readReportedPostComment(skip: number, limit: number) {
     const reportedPostComment = await PostCommentModel.find({
       isReported: true,
-    }).select('title content post_id');
+    })
+      .select('title content post_id')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return reportedPostComment;
   }
