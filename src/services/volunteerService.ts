@@ -89,7 +89,7 @@ class VolunteerService {
   ) {
     const volunteerList = await VolunteerModel.find({ statusName: statusName })
       .select(
-        'title centName deadline statusName applyCount registerCount images'
+        'title centName deadline statusName applyCount registerCount images createdAt'
       )
       .populate('register_user_id', ['image', 'nickname'])
       .skip(skip)

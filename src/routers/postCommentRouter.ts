@@ -13,10 +13,11 @@ const postCommentController = makeInstance<PostCommentController>(
 postCommentRouter.post(
   '/postComments',
   loginRequired,
-  postCommentController.postComment
+  postCommentController.postPostComment
 );
 
 // 사용자가 작성한 댓글의 게시글 확인
+// skip, limit
 postCommentRouter.get(
   '/postComments/users',
   loginRequired,
@@ -24,16 +25,17 @@ postCommentRouter.get(
 );
 
 // postId에 해당하는 커뮤니티 댓글 전체 확인
+// skip, limit
 postCommentRouter.get(
   '/postComments/:postId',
-  postCommentController.getComment
+  postCommentController.getPostComment
 );
 
 //작성한 커뮤니티 댓글 수정
 postCommentRouter.patch(
   '/postComments/:postCommentId',
   loginRequired,
-  postCommentController.patchComment
+  postCommentController.patchPostComment
 );
 
 // 작성한 커뮤니티 댓글 신고
@@ -47,7 +49,7 @@ postCommentRouter.patch(
 postCommentRouter.delete(
   '/postComments/:postCommentId',
   loginRequired,
-  postCommentController.deleteComment
+  postCommentController.deletePostComment
 );
 
 // ===== 관리자 기능 ======
@@ -55,6 +57,7 @@ postCommentRouter.delete(
 //adminOnly 추가 예정(테스트 때문에 잠시 빼둠)
 
 // 신고받은 게시글 전체 조회
+// skip, limit
 postCommentRouter.get(
   '/postComments/admins/reports',
   adminOnly,

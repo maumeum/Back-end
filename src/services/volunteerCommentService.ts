@@ -80,12 +80,10 @@ class VolunteerCommentService {
         volunteer_id: condition.volunteer_id,
       });
     } else if (condition.isReported) {
-      console.log('들어왔다!');
       counts = await VolunteerCommentModel.countDocuments({
         isReported: condition.isReported,
       });
     }
-    console.log(counts);
 
     return counts;
   }
