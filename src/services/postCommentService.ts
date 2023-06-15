@@ -17,30 +17,32 @@ interface PostReportData {
 }
 
 class PostCommentService {
-  public async createComment(postCommentData: PostCommentData) {
+  public async createPostComment(postCommentData: PostCommentData) {
     const postComment = await PostCommentModel.create(postCommentData);
     return postComment;
   }
 
-  public async readPostByComment(user_id: ObjectId) {
-    const userComments = await PostCommentModel.find({ user_id }).populate(
-      'post_id',
-      ['title', 'content', 'postType', 'createdAt', 'authorization']
-    );
+  public async readPostByComment(
+    user_id: ObjectId,
+    skip: number,
+    limit: number
+  ) {
+    const userComments = await PostCommentModel.find({ user_id })
+      .populate('post_id', [
+        'title',
+        'content',
+        'postType',
+        'createdAt',
+        'authorization',
+      ])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
-    if (userComments.length === 0) {
-      return [];
-    }
-
-    const postList = userComments.map((userComment) => {
-      const postId = userComment.post_id as Post;
-      return postId;
-    });
-
-    return postList;
+    return userComments;
   }
 
-  public async readComment(post_id: string, skip: number, limit: number) {
+  public async readPostComment(post_id: string, skip: number, limit: number) {
     const postCommentList = await PostCommentModel.find({
       post_id: post_id,
     })
@@ -53,7 +55,7 @@ class PostCommentService {
       ])
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: -1 });
     return postCommentList;
   }
 
@@ -63,12 +65,26 @@ class PostCommentService {
     return postCommentList;
   }
 
-  public async totalCommentCount(post_id: string) {
-    const counts = await PostCommentModel.countDocuments({ post_id: post_id });
+  public async getPostListQueryBuilder(condition: any) {
+    let counts = 0;
+    if (condition.user_id) {
+      counts = await PostCommentModel.countDocuments({
+        user_id: condition.user_id,
+      });
+    } else if (condition.post_id) {
+      counts = await PostCommentModel.countDocuments({
+        post_id: condition.post_id,
+      });
+    } else if (condition.isReported) {
+      counts = await PostCommentModel.countDocuments({
+        isReported: condition.isReported,
+      });
+    }
+
     return counts;
   }
 
-  public async updateComment(
+  public async updatePostComment(
     postCommentId: string,
     postCommentData: PostCommentData
   ) {
@@ -108,7 +124,7 @@ class PostCommentService {
     return true;
   }
 
-  public async deleteComment(postCommentId: string) {
+  public async deletePostComment(postCommentId: string) {
     const deletePostComment = await PostCommentModel.findByIdAndDelete(
       postCommentId
     );
@@ -125,16 +141,22 @@ class PostCommentService {
   }
 
   public async deleteComments(postId: string) {
-    await PostCommentModel.deleteMany({
+    const deleteList = await PostCommentModel.deleteMany({
       postId: postId,
     });
+
+    console.log(deleteList);
   }
 
   // ===== 관리자 기능 =====
-  public async readReportedPostComment() {
+  public async readReportedPostComment(skip: number, limit: number) {
     const reportedPostComment = await PostCommentModel.find({
       isReported: true,
-    }).select('title content post_id');
+    })
+      .select('title content post_id')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return reportedPostComment;
   }

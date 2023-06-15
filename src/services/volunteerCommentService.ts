@@ -17,7 +17,7 @@ interface VolunteerReportData {
 }
 
 class VolunteerCommentService {
-  public async createComment(volunteerComment: VolunteerCommentData) {
+  public async createVolunteerComment(volunteerComment: VolunteerCommentData) {
     const comment = await VolunteerCommentModel.create(volunteerComment);
 
     if (!comment) {
@@ -31,24 +31,19 @@ class VolunteerCommentService {
     return comment;
   }
 
-  public async readVolunteerByComment(user_id: ObjectId) {
+  public async readVolunteerByComment(
+    user_id: ObjectId,
+    skip: number,
+    limit: number
+  ) {
     //이쪽에 스킵리밋 적용.
-    const userComments = await VolunteerCommentModel.find({ user_id }).populate(
-      'volunteer_id',
-      ['title', 'content', 'createdAt']
-    );
+    const userComments = await VolunteerCommentModel.find({ user_id })
+      .populate('volunteer_id', ['title', 'content', 'createdAt'])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
-    if (userComments.length === 0) {
-      return [];
-    }
-
-    const volunteerList = userComments.map((userComment) => {
-      const volunteerId = userComment.volunteer_id as Volunteer;
-
-      return volunteerId;
-    });
-
-    return volunteerList;
+    return userComments;
   }
 
   public async readVolunteerComment(
@@ -80,7 +75,26 @@ class VolunteerCommentService {
     return counts;
   }
 
-  public async updateComment(
+  public async getPostListQueryBuilder(condition: any) {
+    let counts = 0;
+    if (condition.user_id) {
+      counts = await VolunteerCommentModel.countDocuments({
+        user_id: condition.user_id,
+      });
+    } else if (condition.volunteer_id) {
+      counts = await VolunteerCommentModel.countDocuments({
+        volunteer_id: condition.volunteer_id,
+      });
+    } else if (condition.isReported) {
+      counts = await VolunteerCommentModel.countDocuments({
+        isReported: condition.isReported,
+      });
+    }
+
+    return counts;
+  }
+
+  public async updateVolunteerComment(
     volunteerComment_id: string,
     volunteerCommentData: VolunteerCommentData
   ) {
@@ -119,7 +133,7 @@ class VolunteerCommentService {
 
     return true;
   }
-  public async deleteComment(volunteerComment_id: string) {
+  public async deleteVolunteerComment(volunteerComment_id: string) {
     const deletedComment = await VolunteerCommentModel.findByIdAndDelete(
       volunteerComment_id
     );
@@ -136,10 +150,14 @@ class VolunteerCommentService {
   }
 
   // ===== 관리자 기능 =====
-  public async readReportedVolunteerComment() {
+  public async readReportedVolunteerComment(skip: number, limit: number) {
     const reportedVolunteerComment = await VolunteerCommentModel.find({
       isReported: true,
-    }).select('title content');
+    })
+      .select('title content')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createAt: -1 });
     return reportedVolunteerComment;
   }
 

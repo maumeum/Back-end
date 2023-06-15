@@ -75,30 +75,22 @@ class VolunteerApplicationController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id; //봉사를 신청한 사람
       const { status } = req.query;
-      let volunteerStatus = null;
 
-      const applicationVolunteerList =
-        await this.volunteerApplicationService.readApplicationVolunteer(
-          user_id
-        );
-
-      //const volunteerStatus :  = statusCondition(status!.toString(), applicationVolunteerList);
-
+      let isParticipateStatus = false;
       if (status === 'true') {
-        volunteerStatus = applicationVolunteerList.filter(
-          (applicationVolunteer) => {
-            return applicationVolunteer.isParticipate === true;
-          }
-        );
+        // 봉사를 완료한 사람
+        isParticipateStatus = true;
       } else if (status === 'false') {
-        volunteerStatus = applicationVolunteerList.filter(
-          (applicationVolunteer) => {
-            return applicationVolunteer.isParticipate === false;
-          }
-        );
+        isParticipateStatus = false;
       }
 
-      res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerStatus));
+      const volunteerList =
+        await this.volunteerApplicationService.readApplicationVolunteer(
+          user_id,
+          isParticipateStatus
+        );
+
+      res.status(STATUS_CODE.OK).json(buildResponse(null, volunteerList));
     }
   );
 
