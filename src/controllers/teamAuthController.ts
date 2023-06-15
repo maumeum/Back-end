@@ -59,6 +59,18 @@ class TeamAuthController {
     },
   );
 
+  public getTeamAuthByUUID = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { uuid } = req.body;
+      const user = await this.userService.getUserByCondition({ uuid: uuid });
+      const user_id = user[0]._id;
+      const teamAuthInfo = await this.teamAuthService.readTeamAuthByUid(
+        user_id,
+      );
+      res.status(STATUS_CODE.OK).json(buildResponse(null, teamAuthInfo));
+    },
+  );
+
   //관리자가 제출된 팀 인증 다큐먼트들을 확인
   public getSubmittedTeamAuth = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {

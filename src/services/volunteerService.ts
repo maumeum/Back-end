@@ -123,7 +123,12 @@ class VolunteerService {
   public async readVolunteerById(volunteerId: string) {
     const volunteer = await VolunteerModel.findOne({
       _id: volunteerId,
-    });
+    }).populate('register_user_id', [
+      'nickname',
+      'image',
+      'introduction',
+      'uuid',
+    ]);
 
     if (!volunteer) {
       throw new AppError(

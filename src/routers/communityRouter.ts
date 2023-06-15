@@ -28,6 +28,11 @@ communityRouter.get(
 //유저 게시물 검색 //완료
 communityRouter.get("/community/search", communityController.searchPost);
 
+//전체 게시물 검색
+communityRouter.get(
+  "/community/totalsearch",
+  communityController.searchtotalPost
+);
 //유저 게시물 조회 //완료
 communityRouter.get(
   "/community/user",

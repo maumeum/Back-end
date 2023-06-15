@@ -54,7 +54,13 @@ class VolunteerCommentService {
     const volunteerCommentList = await VolunteerCommentModel.find({
       volunteer_id: volunteer_id,
     })
-      .populate('user_id', ['nickname', 'uuid', 'authorization'])
+      .populate('user_id', [
+        'nickname',
+        'uuid',
+        'authorization',
+        'nanoid',
+        'image',
+      ])
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 1 });
