@@ -37,7 +37,7 @@ class Volunteer {
   @prop({ required: true, type: () => [String] })
   public images!: string[];
 
-  @prop({ ref: () => User, _id: false, autopopulate: { select: 'teamName' } })
+  @prop({ ref: () => User, type: () => mongoose.Types.ObjectId })
   public register_user_id?: Ref<User>;
 
   @prop({ required: true, default: false })
