@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class VolunteerComment {
-  @prop({ ref: () => Volunteer, type: mongoose.Types.ObjectId })
+  @prop({ ref: () => Volunteer, type: mongoose.Types.ObjectId, required: true })
   public volunteer_id!: Ref<Volunteer>;
 
   @prop({
@@ -17,6 +17,9 @@ class VolunteerComment {
 
   @prop({ required: true })
   public content!: string;
+
+  @prop({ required: true, default: false })
+  public isReported!: boolean;
 }
 
 export { VolunteerComment };

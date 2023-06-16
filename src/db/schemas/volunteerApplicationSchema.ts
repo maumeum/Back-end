@@ -21,6 +21,9 @@ class VolunteerApplication {
 
   @prop({ required: true, default: false })
   public isParticipate!: boolean;
+
+  @prop({ required: true, default: false })
+  public isReviewed!: boolean;
 }
 
 export { VolunteerApplication };

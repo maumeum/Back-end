@@ -1,10 +1,12 @@
 import { ObjectId } from 'mongodb';
 import { VolunteerApplicationModel } from '../db/index.js';
+import { AppError } from '../misc/AppError.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { commonErrors } from '../misc/commonErrors.js';
 
 interface ApplicationVolunteerData {
   user_id: ObjectId;
   volunteer_id: ObjectId;
-  isParticipate: boolean;
 }
 
 interface doubleCheckApplicationVolunteerData {
@@ -13,65 +15,86 @@ interface doubleCheckApplicationVolunteerData {
 }
 
 class VolunteerApplicationService {
-  static async createApplicationVolunteer({
+  public async createApplicationVolunteer({
     user_id,
     volunteer_id,
-    isParticipate,
   }: ApplicationVolunteerData) {
     //신청 가능여부 체크
 
-    const result = await this.doubleCheckApplicationVolunteer({
+    await VolunteerApplicationModel.create({
       user_id,
       volunteer_id,
     });
 
-    if (result) {
-      const applicationVolunteer = await VolunteerApplicationModel.create({
-        user_id,
-        volunteer_id,
-        isParticipate,
-      });
-
-      // if (!applicationVolunteer) {
-      //   throw new Error('봉사활동 신청에 실패하였습니다.');
-      // }
-
-      return applicationVolunteer;
-    }
+    return true;
   }
 
-  static async readApplicationVolunteer(userId: ObjectId) {
+  public async readApplicationVolunteer(
+    userId: ObjectId,
+    isParticipateStatus: boolean
+  ) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
-    }).populate('volunteer_id', [
-      'title',
-      'centName',
-      'deadline',
-      'statusName',
-      'images',
-    ]);
+      isParticipate: isParticipateStatus,
+    })
+      .populate({
+        path: 'volunteer_id',
+        select: [
+          'title',
+          'centName',
+          'deadline',
+          'endDate',
+          'startDate',
+          'statusName',
+          'images',
+          'register_user_id',
+        ],
+        populate: {
+          path: 'register_user_id',
+          select: ['nickname', 'image', 'authorization'],
+        },
+      })
+      .exec();
 
     return applicationVolunteerList;
   }
 
-  static async doubleCheckApplicationVolunteer({
+  public async doubleCheckApplicationVolunteer({
     user_id,
     volunteer_id,
   }: doubleCheckApplicationVolunteerData) {
-    try {
-      const volunteerApplication = await VolunteerApplicationModel.find({
-        user_id: user_id,
-        volunteer_id: volunteer_id,
-      });
+    const volunteerApplication = await VolunteerApplicationModel.find({
+      user_id: user_id,
+      volunteer_id: volunteer_id,
+    });
 
-      if (volunteerApplication.length !== 0) {
-        throw new Error('이미 신청이 완료된 봉사활동입니다.');
-      }
-
+    if (volunteerApplication.length !== 0) {
       return true;
-    } catch (error) {
-      console.log(error);
     }
+
+    return false;
+  }
+
+  // public async getStockCheck()
+
+  public async readApplicationVolunteerByVId(volunteer_id: ObjectId) {
+    const applicationVolunteerList = await VolunteerApplicationModel.find({
+      volunteer_id: volunteer_id,
+    }).select('isParticipate');
+    return applicationVolunteerList;
+  }
+
+  public async readApplicationVolunteerByCondition(condition: {}) {
+    const checkedApplicationVolunteer = await VolunteerApplicationModel.findOne(
+      condition
+    );
+    return checkedApplicationVolunteer;
+  }
+
+  public async deleteApplicationVolunteer(volunteerApplicationId: string) {
+    await VolunteerApplicationModel.findByIdAndDelete(volunteerApplicationId);
+
+    return true;
   }
 }
 

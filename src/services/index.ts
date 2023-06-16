@@ -3,3 +3,7 @@ export * from './volunteerApplicationService.js';
 export * from './volunteerService.js';
 export * from './communityService.js';
 export * from './reviewService.js';
+export * from './userService.js';
+export * from './postCommentService.js';
+export * from './volunteerCommentService.js';
+export * from './teamAuthService.js';

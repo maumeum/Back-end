@@ -1,91 +1,181 @@
 import { VolunteerCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
 import { Volunteer } from '../db/schemas/volunteerSchema.js';
-import { DateTime } from 'luxon';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface VolunteerCommentData {
-  volunteer_id: ObjectId | string | null;
-  user_id: ObjectId | string | null;
+  volunteer_id: ObjectId;
+  user_id: ObjectId;
   content: string;
-  createdAt: Date;
+  isReported: boolean;
 }
+
+interface VolunteerReportData {
+  isReported: boolean;
+}
+
 class VolunteerCommentService {
-  static async createComment(volunteerComment: VolunteerCommentData) {
+  public async createVolunteerComment(volunteerComment: VolunteerCommentData) {
     const comment = await VolunteerCommentModel.create(volunteerComment);
 
     if (!comment) {
-      throw new Error('댓글 작성에 실패하였습니다.');
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
-    return true;
+    return comment;
   }
 
-  static async readVolunteerByComment(user_id: ObjectId) {
-    const userComments = await VolunteerCommentModel.find({ user_id }).populate(
-      'volunteer_id',
-      ['title', 'content']
-    );
+  public async readVolunteerByComment(
+    user_id: ObjectId,
+    skip: number,
+    limit: number
+  ) {
+    //이쪽에 스킵리밋 적용.
+    const userComments = await VolunteerCommentModel.find({ user_id })
+      .populate('volunteer_id', ['title', 'content', 'createdAt'])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
-    if (userComments.length === 0) {
-      return false;
-    }
+    return userComments;
+  }
 
-    const volunteerList = userComments.map((userComment) => {
-      const volunteerId = userComment.volunteer_id as Volunteer;
-      const userCommentObj = userComment.toObject() as VolunteerCommentData;
-      const createdAt = userCommentObj.createdAt;
+  public async readVolunteerComment(
+    volunteer_id: string,
+    skip: number,
+    limit: number
+  ) {
+    const volunteerCommentList = await VolunteerCommentModel.find({
+      volunteer_id: volunteer_id,
+    })
+      .populate('user_id', [
+        'nickname',
+        'uuid',
+        'authorization',
+        'nanoid',
+        'image',
+      ])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: 1 });
 
-      const volunteerCommentSavedTime = DateTime.fromJSDate(createdAt);
+    return volunteerCommentList;
+  }
 
-      return {
-        title: volunteerId.title,
-        content: volunteerId.content,
-        createdAt: volunteerCommentSavedTime,
-        postType: '봉사모집하기',
-      };
+  public async totalVolunteerCount(volunteer_id: string) {
+    const counts = await VolunteerCommentModel.countDocuments({
+      volunteer_id: volunteer_id,
     });
-
-    return volunteerList;
+    return counts;
   }
 
-  static async readPostComment(volunteerId: string) {
-    const commentList = await VolunteerCommentModel.find({
-      volunteer_id: volunteerId,
-    });
-
-    if (!commentList) {
-      throw new Error('댓글 조회를 실패하였습니다.');
+  public async getPostListQueryBuilder(condition: any) {
+    let counts = 0;
+    if (condition.user_id) {
+      counts = await VolunteerCommentModel.countDocuments({
+        user_id: condition.user_id,
+      });
+    } else if (condition.volunteer_id) {
+      counts = await VolunteerCommentModel.countDocuments({
+        volunteer_id: condition.volunteer_id,
+      });
+    } else if (condition.isReported) {
+      counts = await VolunteerCommentModel.countDocuments({
+        isReported: condition.isReported,
+      });
     }
 
-    return commentList;
+    return counts;
   }
 
-  static async updateComment(
-    volunteerCommentId: string,
+  public async updateVolunteerComment(
+    volunteerComment_id: string,
     volunteerCommentData: VolunteerCommentData
   ) {
-    const newComment = await VolunteerCommentModel.findByIdAndUpdate(
-      volunteerCommentId,
+    const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
+      volunteerComment_id,
       volunteerCommentData
     );
 
-    if (!newComment) {
-      throw new Error('댓글 수정에 실패햐였습니다.');
+    if (!updatedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
     return true;
   }
 
-  static async deleteComment(volunteerCommentId: string) {
-    const comment = await VolunteerCommentModel.findByIdAndDelete(
-      volunteerCommentId
+  public async updateReportComment(
+    volunteerComment_id: string,
+    isReported: VolunteerReportData
+  ) {
+    const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
+      volunteerComment_id,
+      isReported
     );
 
-    if (!comment) {
-      throw new Error('댓글 삭제에 실패하였습니다.');
+    if (!updatedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
     }
 
     return true;
+  }
+  public async deleteVolunteerComment(volunteerComment_id: string) {
+    const deletedComment = await VolunteerCommentModel.findByIdAndDelete(
+      volunteerComment_id
+    );
+
+    if (!deletedComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return deletedComment;
+  }
+
+  // ===== 관리자 기능 =====
+  public async readReportedVolunteerComment(skip: number, limit: number) {
+    const reportedVolunteerComment = await VolunteerCommentModel.find({
+      isReported: true,
+    })
+      .populate('user_id', 'nickname')
+      .select('content volunteer_id')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createAt: -1 });
+    return reportedVolunteerComment;
+  }
+
+  public async deleteReportedVolunteerComment(volunteerComment_id: string) {
+    const volunteerComment = await VolunteerCommentModel.findByIdAndDelete(
+      volunteerComment_id
+    ).populate('user_id', 'reportedTimes');
+
+    if (!volunteerComment) {
+      throw new AppError(
+        commonErrors.resourceNotFoundError,
+        STATUS_CODE.BAD_REQUEST,
+        'BAD_REQUEST'
+      );
+    }
+
+    return volunteerComment;
   }
 }
 

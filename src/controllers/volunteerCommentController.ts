@@ -1,125 +1,242 @@
-import { VolunteerCommentService } from '../services/volunteerCommentService.js';
+import { UserService, VolunteerCommentService } from '../services/index.js';
 import { NextFunction, Request, Response } from 'express';
+import { STATUS_CODE } from '../utils/statusCode.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { makeInstance } from '../utils/makeInstance.js';
+import { buildResponse } from '../utils/builderResponse.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { countReportedTimes } from '../utils/reportedTimesData.js';
+import { Volunteer } from '../db/schemas/volunteerSchema.js';
 
 class VolunteerCommentController {
-  static postComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const volunteerComment = req.body;
-      const result = await VolunteerCommentService.createComment(
-        volunteerComment
-      );
+  private volunteerCommentService = makeInstance<VolunteerCommentService>(
+    VolunteerCommentService
+  );
 
-      if (result) {
-        res.status(200).json({ message: 'created' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
-    }
-  };
+  private userService = makeInstance<UserService>(UserService);
 
-  static getVolunteerByComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public postVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id = req.id;
-      const volunteerComment =
-        await VolunteerCommentService.readVolunteerByComment(user_id);
+      const volunteerBodyData = req.body;
 
-      if (volunteerComment) {
-        res.status(200).json(volunteerComment);
-      } else {
-        res.status(404).json({ status: 'false' });
-      }
-    } catch (error) {
-      next(error);
+      const volunteerData = {
+        ...volunteerBodyData,
+        user_id,
+      };
+
+      await this.volunteerCommentService.createVolunteerComment(volunteerData);
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
-  };
+  );
 
-  static getPostComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public getVolunteerByComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
+      const user_id = req.id;
+      const volunteerComments =
+        await this.volunteerCommentService.readVolunteerByComment(
+          user_id,
+          Number(skip),
+          Number(limit)
+        );
+
+      const volunteerList = volunteerComments.map((volunteerComment) => {
+        const volunteerId = volunteerComment.volunteer_id as Volunteer;
+        return volunteerId;
+      });
+
+      const totalVolunteersCount =
+        await this.volunteerCommentService.getPostListQueryBuilder({
+          user_id: user_id,
+        });
+      const hasMore = Number(skip) + Number(limit) < totalVolunteersCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { volunteerList, hasMore }));
+    }
+  );
+
+  public getVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerId } = req.params;
+      const { skip, limit } = req.query;
 
       if (!volunteerId) {
-        throw new Error('봉사활동에 대한 정보가 없습니다.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
 
-      const commentList = await VolunteerCommentService.readPostComment(
-        volunteerId
-      );
+      const volunteerCommentList =
+        await this.volunteerCommentService.readVolunteerComment(
+          volunteerId,
+          Number(skip),
+          Number(limit)
+        );
 
-      if (commentList) {
-        res.status(200).json(commentList);
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      const totalVolunteerCount =
+        await this.volunteerCommentService.getPostListQueryBuilder({
+          volunteer_id: volunteerId,
+        });
+      const hasMore = Number(skip) + Number(limit) < totalVolunteerCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { volunteerCommentList, hasMore }));
     }
-  };
+  );
 
-  static patchComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public patchVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
-        throw new Error('봉사활동 댓글ID에 대한 정보가 없습니다.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
       const volunteerCommentData = req.body;
-      const newComment = await VolunteerCommentService.updateComment(
+      await this.volunteerCommentService.updateVolunteerComment(
         volunteerCommentId,
         volunteerCommentData
       );
 
-      if (newComment) {
-        res.status(200).json({ message: 'updated' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
-  };
+  );
 
-  static deleteComment = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  public patchReportComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { volunteerCommentId } = req.params;
 
       if (!volunteerCommentId) {
-        throw new Error('봉사활동 댓글ID에 대한 정보가 없습니다.');
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
       }
-      const comment = await VolunteerCommentService.deleteComment(
+
+      await this.volunteerCommentService.updateReportComment(
+        volunteerCommentId,
+        { isReported: true }
+      );
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  public deleteVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerCommentId } = req.params;
+
+      if (!volunteerCommentId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+      await this.volunteerCommentService.deleteVolunteerComment(
         volunteerCommentId
       );
 
-      if (comment) {
-        res.status(201).json({ message: 'deleted' });
-      } else {
-        res.status(404).json({ message: 'error' });
-      }
-    } catch (error) {
-      next(error);
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     }
-  };
+  );
+
+  // ===== 관리자 기능 =====
+
+  // 신고된 내역 전체 조회
+  public getReportedVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { skip, limit } = req.query;
+      const reportedVolunteerComment =
+        await this.volunteerCommentService.readReportedVolunteerComment(
+          Number(skip),
+          Number(limit)
+        );
+
+      const totalVolunteerCount =
+        await this.volunteerCommentService.getPostListQueryBuilder({
+          isReported: true,
+        });
+      const hasMore = Number(skip) + Number(limit) < totalVolunteerCount;
+
+      res
+        .status(STATUS_CODE.OK)
+        .json(buildResponse(null, { reportedVolunteerComment, hasMore }));
+    }
+  );
+
+  // 신고된 내역 반려
+  public patchReportedVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerCommentId } = req.params;
+
+      if (!volunteerCommentId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      await this.volunteerCommentService.updateReportComment(
+        volunteerCommentId,
+        {
+          isReported: false,
+        }
+      );
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
+
+  public deleteReportedVolunteerComment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { volunteerCommentId } = req.params;
+
+      if (!volunteerCommentId) {
+        throw new AppError(
+          commonErrors.resourceNotFoundError,
+          STATUS_CODE.BAD_REQUEST,
+          'BAD_REQUEST'
+        );
+      }
+
+      const deleteVolunteerComment =
+        await this.volunteerCommentService.deleteReportedVolunteerComment(
+          volunteerCommentId
+        );
+
+      //글 작성한 유저정보 가져오기
+      const reportUser = deleteVolunteerComment.user_id;
+
+      const reportUserData = await this.userService.getUserReportedTimes(
+        reportUser!
+      );
+
+      let isDisabledUser;
+
+      if (reportUserData) {
+        isDisabledUser = countReportedTimes(reportUserData);
+      }
+
+      if (isDisabledUser) {
+        await this.userService.updateReportedTimes(reportUser!, isDisabledUser);
+      }
+
+      res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
+    }
+  );
 }
 
 export { VolunteerCommentController };

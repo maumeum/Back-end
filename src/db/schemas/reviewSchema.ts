@@ -24,6 +24,9 @@ class Review {
 
   @prop({ ref: () => Volunteer, type: () => mongoose.Types.ObjectId })
   public volunteer_id?: Ref<Volunteer>;
+
+  @prop({ required: true, default: false })
+  public isReported!: boolean;
 }
 
 export { Review };

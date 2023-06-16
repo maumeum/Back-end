@@ -6,6 +6,7 @@ import { Review } from './schemas/reviewSchema.js';
 import { Volunteer } from './schemas/volunteerSchema.js';
 import { PostComment } from './schemas/postCommentSchema.js';
 import { VolunteerApplication } from './schemas/volunteerApplicationSchema.js';
+import { TeamAuth } from './schemas/teamAuthSchema.js';
 
 const UserModel = getModelForClass(User);
 const VolunteerCommentModel = getModelForClass(VolunteerComment);
@@ -14,6 +15,7 @@ const ReviewModel = getModelForClass(Review);
 const VolunteerModel = getModelForClass(Volunteer);
 const PostCommentModel = getModelForClass(PostComment);
 const VolunteerApplicationModel = getModelForClass(VolunteerApplication);
+const TeamAuthModel = getModelForClass(TeamAuth);
 
 export {
   UserModel,
@@ -23,4 +25,5 @@ export {
   VolunteerModel,
   PostCommentModel,
   VolunteerApplicationModel,
+  TeamAuthModel,
 };

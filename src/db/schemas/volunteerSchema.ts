@@ -10,29 +10,23 @@ class Volunteer {
   @prop({ required: true })
   public content!: string;
 
-  @prop({ required: true })
-  public centName!: string;
-
-  @prop()
-  public centDescription?: string;
-
   @prop({ required: true, default: '모집중' })
   public statusName!: string;
 
-  @prop({ type: Date })
-  public deadline?: Date;
+  @prop({ required: true, type: Date })
+  public deadline!: Date;
 
-  @prop({ type: Date })
+  @prop({ required: true, type: Date })
   public startDate!: Date;
 
-  @prop({ type: Date })
+  @prop({ required: true, type: Date })
   public endDate!: Date;
 
-  @prop()
-  public applyCount?: number;
+  @prop({ required: true, default: 0 })
+  public applyCount!: number;
 
-  @prop()
-  public registerCount?: number;
+  @prop({ required: true })
+  public registerCount!: number;
 
   @prop({ required: true })
   public actType!: string;
@@ -45,6 +39,9 @@ class Volunteer {
 
   @prop({ ref: () => User, type: () => mongoose.Types.ObjectId })
   public register_user_id?: Ref<User>;
+
+  @prop({ required: true, default: false })
+  public isReported!: boolean;
 }
 
 export { Volunteer };

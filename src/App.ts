@@ -9,16 +9,19 @@ import {
   volunteerApplicationRouter,
   communityRouter,
   reviewRouter,
+  teamAuthRouter,
 } from './routers/index.js';
 import { volunteerCommentRouter } from './routers/volunteerCommentRouter.js';
 import { postCommentRouter } from './routers/postCommentRouter.js';
+import { error } from 'console';
+import { logger } from './utils/logger.js';
+import morgan from 'morgan';
 
 dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
 app.use('/', express.static(path.join(__dirname, 'public')));
-
 app.use(cors()); //cors에러 방지
 app.use(express.json()); // 바디파서
 app.use(express.urlencoded({ extended: true }));
@@ -27,26 +30,53 @@ app.use(express.urlencoded({ extended: true }));
 const DB_URL =
   process.env.MONGODB_URL ||
   'MongoDB 서버 주소가 설정되지 않았거나, env 파일도 필요합니다.\n';
-mongoose.connect(DB_URL, { dbName: 'maum' });
+
+let dbName = 'maum';
+let serverType = 'DEVELOPMENT';
+
+if (process.env.NODE_ENV === 'production') {
+  dbName = 'maum-production';
+  serverType = 'PRODUCTION';
+}
+
+mongoose.connect(DB_URL, { dbName });
 const db = mongoose.connection;
+
 db.on('connected', () =>
-  console.log('정상적으로 MongoDB 서버에 연결되었습니다.  ' + DB_URL),
+  logger.info(`정상적으로 MongoDB ${serverType} 서버에 연결되었습니다.`),
 );
 db.on('error', (error) =>
-  console.error('\nMongoDB 연결에 실패하였습니다...\n' + DB_URL + '\n' + error),
+  logger.info('\nMongoDB 연결에 실패하였습니다...\n' + error),
 );
 
 app.use('/api', userRouter);
 app.use('/api', volunteerRouter);
 app.use('/api', volunteerApplicationRouter);
 app.use('/api', volunteerCommentRouter);
-app.use('/commuities', communityRouter);
+app.use('/api', communityRouter);
 app.use('/api', postCommentRouter);
 app.use('/api', reviewRouter);
+app.use('/api', teamAuthRouter);
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-}); // 마지막에 붙이는 에러핸들러
+// app.use(
+//   morgan('common', {
+//     stream: { write: (message) => logger.info(message.trim()) },
+//   }),
+// );
+
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  // @ts-ignore
+  res.statusCode = error.httpCode ?? 500;
+  logger.error({
+    message: error.message,
+    name: error.name,
+    stack: error.stack,
+  });
+  res.json({
+    name: error.name,
+    httpMessage: error.message,
+    data: null,
+  });
+});
 
 export { app };
