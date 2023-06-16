@@ -17,7 +17,7 @@ teamAuthRouter.post(
 //일반 유저가 본인의 정보를 조회
 teamAuthRouter.get('/team/auth', loginRequired, teamAuthController.getTeamAuth);
 
-teamAuthRouter.get('/team/detail', teamAuthController.getTeamAuthByUUID);
+teamAuthRouter.post('/team/detail', teamAuthController.getTeamAuthByUUID);
 
 //관리자가 팀 인증 요청을 전체 조회하는것
 teamAuthRouter.get(
