@@ -1,6 +1,5 @@
 import { VolunteerCommentModel } from '../db/index.js';
 import { ObjectId } from 'mongodb';
-import { Volunteer } from '../db/schemas/volunteerSchema.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
@@ -24,7 +23,7 @@ class VolunteerCommentService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -34,7 +33,7 @@ class VolunteerCommentService {
   public async readVolunteerByComment(
     user_id: ObjectId,
     skip: number,
-    limit: number
+    limit: number,
   ) {
     //이쪽에 스킵리밋 적용.
     const userComments = await VolunteerCommentModel.find({ user_id })
@@ -49,7 +48,7 @@ class VolunteerCommentService {
   public async readVolunteerComment(
     volunteer_id: string,
     skip: number,
-    limit: number
+    limit: number,
   ) {
     const volunteerCommentList = await VolunteerCommentModel.find({
       volunteer_id: volunteer_id,
@@ -96,18 +95,18 @@ class VolunteerCommentService {
 
   public async updateVolunteerComment(
     volunteerComment_id: string,
-    volunteerCommentData: VolunteerCommentData
+    volunteerCommentData: VolunteerCommentData,
   ) {
     const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
       volunteerComment_id,
-      volunteerCommentData
+      volunteerCommentData,
     );
 
     if (!updatedComment) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -116,18 +115,18 @@ class VolunteerCommentService {
 
   public async updateReportComment(
     volunteerComment_id: string,
-    isReported: VolunteerReportData
+    isReported: VolunteerReportData,
   ) {
     const updatedComment = await VolunteerCommentModel.findByIdAndUpdate(
       volunteerComment_id,
-      isReported
+      isReported,
     );
 
     if (!updatedComment) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -135,14 +134,14 @@ class VolunteerCommentService {
   }
   public async deleteVolunteerComment(volunteerComment_id: string) {
     const deletedComment = await VolunteerCommentModel.findByIdAndDelete(
-      volunteerComment_id
+      volunteerComment_id,
     );
 
     if (!deletedComment) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -164,14 +163,14 @@ class VolunteerCommentService {
 
   public async deleteReportedVolunteerComment(volunteerComment_id: string) {
     const volunteerComment = await VolunteerCommentModel.findByIdAndDelete(
-      volunteerComment_id
+      volunteerComment_id,
     ).populate('user_id', 'reportedTimes');
 
     if (!volunteerComment) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 

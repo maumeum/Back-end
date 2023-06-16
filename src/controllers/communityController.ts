@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 import { CommunityService } from '../services/communityService.js';
-import fs from 'fs';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
 import { buildResponse } from '../utils/builderResponse.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
-import { logger } from '../utils/logger.js';
 import { makeInstance } from '../utils/makeInstance.js';
 import { UserService } from '../services/userService.js';
 import { countReportedTimes } from '../utils/reportedTimesData.js';
@@ -73,7 +71,7 @@ export class CommunityController {
 
     const posts = await this.communityService.findAllPost(
       Number(skip),
-      Number(limit)
+      Number(limit),
     );
     const totalReviewsCount = await this.communityService.totalReviewsCount();
 
@@ -92,7 +90,7 @@ export class CommunityController {
       keyword as string,
       posttype as string,
       Number(skip),
-      Number(limit)
+      Number(limit),
     );
     const totalReviewsCount = await this.communityService.totalReviewsCount();
 
@@ -104,7 +102,7 @@ export class CommunityController {
     const posts = await this.communityService.searchPosts(
       keyword as string,
       Number(skip),
-      Number(limit)
+      Number(limit),
     );
     const totalReviewsCount =
       await this.communityService.totalCategoryReviewsCount1(keyword as string);
@@ -121,7 +119,7 @@ export class CommunityController {
     const post = await this.communityService.indByPostIdPost(
       id,
       Number(skip),
-      Number(limit)
+      Number(limit),
     );
     const user = await this.communityService.findUserByPostId(id);
 
@@ -172,13 +170,13 @@ export class CommunityController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       const categoryPost = await this.communityService.getPostByCat(
         category,
         Number(skip),
-        Number(limit)
+        Number(limit),
       );
       const totalReviewsCount =
         await this.communityService.totalCategoryReviewsCount(category);
@@ -187,7 +185,7 @@ export class CommunityController {
       res
         .status(STATUS_CODE.OK)
         .json(buildResponse(null, { categoryPost, hasMore }));
-    }
+    },
   );
 
   // 특정 게시물 신고
@@ -198,7 +196,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -215,7 +213,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.argumentError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -233,7 +231,7 @@ export class CommunityController {
       throw new AppError(
         commonErrors.requestValidationError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -250,7 +248,7 @@ export class CommunityController {
         await this.communityService.readReportedCommunity();
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, reportedCommunity));
-    }
+    },
   );
 
   public patchReportedCommunity = asyncHandler(
@@ -261,7 +259,7 @@ export class CommunityController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -270,7 +268,7 @@ export class CommunityController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public deleteReportedCommunity = asyncHandler(
@@ -281,7 +279,7 @@ export class CommunityController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -292,7 +290,7 @@ export class CommunityController {
       const reportUser = deleteCommunity.user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
-        reportUser!
+        reportUser!,
       );
 
       let isDisabledUser;
@@ -306,6 +304,6 @@ export class CommunityController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 }

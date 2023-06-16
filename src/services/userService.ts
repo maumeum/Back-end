@@ -7,9 +7,6 @@ import { STATUS_CODE } from '../utils/statusCode.js';
 import { AppError } from '../misc/AppError.js';
 import { Ref } from '@typegoose/typegoose';
 import { User } from '../db/schemas/userSchema.js';
-import { logger } from '../utils/logger.js';
-
-//인터페이스 분리해서 작성
 interface UserInfo {
   user_id?: ObjectId;
   nickname?: string;

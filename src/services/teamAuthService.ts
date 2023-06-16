@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { TeamAuthModel } from '../db/index.js';
-import { logger } from '../utils/logger.js';
 
 interface teamAuth {
   _id?: ObjectId;

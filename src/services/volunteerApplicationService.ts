@@ -1,8 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { VolunteerApplicationModel } from '../db/index.js';
-import { AppError } from '../misc/AppError.js';
-import { STATUS_CODE } from '../utils/statusCode.js';
-import { commonErrors } from '../misc/commonErrors.js';
 
 interface ApplicationVolunteerData {
   user_id: ObjectId;
@@ -31,7 +28,7 @@ class VolunteerApplicationService {
 
   public async readApplicationVolunteer(
     userId: ObjectId,
-    isParticipateStatus: boolean
+    isParticipateStatus: boolean,
   ) {
     const applicationVolunteerList = await VolunteerApplicationModel.find({
       user_id: userId,
@@ -86,7 +83,7 @@ class VolunteerApplicationService {
 
   public async readApplicationVolunteerByCondition(condition: {}) {
     const checkedApplicationVolunteer = await VolunteerApplicationModel.findOne(
-      condition
+      condition,
     );
     return checkedApplicationVolunteer;
   }
