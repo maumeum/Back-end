@@ -22,11 +22,7 @@ class PostCommentService {
     return postComment;
   }
 
-  public async readPostByComment(
-    user_id: ObjectId,
-    skip: number,
-    limit: number
-  ) {
+  public async readPostByComment(user_id: ObjectId) {
     const userComments = await PostCommentModel.find({ user_id })
       .populate('post_id', [
         'title',
@@ -35,8 +31,6 @@ class PostCommentService {
         'createdAt',
         'authorization',
       ])
-      .skip(skip)
-      .limit(limit)
       .sort({ createdAt: -1 });
 
     return userComments;
@@ -67,11 +61,14 @@ class PostCommentService {
 
   public async getPostListQueryBuilder(condition: any) {
     let counts = 0;
+    /*
     if (condition.user_id) {
       counts = await PostCommentModel.countDocuments({
         user_id: condition.user_id,
       });
-    } else if (condition.post_id) {
+    } 
+    */
+    if (condition.post_id) {
       counts = await PostCommentModel.countDocuments({
         post_id: condition.post_id,
       });

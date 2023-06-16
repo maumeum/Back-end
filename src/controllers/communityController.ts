@@ -138,7 +138,7 @@ export class CommunityController {
 
       if (req.files) {
         const files = (req as MulterRequest).files;
-        console.log(files);
+
         const newPath = files.map((v: any) => {
           return v.path.replace('public/', '');
         });

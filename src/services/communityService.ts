@@ -1,8 +1,8 @@
-import { Ref } from "@typegoose/typegoose";
-import { PostCommentModel, PostModel, UserModel } from "../db/index.js";
-import { AppError } from "../misc/AppError.js";
-import { commonErrors } from "../misc/commonErrors.js";
-import { STATUS_CODE } from "../utils/statusCode.js";
+import { Ref } from '@typegoose/typegoose';
+import { PostCommentModel, PostModel, UserModel } from '../db/index.js';
+import { AppError } from '../misc/AppError.js';
+import { commonErrors } from '../misc/commonErrors.js';
+import { STATUS_CODE } from '../utils/statusCode.js';
 
 interface communityReportData {
   isReported: boolean;
@@ -48,23 +48,20 @@ export class CommunityService {
   }
 
   public async findAllPost(skip: number, limit: number) {
-    console.log(skip, limit);
-
     const posts = await PostModel.find()
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 })
-      .populate("user_id", ["nickname", "uuid"]);
+      .populate('user_id', ['nickname', 'uuid']);
     return posts;
   }
   //수정한곳
   public async getPostByCat(category: string, skip: number, limit: number) {
-    console.log(category);
     return await PostModel.find({ postType: category })
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 })
-      .populate("user_id", ["nickname", "uuid"]);
+      .populate('user_id', ['nickname', 'uuid']);
   }
 
   public async searchPost(
@@ -82,7 +79,7 @@ export class CommunityService {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 })
-      .populate("user_id", ["nickname", "uuid"]);
+      .populate('user_id', ['nickname', 'uuid']);
     return posts;
   }
 
@@ -96,7 +93,7 @@ export class CommunityService {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 })
-      .populate("user_id", ["nickname", "uuid"]);
+      .populate('user_id', ['nickname', 'uuid']);
     return posts;
   }
   public async indByPostIdPost(id: string, skip: number, limit: number) {
@@ -104,7 +101,7 @@ export class CommunityService {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 })
-      .populate("user_id", ["nickname", "nanoid"]);
+      .populate('user_id', ['nickname', 'nanoid']);
     const user = await UserModel.findOne({ _id: post!.user_id });
     const total = {
       user: user!.nickname,
@@ -126,7 +123,7 @@ export class CommunityService {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST'
       );
     }
 
@@ -172,10 +169,10 @@ export class CommunityService {
     );
   }
   public async getUserPosts(id: string) {
-    return await PostModel.find({ user_id: id }).populate("user_id", [
-      "nickname",
-      "authorization",
-      "uuid",
+    return await PostModel.find({ user_id: id }).populate('user_id', [
+      'nickname',
+      'authorization',
+      'uuid',
     ]);
   }
 
@@ -184,21 +181,21 @@ export class CommunityService {
   public async readReportedCommunity() {
     const reportedCommunity = await PostModel.find({
       isReported: true,
-    }).select("title content");
+    }).select('title content');
 
     return reportedCommunity;
   }
   public async deleteReportedCommunity(community_id: string) {
     const community = await PostModel.findByIdAndDelete(community_id).populate(
-      "user_id",
-      "reportedTimes"
+      'user_id',
+      'reportedTimes'
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        "BAD_REQUEST"
+        'BAD_REQUEST'
       );
     }
 

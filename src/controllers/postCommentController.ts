@@ -62,13 +62,11 @@ class PostCommentController {
 
   public getPostByComment = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { skip, limit } = req.query;
+      //const { skip, limit } = req.query;
       const user_id = req.id;
 
       const postComments = await this.postCommentService.readPostByComment(
-        user_id,
-        Number(skip),
-        Number(limit)
+        user_id
       );
 
       const postList = postComments.map((postComment) => {
@@ -76,16 +74,15 @@ class PostCommentController {
         return postId;
       });
 
-      console.log(postList);
+      /*
       const totalVolunteerCount =
         await this.postCommentService.getPostListQueryBuilder({
           user_id: user_id,
         });
       const hasMore = Number(skip) + Number(limit) < totalVolunteerCount;
+      */
 
-      res
-        .status(STATUS_CODE.OK)
-        .json(buildResponse(null, { postList, hasMore }));
+      res.status(STATUS_CODE.OK).json(buildResponse(null, postList));
     }
   );
 

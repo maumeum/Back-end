@@ -57,7 +57,6 @@ class VolunteerController {
         };
       }
 
-      console.log(volunteerData);
       await this.volunteerService.createVolunteer(volunteerData);
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
     },
