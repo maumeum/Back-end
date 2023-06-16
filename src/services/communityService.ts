@@ -1,4 +1,3 @@
-import { Ref } from '@typegoose/typegoose';
 import { PostCommentModel, PostModel, UserModel } from '../db/index.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
@@ -55,7 +54,7 @@ export class CommunityService {
       .populate('user_id', ['nickname', 'uuid']);
     return posts;
   }
-  //수정한곳
+
   public async getPostByCat(category: string, skip: number, limit: number) {
     return await PostModel.find({ postType: category })
       .skip(skip)
@@ -68,7 +67,7 @@ export class CommunityService {
     keyword: string,
     posttype: string,
     skip: number,
-    limit: number
+    limit: number,
   ) {
     const options = [{ title: { $regex: `${keyword}` } }];
 
@@ -112,18 +111,18 @@ export class CommunityService {
 
   public async updateReportPost(
     communityId: string,
-    communityData: communityReportData
+    communityData: communityReportData,
   ) {
     const community = await PostModel.findByIdAndUpdate(
       communityId,
-      communityData
+      communityData,
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 
@@ -155,7 +154,7 @@ export class CommunityService {
       content: string;
       images?: string;
       postType: string;
-    }
+    },
   ) {
     return await PostModel.findOneAndUpdate(
       { _id: id },
@@ -165,7 +164,7 @@ export class CommunityService {
         images,
         postType,
       },
-      { new: true }
+      { new: true },
     );
   }
   public async getUserPosts(id: string) {
@@ -188,14 +187,14 @@ export class CommunityService {
   public async deleteReportedCommunity(community_id: string) {
     const community = await PostModel.findByIdAndDelete(community_id).populate(
       'user_id',
-      'reportedTimes'
+      'reportedTimes',
     );
 
     if (!community) {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
 

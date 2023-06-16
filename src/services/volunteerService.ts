@@ -1,13 +1,8 @@
 import { ObjectId } from 'mongodb';
-import {
-  TeamAuthModel,
-  VolunteerApplicationModel,
-  VolunteerModel,
-} from '../db/index.js';
+import { TeamAuthModel, VolunteerModel } from '../db/index.js';
 import { AppError } from '../misc/AppError.js';
 import { commonErrors } from '../misc/commonErrors.js';
 import { STATUS_CODE } from '../utils/statusCode.js';
-import { logger } from '../utils/logger.js';
 import { searchOption } from '../utils/searchOptions.js';
 
 interface VolunteerData {
