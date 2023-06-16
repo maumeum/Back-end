@@ -19,7 +19,7 @@ const sendMail = async (email: String, nickname: String, teamName: string) => {
     <a href="http://kdt-sw-4-team01.elicecoding.com/">http://kdt-sw-4-team01.elicecoding.com/</a>
   `,
   };
-  console.log(teamName);
+
   await transporter.sendMail(mailOptions);
 };
 

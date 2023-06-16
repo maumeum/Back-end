@@ -76,7 +76,6 @@ class PostCommentController {
         return postId;
       });
 
-      console.log(postList);
       const totalVolunteerCount =
         await this.postCommentService.getPostListQueryBuilder({
           user_id: user_id,
