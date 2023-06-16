@@ -173,7 +173,21 @@ class VolunteerService {
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    return volunteerList;
+    const updatedVolunteerList = await Promise.all(
+      volunteerList.map(async (volunteer) => {
+        const userId = volunteer.register_user_id;
+        const teamAuth = await TeamAuthModel.findOne({
+          user_id: userId,
+        }).select('teamName');
+        const teamName = teamAuth ? teamAuth.teamName : null;
+        return {
+          ...volunteer.toObject(),
+          teamName,
+        };
+      }),
+    );
+
+    return updatedVolunteerList;
   }
 
   public async readRegistrationVolunteer(
