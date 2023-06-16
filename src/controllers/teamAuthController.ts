@@ -7,7 +7,6 @@ import { STATUS_CODE } from '../utils/statusCode.js';
 import { buildResponse } from '../utils/builderResponse.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { ObjectId } from 'mongodb';
-import { logger } from '../utils/logger.js';
 import { sendMail } from '../middlewares/nodeMailer.js';
 
 class TeamAuthController {

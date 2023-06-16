@@ -15,8 +15,6 @@ import { logger } from '../utils/logger.js';
 import { countReportedTimes } from '../utils/reportedTimesData.js';
 
 interface MyFile extends Express.Multer.File {
-  // 추가적인 사용자 정의 속성을 선언할 수도 있습니다
-  // 예: 필요한 경우 가공된 파일 경로 등
   processedPath: string;
 }
 
@@ -40,7 +38,7 @@ class ReviewController {
       const user_id = req.id;
       const reviews = await this.reviewService.getReviewsByUserId(user_id);
       res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
-    }
+    },
   );
 
   public readReviewDetail = asyncHandler(
@@ -50,7 +48,7 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       const review = await this.reviewService.getReviewById(review_id);
@@ -58,11 +56,11 @@ class ReviewController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       res.status(STATUS_CODE.OK).json(buildResponse(null, review));
-    }
+    },
   );
 
   public readReview = asyncHandler(
@@ -71,7 +69,7 @@ class ReviewController {
 
       const reviews = await this.reviewService.getReviews(
         Number(skip),
-        Number(limit)
+        Number(limit),
       );
       const totalReviewsCount = await this.reviewService.totalReviewsCount();
       logger.debug(`totalReviewsCount : ${totalReviewsCount}`);
@@ -84,14 +82,14 @@ class ReviewController {
       res
         .status(STATUS_CODE.OK)
         .json(buildResponse(null, { reviews, hasMore }));
-    }
+    },
   );
 
   public readRandomReviews = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const reviews = await this.reviewService.getRandomReviews();
       res.status(STATUS_CODE.OK).json(buildResponse(null, reviews));
-    }
+    },
   );
 
   public postReview = asyncHandler(
@@ -107,7 +105,7 @@ class ReviewController {
 
       const volunteer =
         await this.volunteerApplicationService.readApplicationVolunteerByCondition(
-          { user_id, volunteer_id }
+          { user_id, volunteer_id },
         );
       logger.debug(`volunteer : ${volunteer}`);
 
@@ -120,7 +118,7 @@ class ReviewController {
         throw new AppError(
           `${commonErrors.requestValidationError} : 참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.`,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST  참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.'
+          'BAD_REQUEST  참여 확인 버튼을 누르지 않았거나, 봉사가 끝난 날로부터 7일이 지나지 않았습니다.',
         );
       }
 
@@ -134,7 +132,7 @@ class ReviewController {
 
       const applicationVolunteer =
         await this.volunteerApplicationService.readApplicationVolunteerByCondition(
-          { user_id, volunteer_id }
+          { user_id, volunteer_id },
         );
 
       if (applicationVolunteer) {
@@ -143,7 +141,7 @@ class ReviewController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, createdReview));
-    }
+    },
   );
 
   public updateReview = asyncHandler(
@@ -153,7 +151,7 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       const files = (req.files as MyFile[]) || [];
@@ -175,10 +173,10 @@ class ReviewController {
 
       const updatedReview = await this.reviewService.updateReview(
         review_id,
-        updateInfo
+        updateInfo,
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, updatedReview));
-    }
+    },
   );
 
   //리뷰 신고
@@ -190,7 +188,7 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -199,17 +197,17 @@ class ReviewController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   public getSearchReviews = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { keyword } = req.query;
       const searchReviews = await this.reviewService.readSearchReviews(
-        keyword as string
+        keyword as string,
       );
       res.status(STATUS_CODE.OK).json(buildResponse(null, searchReviews));
-    }
+    },
   );
 
   public checkUser = asyncHandler(async (req: Request, res: Response) => {
@@ -219,7 +217,7 @@ class ReviewController {
       throw new AppError(
         commonErrors.resourceNotFoundError,
         STATUS_CODE.BAD_REQUEST,
-        'BAD_REQUEST'
+        'BAD_REQUEST',
       );
     }
     const review = await this.reviewService.getReviewById(review_id);
@@ -240,12 +238,12 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       await this.reviewService.deleteReview(review_id);
       res.status(STATUS_CODE.OK).json(buildResponse(null, null));
-    }
+    },
   );
 
   public changeParticipationStatus = asyncHandler(
@@ -257,15 +255,15 @@ class ReviewController {
         throw new AppError(
           commonErrors.argumentError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
       const changed = await this.reviewService.changeParticipateStatus(
         volunteer_id,
-        user_id
+        user_id,
       );
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, changed));
-    }
+    },
   );
 
   // ===== 관리자 기능 =====
@@ -275,7 +273,7 @@ class ReviewController {
       const reportedReview = await this.reviewService.readReportedReview();
 
       res.status(STATUS_CODE.OK).json(buildResponse(null, reportedReview));
-    }
+    },
   );
 
   // 신고된 내역 취소(반려)
@@ -287,7 +285,7 @@ class ReviewController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
@@ -296,7 +294,7 @@ class ReviewController {
       });
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 
   // 신고된 내역 승인
@@ -308,19 +306,19 @@ class ReviewController {
         throw new AppError(
           commonErrors.resourceNotFoundError,
           STATUS_CODE.BAD_REQUEST,
-          'BAD_REQUEST'
+          'BAD_REQUEST',
         );
       }
 
       const deleteReview = await this.reviewService.deleteReportedReview(
-        review_id
+        review_id,
       );
 
       //글 작성한 유저정보 가져오기
       const reportUser = deleteReview.user_id;
 
       const reportUserData = await this.userService.getUserReportedTimes(
-        reportUser!
+        reportUser!,
       );
 
       let isDisabledUser;
@@ -334,7 +332,7 @@ class ReviewController {
       }
 
       res.status(STATUS_CODE.CREATED).json(buildResponse(null, null));
-    }
+    },
   );
 }
 export { ReviewController };
